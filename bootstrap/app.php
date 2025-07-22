@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Remove EnsureFrontendRequestsAreStateful as it might be causing the issue
+        // Remove EnsureFrontendRequestsAreStateful as it's causing redirect issues
         // $middleware->api(prepend: [
         //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         // ]);

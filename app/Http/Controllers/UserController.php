@@ -29,7 +29,12 @@ class UserController extends Controller
         \Log::info('Profile update request received', [
             'user_id' => $user->id,
             'request_data' => $request->all(),
-            'has_file' => $request->hasFile('profile_picture')
+            'request_method' => $request->method(),
+            'content_type' => $request->header('Content-Type'),
+            'has_file' => $request->hasFile('profile_picture'),
+            'name_field' => $request->input('name'),
+            'name_field_exists' => $request->has('name'),
+            'all_inputs' => $request->all()
         ]);
         
         $request->validate([
@@ -40,10 +45,11 @@ class UserController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $user->name = $request->name;
-        $user->phone = $request->phone;
-        $user->company = $request->company;
-        $user->bio = $request->bio;
+        // Update user data
+        $user->name = $request->input('name');
+        $user->phone = $request->input('phone');
+        $user->company = $request->input('company');
+        $user->bio = $request->input('bio');
 
         // Handle profile picture upload
         if ($request->hasFile('profile_picture')) {

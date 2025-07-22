@@ -294,6 +294,7 @@
 <script>
 import Navigation from '../shared/Navigation.vue'
 import { showDeleteConfirm, showSuccess, showError } from '../../utils/sweetalert.js'
+import axios from 'axios'
 
 export default {
   name: 'UserAssistants',
@@ -372,27 +373,19 @@ export default {
     async loadAssistants() {
       try {
         this.loading = true;
-        const params = new URLSearchParams({
+        const params = {
           sort_by: this.sortBy,
           sort_order: this.sortOrder,
           search: this.searchQuery
-        });
+        };
 
-        const response = await fetch(`/api/assistants?${params.toString()}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          this.assistants = data.data || [];
-        } else {
-          console.error('Failed to load assistants');
-        }
+        const response = await axios.get('/api/assistants', { params });
+        this.assistants = response.data.data || [];
       } catch (error) {
         console.error('Error loading assistants:', error);
+        if (error.response && error.response.status === 401) {
+          this.$router.push('/login');
+        }
       } finally {
         this.loading = false;
       }
@@ -411,19 +404,8 @@ export default {
       this.showStatsModal = true;
       
       try {
-        const response = await fetch(`/api/assistants/${assistant.vapi_assistant_id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          this.stats = data.data.vapi_data?.stats || null;
-        } else {
-          this.stats = null;
-        }
+        const response = await axios.get(`/api/assistants/${assistant.vapi_assistant_id}`);
+        this.stats = response.data.data.vapi_data?.stats || null;
       } catch (error) {
         console.error('Error loading stats:', error);
         this.stats = null;
@@ -443,22 +425,16 @@ export default {
       try {
         this.deletingAssistant = assistantId; // Set loading state
         console.log('Deleting assistant:', assistantId);
-        const response = await fetch(`/api/assistants/${assistantId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        const response = await axios.delete(`/api/assistants/${assistantId}`);
         
         console.log('Delete response status:', response.status);
         
-        if (response.ok) {
-            const result = await response.json();
+        if (response.status === 200) {
+            const result = response.data;
             console.log('Delete successful:', result);
             await this.loadAssistants();
         } else {
-          const errorData = await response.json();
+          const errorData = response.data;
           console.error('Failed to delete assistant:', errorData);
           await showError('Delete Failed', errorData.message || 'Failed to delete assistant. Please try again.');
         }

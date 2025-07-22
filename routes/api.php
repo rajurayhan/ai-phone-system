@@ -16,10 +16,6 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 // Authentication routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -114,4 +110,17 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
             'data' => []
         ]);
     });
+});
+
+// Test route for debugging request headers
+Route::post('/test-headers', function (Request $request) {
+    return response()->json([
+        'success' => true,
+        'headers' => $request->headers->all(),
+        'method' => $request->method(),
+        'url' => $request->url(),
+        'has_csrf' => $request->hasHeader('X-CSRF-TOKEN'),
+        'has_authorization' => $request->hasHeader('Authorization'),
+        'content_type' => $request->header('Content-Type')
+    ]);
 });

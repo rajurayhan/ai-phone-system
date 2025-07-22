@@ -195,7 +195,8 @@
 
 <script>
 import Navigation from '../shared/Navigation.vue'
-import { showError } from '../../utils/sweetalert.js'
+import { showError, showSuccess } from '../../utils/sweetalert.js'
+import axios from 'axios'
 
 export default {
   name: 'Profile',
@@ -206,7 +207,7 @@ export default {
     return {
       loading: false,
       passwordLoading: false,
-      user: JSON.parse(localStorage.getItem('user') || '{}'),
+      user: {},
       form: {
         name: '',
         email: '',
@@ -228,112 +229,127 @@ export default {
     }
   },
   mounted() {
-    this.loadUserData();
+    this.fetchUserData();
   },
   methods: {
-    loadUserData() {
-      this.form = {
-        name: this.user.name || '',
-        email: this.user.email || '',
-        phone: this.user.phone || '',
-        company: this.user.company || '',
-        bio: this.user.bio || ''
-      };
+    async fetchUserData() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        await showError('Authentication Error', 'No authentication token found. Please log in again.');
+        this.$router.push('/login');
+        return;
+      }
+      try {
+        const response = await axios.get('/api/user', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        this.user = response.data.data;
+        this.form = {
+          name: this.user.name || '',
+          email: this.user.email || '',
+          phone: this.user.phone || '',
+          company: this.user.company || '',
+          bio: this.user.bio || ''
+        };
+        localStorage.setItem('user', JSON.stringify(this.user));
+      } catch (error) {
+        await showError('Error', 'Failed to load user data. Please log in again.');
+        this.$router.push('/login');
+      }
     },
-    
     handleProfilePictureChange(event) {
       const file = event.target.files[0];
       if (file) {
         if (file.size > 2 * 1024 * 1024) {
-          alert('File size must be less than 2MB');
+          showError('File Too Large', 'File size must be less than 2MB');
           return;
         }
         this.selectedFile = file;
       }
     },
-    
     async updateProfile() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        await showError('Authentication Error', 'No authentication token found. Please log in again.');
+        this.$router.push('/login');
+        return;
+      }
       try {
         this.loading = true;
         
-        const formData = new FormData();
-        formData.append('name', this.form.name);
-        formData.append('phone', this.form.phone);
-        formData.append('company', this.form.company);
-        formData.append('bio', this.form.bio);
+        // Debug: Log the form data
+        console.log('Form data before submission:', this.form);
+        console.log('Name value:', this.form.name);
+        console.log('Name type:', typeof this.form.name);
+        console.log('Name length:', this.form.name ? this.form.name.length : 0);
         
-        if (this.selectedFile) {
-          formData.append('profile_picture', this.selectedFile);
-        }
+        // Prepare the data to send
+        const updateData = {
+          name: this.form.name || '',
+          phone: this.form.phone || '',
+          company: this.form.company || '',
+          bio: this.form.bio || ''
+        };
         
-        console.log('Sending profile update request...');
-        const response = await fetch('/api/user', {
-          method: 'PUT',
+        // Debug: Log what's being sent
+        console.log('Data being sent:', updateData);
+        
+        const response = await axios.put('/api/user', updateData, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: formData
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
         });
         
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Profile update successful:', data);
-          this.user = data.data;
-          localStorage.setItem('user', JSON.stringify(data.data));
-          this.selectedFile = null; // Reset file input
-          if (this.$refs.profilePictureInput) { this.$refs.profilePictureInput.value = ''; }
-        } else {
-          const errorText = await response.text();
-          console.error('Profile update failed:', errorText);
-          let errorMessage = 'Failed to update profile';
-          
-          try {
-            const errorData = JSON.parse(errorText);
-            errorMessage = errorData.message || errorMessage;
-          } catch (e) {
-            errorMessage = errorText || errorMessage;
-          }
-          
-          await showError('Update Failed', errorMessage);
+        this.user = response.data.data;
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.selectedFile = null;
+        if (this.$refs.profilePictureInput) {
+          this.$refs.profilePictureInput.value = '';
         }
+        showSuccess('Profile Updated', 'Your profile has been updated successfully.');
       } catch (error) {
-        console.error('Error updating profile:', error);
-        await showError('Error', 'Failed to update profile: ' + error.message);
+        console.error('Profile update error:', error);
+        console.error('Error response:', error.response);
+        let errorMessage = 'Failed to update profile.';
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        await showError('Update Failed', errorMessage);
       } finally {
         this.loading = false;
       }
     },
-    
     async changePassword() {
       if (this.passwordForm.new_password !== this.passwordForm.new_password_confirmation) {
         await showError('Password Mismatch', 'New passwords do not match');
         return;
       }
-      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        await showError('Authentication Error', 'No authentication token found. Please log in again.');
+        this.$router.push('/login');
+        return;
+      }
       try {
         this.passwordLoading = true;
-        
-        const response = await fetch('/api/user/password', {
-          method: 'PUT',
+        const response = await axios.put('/api/user/password', this.passwordForm, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(this.passwordForm)
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
         });
-        
-        if (response.ok) {
-          this.passwordForm = { current_password: '', new_password: '', new_password_confirmation: '' };
-        } else {
-          const error = await response.json();
-          await showError('Password Change Failed', error.message || 'Failed to change password');
-        }
+        this.passwordForm = { current_password: '', new_password: '', new_password_confirmation: '' };
+        showSuccess('Password Changed', 'Your password has been changed successfully.');
       } catch (error) {
-        console.error('Error changing password:', error);
-        await showError('Error', 'Failed to change password: ' + error.message);
+        let errorMessage = 'Failed to change password.';
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        await showError('Password Change Failed', errorMessage);
       } finally {
         this.passwordLoading = false;
       }
