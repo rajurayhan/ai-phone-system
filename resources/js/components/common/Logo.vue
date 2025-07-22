@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="ml-2">
-      <h1 class="text-xl font-bold text-gray-900">LHG AI Voice Agent</h1>
+      <h1 class="text-xl font-bold text-gray-900">Hive AI Voice Agent</h1>
     </div>
   </div>
 </template>
