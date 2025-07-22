@@ -351,6 +351,9 @@ export default {
     const currentUser = ref(JSON.parse(localStorage.getItem('user') || '{}'))
     const isAdmin = computed(() => currentUser.value.role === 'admin')
     
+    // Subscription info for display
+    const subscriptionInfo = ref(null)
+    
     // Check if we're creating a new assistant or editing an existing one
     const isCreating = computed(() => {
       return route.params.id === 'create' || !route.params.id
@@ -547,6 +550,33 @@ You embody the highest standards of customer service that {{company_name}} would
         console.error('Error loading users:', error)
       } finally {
         loadingUsers.value = false
+      }
+    }
+
+    const loadSubscriptionInfo = async () => {
+      if (!isCreating.value) return // Only load for creation
+      
+      try {
+        const response = await axios.get('/api/subscriptions/usage')
+        const usage = response.data.data
+        
+        if (usage && usage.subscription) {
+          subscriptionInfo.value = {
+            plan: usage.subscription.package?.name || 'No Plan',
+            used: usage.subscription.assistants_used || 0,
+            limit: usage.subscription.package?.voice_agents_limit || 0,
+            remaining: (usage.subscription.package?.voice_agents_limit || 0) - (usage.subscription.assistants_used || 0)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading subscription info:', error)
+        // Set default values if API fails
+        subscriptionInfo.value = {
+          plan: 'Unknown',
+          used: 0,
+          limit: 0,
+          remaining: 0
+        }
       }
     }
 
@@ -900,6 +930,7 @@ When gathering details, ask:
     onMounted(() => {
       loadAssistant()
       loadUsers()
+      loadSubscriptionInfo()
     })
 
     return {
@@ -920,7 +951,8 @@ When gathering details, ask:
       goBack,
       users,
       loadingUsers,
-      isAdmin
+      isAdmin,
+      subscriptionInfo
     }
   }
 }

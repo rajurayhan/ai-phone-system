@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
         // Create admin user
         $adminUser = User::create([
             'name' => 'Admin User',
-            'email' => 'admin@applicatehive.com',
+            'email' => 'admin@lhgraphics.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'status' => 'active',
@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
         // Create test user
         $testUser = User::create([
             'name' => 'Test User',
-            'email' => 'test@applicatehive.com',
+            'email' => 'test@lhgraphics.com',
             'password' => Hash::make('password'),
             'role' => 'user',
             'status' => 'active',
@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
         // Create additional test users
         User::create([
             'name' => 'Josh Smith',
-            'email' => 'josh@applicatehive.com',
+            'email' => 'josh@lhgraphics.com',
             'password' => Hash::make('password'),
             'role' => 'user',
             'status' => 'active',
@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             'name' => 'Sean Johnson',
-            'email' => 'sean@applicatehive.com',
+            'email' => 'sean@lhgraphics.com',
             'password' => Hash::make('password'),
             'role' => 'user',
             'status' => 'active',
