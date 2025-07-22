@@ -36,6 +36,17 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Josh',
                 'password' => Hash::make('josh@2025'),
+                'role' => 'admin',
+                'status' => 'active',
+                'company' => 'Test Company',
+                'bio' => 'Test user for development',
+            ]
+        );
+        $testUser2 = User::firstOrCreate(
+            ['email' => 'sean@lhgraphics.com'],
+            [
+                'name' => 'Sean',
+                'password' => Hash::make('sean@2025'),
                 'role' => 'user',
                 'status' => 'active',
                 'company' => 'Test Company',
