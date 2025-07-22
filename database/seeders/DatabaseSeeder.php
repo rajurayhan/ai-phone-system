@@ -19,10 +19,10 @@ class DatabaseSeeder extends Seeder
     {
         // Create admin user
         $adminUser = User::firstOrCreate(
-            ['email' => 'admin@voiceai.com'],
+            ['email' => 'raju@lhgraphics.com'],
             [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
+                'name' => 'Raju',
+                'password' => Hash::make('raju@2025'),
                 'role' => 'admin',
                 'status' => 'active',
                 'company' => 'Voice AI',
@@ -32,10 +32,10 @@ class DatabaseSeeder extends Seeder
 
         // Create test user
         $testUser = User::firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'josh@lhgraphics.com'],
             [
-                'name' => 'Test User',
-                'password' => Hash::make('password'),
+                'name' => 'Josh',
+                'password' => Hash::make('josh@2025'),
                 'role' => 'user',
                 'status' => 'active',
                 'company' => 'Test Company',
