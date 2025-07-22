@@ -288,9 +288,10 @@
 
 <script>
 import Navigation from '../shared/Navigation.vue'
+import { showError, showConfirm } from '../../utils/sweetalert.js'
 
 export default {
-  name: 'AdminUsers',
+  name: 'Users',
   components: {
     Navigation
   },
@@ -378,7 +379,7 @@ export default {
 
     async submitCreateUser() {
       if (!this.createForm.name || !this.createForm.email || !this.createForm.password) {
-        alert('Name, Email, and Password are required.');
+        await showError('Validation Error', 'Name, Email, and Password are required.');
         return;
       }
 
@@ -397,19 +398,18 @@ export default {
           const data = await response.json();
           this.users.push(data.data);
           this.closeCreateModal();
-          alert('User created successfully!');
         } else {
           const errorData = await response.json();
-          alert(`Failed to create user: ${errorData.message || 'Unknown error'}`);
+          await showError('Create Failed', errorData.message || 'Failed to create user. Please try again.');
         }
       } catch (error) {
         console.error('Error submitting create user:', error);
-        alert('An error occurred while creating the user.');
+        await showError('Error', 'An error occurred while creating the user.');
       } finally {
         this.createLoading = false;
       }
     },
-
+    
     editUser(user) {
       this.editForm = { ...user };
       this.showEditModal = true;
@@ -422,7 +422,7 @@ export default {
 
     async submitEditUser() {
       if (!this.editForm.name || !this.editForm.email) {
-        alert('Name and Email are required for editing.');
+        await showError('Validation Error', 'Name and Email are required for editing.');
         return;
       }
 
@@ -444,21 +444,26 @@ export default {
             this.users[index] = data.data;
           }
           this.closeEditModal();
-          alert('User updated successfully!');
         } else {
           const errorData = await response.json();
-          alert(`Failed to update user: ${errorData.message || 'Unknown error'}`);
+          await showError('Update Failed', errorData.message || 'Failed to update user. Please try again.');
         }
       } catch (error) {
         console.error('Error submitting edit user:', error);
-        alert('An error occurred while updating the user.');
+        await showError('Error', 'An error occurred while updating the user.');
       } finally {
         this.editLoading = false;
       }
     },
     
     async toggleUserStatus(user) {
-      if (!confirm(`Are you sure you want to ${user.status === 'active' ? 'suspend' : 'activate'} this user?`)) {
+      const action = user.status === 'active' ? 'suspend' : 'activate';
+      const result = await showConfirm(
+        `Confirm ${action.charAt(0).toUpperCase() + action.slice(1)}`,
+        `Are you sure you want to ${action} this user?`
+      );
+      
+      if (!result.isConfirmed) {
         return;
       }
       
@@ -474,10 +479,12 @@ export default {
         if (response.ok) {
           await this.loadUsers();
         } else {
-          console.error('Failed to toggle user status');
+          const errorData = await response.json();
+          await showError('Status Update Failed', errorData.message || 'Failed to update user status.');
         }
       } catch (error) {
         console.error('Error toggling user status:', error);
+        await showError('Error', 'Failed to update user status: ' + error.message);
       }
     }
   }

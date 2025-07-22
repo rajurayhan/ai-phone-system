@@ -1,12 +1,22 @@
 <template>
   <div id="app">
     <router-view />
+    <Toast ref="toast" />
   </div>
 </template>
 
 <script>
+import Toast from './components/shared/Toast.vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    Toast
+  },
+  mounted() {
+    // Make toast available globally
+    this.$toast = this.$refs.toast
+  }
 }
 </script>
 

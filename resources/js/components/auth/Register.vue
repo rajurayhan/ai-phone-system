@@ -139,6 +139,8 @@
 </template>
 
 <script>
+import { showError } from '../../utils/sweetalert.js'
+
 export default {
   name: 'Register',
   data() {
@@ -173,10 +175,13 @@ export default {
       } catch (error) {
         if (error.response && error.response.data.errors) {
           this.errors = error.response.data.errors;
+          await showError('Validation Error', 'Please check your input and try again.');
         } else if (error.response && error.response.data.message) {
           this.error = error.response.data.message;
+          await showError('Registration Failed', error.response.data.message);
         } else {
           this.error = 'An error occurred during registration. Please try again.';
+          await showError('Error', 'An error occurred during registration. Please try again.');
         }
       } finally {
         this.loading = false;

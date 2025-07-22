@@ -195,6 +195,7 @@
 
 <script>
 import Navigation from '../shared/Navigation.vue'
+import { showError } from '../../utils/sweetalert.js'
 
 export default {
   name: 'Profile',
@@ -282,12 +283,8 @@ export default {
           console.log('Profile update successful:', data);
           this.user = data.data;
           localStorage.setItem('user', JSON.stringify(data.data));
-          alert('Profile updated successfully!');
-          // Reset the file input
-          this.selectedFile = null;
-          if (this.$refs.profilePictureInput) {
-            this.$refs.profilePictureInput.value = '';
-          }
+          this.selectedFile = null; // Reset file input
+          if (this.$refs.profilePictureInput) { this.$refs.profilePictureInput.value = ''; }
         } else {
           const errorText = await response.text();
           console.error('Profile update failed:', errorText);
@@ -300,11 +297,11 @@ export default {
             errorMessage = errorText || errorMessage;
           }
           
-          alert(errorMessage);
+          await showError('Update Failed', errorMessage);
         }
       } catch (error) {
         console.error('Error updating profile:', error);
-        alert('Failed to update profile: ' + error.message);
+        await showError('Error', 'Failed to update profile: ' + error.message);
       } finally {
         this.loading = false;
       }
@@ -312,7 +309,7 @@ export default {
     
     async changePassword() {
       if (this.passwordForm.new_password !== this.passwordForm.new_password_confirmation) {
-        alert('New passwords do not match');
+        await showError('Password Mismatch', 'New passwords do not match');
         return;
       }
       
@@ -329,19 +326,14 @@ export default {
         });
         
         if (response.ok) {
-          alert('Password changed successfully!');
-          this.passwordForm = {
-            current_password: '',
-            new_password: '',
-            new_password_confirmation: ''
-          };
+          this.passwordForm = { current_password: '', new_password: '', new_password_confirmation: '' };
         } else {
           const error = await response.json();
-          alert(error.message || 'Failed to change password');
+          await showError('Password Change Failed', error.message || 'Failed to change password');
         }
       } catch (error) {
         console.error('Error changing password:', error);
-        alert('Failed to change password');
+        await showError('Error', 'Failed to change password: ' + error.message);
       } finally {
         this.passwordLoading = false;
       }

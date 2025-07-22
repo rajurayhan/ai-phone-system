@@ -4,7 +4,7 @@ window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-// Add CSRF token to all requests
+// Add CSRF token to all requests (except API requests)
 const token = document.head.querySelector('meta[name="csrf-token"]');
 if (token) {
     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
@@ -20,6 +20,11 @@ window.axios.interceptors.request.use(function (config) {
         config.headers.Authorization = `Bearer ${token}`;
         // Also set the Accept header for JSON responses
         config.headers.Accept = 'application/json';
+        
+        // Remove CSRF token for API requests
+        if (config.url && config.url.startsWith('/api/')) {
+            delete config.headers['X-CSRF-TOKEN'];
+        }
         
         // Debug: Log the token being sent (remove this in production)
         console.log('Sending token:', token.substring(0, 20) + '...');

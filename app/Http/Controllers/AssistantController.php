@@ -256,12 +256,19 @@ class AssistantController extends Controller
     {
         $user = Auth::user();
         
+        \Log::info('Delete assistant request', [
+            'user_id' => $user->id,
+            'assistant_id' => $assistantId,
+            'user_role' => $user->role
+        ]);
+        
         // Find assistant in database
         $assistant = Assistant::where('vapi_assistant_id', $assistantId)
             ->orWhere('id', $assistantId)
             ->first();
 
         if (!$assistant) {
+            \Log::warning('Assistant not found for deletion', ['assistant_id' => $assistantId]);
             return response()->json([
                 'success' => false,
                 'message' => 'Assistant not found'
@@ -270,29 +277,66 @@ class AssistantController extends Controller
 
         // Check if user owns this assistant or is admin
         if (!$user->isAdmin() && $assistant->user_id != $user->id) {
+            \Log::warning('Unauthorized delete attempt', [
+                'user_id' => $user->id,
+                'assistant_user_id' => $assistant->user_id,
+                'assistant_id' => $assistantId
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized to delete this assistant'
             ], 403);
         }
 
-        // Delete from Vapi
-        $vapiSuccess = $this->vapiService->deleteAssistant($assistant->vapi_assistant_id);
+        try {
+            // Delete from Vapi first
+            \Log::info('Deleting assistant from Vapi', [
+                'vapi_assistant_id' => $assistant->vapi_assistant_id
+            ]);
+            
+            $vapiSuccess = $this->vapiService->deleteAssistant($assistant->vapi_assistant_id);
 
-        if (!$vapiSuccess) {
+            if (!$vapiSuccess) {
+                \Log::error('Failed to delete assistant from Vapi', [
+                    'vapi_assistant_id' => $assistant->vapi_assistant_id
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete assistant from Vapi server. Please try again.'
+                ], 500);
+            }
+
+            \Log::info('Successfully deleted from Vapi, now deleting from database', [
+                'assistant_id' => $assistant->id,
+                'vapi_assistant_id' => $assistant->vapi_assistant_id
+            ]);
+
+            // Delete from database
+            $assistant->delete();
+
+            \Log::info('Assistant deleted successfully', [
+                'assistant_id' => $assistant->id,
+                'vapi_assistant_id' => $assistant->vapi_assistant_id,
+                'deleted_by_user_id' => $user->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Assistant deleted successfully from both system and Vapi server'
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Exception during assistant deletion', [
+                'assistant_id' => $assistant->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete assistant from Vapi'
+                'message' => 'An error occurred while deleting the assistant: ' . $e->getMessage()
             ], 500);
         }
-
-        // Delete from database
-        $assistant->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Assistant deleted successfully'
-        ]);
     }
 
     /**

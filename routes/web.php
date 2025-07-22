@@ -21,7 +21,7 @@ Route::get('/debug', function () {
     return view('debug');
 });
 
-// Serve the SPA for all routes
+// Serve the SPA for all routes except API routes
 Route::get('/{any}', function () {
     return view('app');
-})->where('any', '.*');
+})->where('any', '^(?!api).*$');

@@ -175,14 +175,36 @@ class VapiService
     public function deleteAssistant($assistantId)
     {
         try {
+            Log::info('Attempting to delete assistant from Vapi', ['assistant_id' => $assistantId]);
+            
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
             ])->delete($this->baseUrl . '/assistant/' . $assistantId);
 
-            return $response->successful();
+            Log::info('Vapi delete response', [
+                'assistant_id' => $assistantId,
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+
+            if ($response->successful()) {
+                Log::info('Successfully deleted assistant from Vapi', ['assistant_id' => $assistantId]);
+                return true;
+            }
+
+            Log::error('Vapi Delete Assistant Error', [
+                'assistant_id' => $assistantId,
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+            return false;
         } catch (\Exception $e) {
-            Log::error('Vapi Delete Assistant Service Error: ' . $e->getMessage());
+            Log::error('Vapi Delete Assistant Service Error', [
+                'assistant_id' => $assistantId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return false;
         }
     }

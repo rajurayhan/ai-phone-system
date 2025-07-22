@@ -5,11 +5,11 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex justify-between items-center">
           <div class="flex items-center">
-            <router-link to="/dashboard" class="mr-4 text-gray-500 hover:text-gray-700">
+            <button @click="goBack" class="mr-4 text-gray-500 hover:text-gray-700">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-            </router-link>
+            </button>
             <div class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
               <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -287,6 +287,7 @@ You are a professional customer service representative for {{company_name}}..."
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
+import { showErrorToast } from '../../utils/toaster.js'
 
 export default {
   name: 'AssistantForm',
@@ -550,10 +551,22 @@ You embody the highest standards of customer service that {{company_name}} would
         
         if (isCreating.value) {
           await axios.post('/api/assistants', assistantData)
-          router.push('/assistants')
+          // Navigate based on user role
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          if (user.role === 'admin') {
+            router.push('/admin/assistants')
+          } else {
+            router.push('/assistants')
+          }
         } else {
           await axios.put(`/api/assistants/${route.params.id}`, assistantData)
-          router.push('/assistants')
+          // Navigate based on user role
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          if (user.role === 'admin') {
+            router.push('/admin/assistants')
+          } else {
+            router.push('/assistants')
+          }
         }
       } catch (err) {
         console.error('Error saving assistant:', err)
@@ -587,42 +600,53 @@ You embody the highest standards of customer service that {{company_name}} would
                     fieldErrors.value[mappedField] = errorMessage
                   }
                 })
+                showErrorToast(this.$toast, 'Please check the form and fix the errors.');
               } else if (data.message) {
                 error.value = data.message
+                showErrorToast(this.$toast, data.message);
               } else {
                 error.value = 'Invalid data provided. Please check your inputs and try again.'
+                showErrorToast(this.$toast, 'Invalid data provided. Please check your inputs and try again.');
               }
               break
               
             case 401:
               error.value = 'You are not authorized to update this assistant. Please log in again.'
+              showErrorToast(this.$toast, 'You are not authorized to update this assistant. Please log in again.');
               break
               
             case 403:
               error.value = 'You do not have permission to update this assistant.'
+              showErrorToast(this.$toast, 'You do not have permission to update this assistant.');
               break
               
             case 404:
               error.value = 'Assistant not found. Please check the URL and try again.'
+              showErrorToast(this.$toast, 'Assistant not found. Please check the URL and try again.');
               break
               
             case 500:
               error.value = 'Server error occurred. Please try again later.'
+              showErrorToast(this.$toast, 'Server error occurred. Please try again later.');
               break
               
             default:
               if (data.message) {
                 error.value = data.message
+                showErrorToast(this.$toast, data.message);
               } else {
                 error.value = `Failed to update assistant (Status: ${status}). Please try again.`
+                showErrorToast(this.$toast, `Failed to update assistant (Status: ${status}). Please try again.`);
               }
           }
         } else if (err.request) {
           // Network error
           error.value = 'Network error. Please check your internet connection and try again.'
+          showErrorToast(this.$toast, 'Network error. Please check your internet connection and try again.');
         } else {
           // Other errors
           error.value = 'An unexpected error occurred. Please try again.'
+          showErrorToast(this.$toast, 'An unexpected error occurred. Please try again.');
         }
       } finally {
         submitting.value = false
@@ -772,6 +796,21 @@ When gathering details, ask:
       form.value.endCallMessage = `Thank you for calling {{company_name}}. Have a wonderful day!`
     }
 
+    const goBack = () => {
+      // Try to go back in browser history, fallback to appropriate route
+      if (window.history.length > 1) {
+        router.go(-1)
+      } else {
+        // Fallback based on user role
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        if (user.role === 'admin') {
+          router.push('/admin/assistants')
+        } else {
+          router.push('/assistants')
+        }
+      }
+    }
+
     onMounted(() => {
       loadAssistant()
     })
@@ -790,7 +829,8 @@ When gathering details, ask:
       saveAssistant,
       loadDefaultTemplate,
       loadDefaultFirstMessage,
-      loadDefaultEndCallMessage
+      loadDefaultEndCallMessage,
+      goBack
     }
   }
 }

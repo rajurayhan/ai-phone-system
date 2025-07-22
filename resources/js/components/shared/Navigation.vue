@@ -111,10 +111,30 @@ export default {
     }
   },
   methods: {
-    logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      this.$router.push('/login');
+    async logout() {
+      try {
+        // Call logout API
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        // Clear local storage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Redirect to login
+        this.$router.push('/login');
+      } catch (error) {
+        console.error('Logout error:', error);
+        // Even if API call fails, clear local storage and redirect
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        this.$router.push('/login');
+      }
     }
   },
   mounted() {

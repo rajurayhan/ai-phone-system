@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom styles for SweetAlert2 */
+.swal2-popup {
+    @apply font-sans;
+}
+
+.swal2-title {
+    @apply text-gray-900;
+}
+
+.swal2-content {
+    @apply text-gray-600;
+}
+
+.swal2-confirm {
+    @apply bg-green-600 hover:bg-green-700 focus:ring-green-500;
+}
+
+.swal2-cancel {
+    @apply bg-gray-600 hover:bg-gray-700 focus:ring-gray-500;
+}
+
+.swal2-error {
+    @apply bg-red-600;
+}
+
+.swal2-warning {
+    @apply bg-amber-600;
+}
+
+.swal2-info {
+    @apply bg-blue-600;
+}
+
+.swal2-success {
+    @apply bg-green-600;
+}
+
 @layer base {
     html {
         font-family: 'Inter', system-ui, sans-serif;

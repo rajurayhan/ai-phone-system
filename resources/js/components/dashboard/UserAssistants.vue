@@ -137,8 +137,12 @@
                   <button @click="viewStats(assistant)" class="flex-1 bg-blue-50 border border-blue-300 text-blue-700 hover:bg-blue-100 px-3 py-2 rounded-md text-sm font-medium">
                     Stats
                   </button>
-                  <button @click="deleteAssistant(assistant.vapi_assistant_id)" class="flex-1 bg-red-50 border border-red-300 text-red-700 hover:bg-red-100 px-3 py-2 rounded-md text-sm font-medium">
-                    Delete
+                  <button 
+                    @click="deleteAssistant(assistant.vapi_assistant_id)" 
+                    :disabled="deletingAssistant === assistant.vapi_assistant_id"
+                    class="flex-1 bg-red-50 border border-red-300 text-red-700 hover:bg-red-100 px-3 py-2 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {{ deletingAssistant === assistant.vapi_assistant_id ? 'Deleting...' : 'Delete' }}
                   </button>
                 </div>
               </div>
@@ -289,6 +293,7 @@
 
 <script>
 import Navigation from '../shared/Navigation.vue'
+import { showDeleteConfirm, showSuccess, showError } from '../../utils/sweetalert.js'
 
 export default {
   name: 'UserAssistants',
@@ -307,7 +312,8 @@ export default {
       searchQuery: '',
       sortBy: 'name',
       sortOrder: 'asc',
-      searchTimeout: null
+      searchTimeout: null,
+      deletingAssistant: null // New state for tracking deletion
     }
   },
   computed: {
@@ -425,11 +431,18 @@ export default {
     },
     
     async deleteAssistant(assistantId) {
-      if (!confirm('Are you sure you want to delete this assistant?')) {
+      const result = await showDeleteConfirm(
+        'Delete Assistant',
+        'Are you sure you want to delete this assistant? This action cannot be undone.'
+      );
+      
+      if (!result.isConfirmed) {
         return;
       }
       
       try {
+        this.deletingAssistant = assistantId; // Set loading state
+        console.log('Deleting assistant:', assistantId);
         const response = await fetch(`/api/assistants/${assistantId}`, {
           method: 'DELETE',
           headers: {
@@ -438,13 +451,22 @@ export default {
           }
         });
         
+        console.log('Delete response status:', response.status);
+        
         if (response.ok) {
-          await this.loadAssistants();
+            const result = await response.json();
+            console.log('Delete successful:', result);
+            await this.loadAssistants();
         } else {
-          console.error('Failed to delete assistant');
+          const errorData = await response.json();
+          console.error('Failed to delete assistant:', errorData);
+          await showError('Delete Failed', errorData.message || 'Failed to delete assistant. Please try again.');
         }
       } catch (error) {
         console.error('Error deleting assistant:', error);
+        await showError('Error', 'Failed to delete assistant: ' + error.message);
+      } finally {
+        this.deletingAssistant = null; // Reset loading state
       }
     },
     
