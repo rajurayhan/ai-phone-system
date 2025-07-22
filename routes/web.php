@@ -13,9 +13,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/test-filtering', function () {
+    return view('test-filtering');
+});
+
+Route::get('/debug', function () {
+    return view('debug');
+});
+
 // Serve the SPA for all routes
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '.*');
-
-require __DIR__.'/auth.php';

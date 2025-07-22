@@ -1,138 +1,129 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex">
-            <div class="flex-shrink-0 flex items-center">
-              <router-link to="/dashboard" class="flex items-center">
-                <div class="h-8 w-8 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
-                  <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                  </svg>
-                </div>
-                <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">LHG AI Voice Agent</h1>
-                </div>
-              </router-link>
-            </div>
-          </div>
-          <div class="flex items-center">
-            <div class="ml-3 relative">
-              <div>
-                <button @click="userMenuOpen = !userMenuOpen" class="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                  <span class="sr-only">Open user menu</span>
-                  <div class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center">
-                    <span class="text-white font-medium">{{ userInitials }}</span>
-                  </div>
-                </button>
-              </div>
-              <div v-if="userMenuOpen" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <router-link to="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</router-link>
-                <button @click="logout" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <Navigation />
 
     <div class="py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl mx-auto">
-          <!-- Profile Header -->
-          <div class="bg-white shadow rounded-lg mb-6">
-            <div class="px-4 py-5 sm:p-6">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <div class="h-16 w-16 rounded-full bg-primary-500 flex items-center justify-center">
-                    <span class="text-white text-xl font-medium">{{ userInitials }}</span>
-                  </div>
-                </div>
-                <div class="ml-6">
-                  <h1 class="text-2xl font-bold text-gray-900">{{ user.name }}</h1>
-                  <p class="text-sm text-gray-500">{{ user.email }}</p>
-                  <p class="text-sm text-gray-500">Member since {{ user.created_at }}</p>
-                </div>
-              </div>
-            </div>
+        <!-- Header -->
+        <div class="md:flex md:items-center md:justify-between">
+          <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+              Profile Settings
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">
+              Manage your account settings and preferences
+            </p>
           </div>
+        </div>
 
-          <!-- Profile Form -->
+        <div class="mt-8">
           <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-6">Profile Information</h3>
-              
               <form @submit.prevent="updateProfile">
+                <!-- Profile Picture -->
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+                  <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                      <div v-if="user.profile_picture" class="h-20 w-20 rounded-full overflow-hidden">
+                        <img :src="user.profile_picture" :alt="user.name" class="h-full w-full object-cover">
+                      </div>
+                      <div v-else class="h-20 w-20 rounded-full bg-green-600 flex items-center justify-center">
+                        <span class="text-white text-xl font-medium">{{ userInitials }}</span>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <input
+                        type="file"
+                        ref="profilePictureInput"
+                        @change="handleProfilePictureChange"
+                        accept="image/*"
+                        class="hidden"
+                      />
+                      <button
+                        type="button"
+                        @click="$refs.profilePictureInput.click()"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      >
+                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Upload Photo
+                      </button>
+                      <p class="mt-1 text-sm text-gray-500">JPG, PNG or GIF up to 2MB</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Personal Information -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
                     <input
                       id="name"
                       v-model="form.name"
                       type="text"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                      :class="{ 'border-red-500 focus:ring-red-500': errors.name }"
+                      required
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     />
-                    <p v-if="errors.name" class="mt-2 text-sm text-red-600">{{ errors.name }}</p>
                   </div>
 
                   <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
                     <input
                       id="email"
                       v-model="form.email"
                       type="email"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                      :class="{ 'border-red-500 focus:ring-red-500': errors.email }"
+                      required
+                      disabled
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50 sm:text-sm"
                     />
-                    <p v-if="errors.email" class="mt-2 text-sm text-red-600">{{ errors.email }}</p>
+                    <p class="mt-1 text-sm text-gray-500">Email cannot be changed</p>
                   </div>
 
                   <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
                     <input
                       id="phone"
                       v-model="form.phone"
                       type="tel"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                      :class="{ 'border-red-500 focus:ring-red-500': errors.phone }"
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     />
-                    <p v-if="errors.phone" class="mt-2 text-sm text-red-600">{{ errors.phone }}</p>
                   </div>
 
                   <div>
-                    <label for="company" class="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                    <label for="company" class="block text-sm font-medium text-gray-700">Company</label>
                     <input
                       id="company"
                       v-model="form.company"
                       type="text"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                      :class="{ 'border-red-500 focus:ring-red-500': errors.company }"
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     />
-                    <p v-if="errors.company" class="mt-2 text-sm text-red-600">{{ errors.company }}</p>
-                  </div>
-
-                  <div class="sm:col-span-2">
-                    <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                    <textarea
-                      id="bio"
-                      v-model="form.bio"
-                      rows="4"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200 resize-none"
-                      :class="{ 'border-red-500 focus:ring-red-500': errors.bio }"
-                    ></textarea>
-                    <p v-if="errors.bio" class="mt-2 text-sm text-red-600">{{ errors.bio }}</p>
                   </div>
                 </div>
 
                 <div class="mt-6">
+                  <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                  <textarea
+                    id="bio"
+                    v-model="form.bio"
+                    rows="4"
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    placeholder="Tell us about yourself..."
+                  ></textarea>
+                </div>
+
+                <div class="mt-6 flex justify-end">
                   <button
                     type="submit"
                     :disabled="loading"
-                    class="w-full sm:w-auto px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                   >
+                    <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                     {{ loading ? 'Updating...' : 'Update Profile' }}
                   </button>
                 </div>
@@ -141,86 +132,59 @@
           </div>
 
           <!-- Change Password -->
-          <div class="bg-white shadow rounded-lg mt-6">
+          <div class="mt-8 bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-6">Change Password</h3>
-              
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Change Password</h3>
               <form @submit.prevent="changePassword">
-                <div class="space-y-4">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <label for="current_password" class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                    <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
                     <input
                       id="current_password"
                       v-model="passwordForm.current_password"
                       type="password"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                      :class="{ 'border-red-500 focus:ring-red-500': passwordErrors.current_password }"
+                      required
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     />
-                    <p v-if="passwordErrors.current_password" class="mt-2 text-sm text-red-600">{{ passwordErrors.current_password }}</p>
                   </div>
 
                   <div>
-                    <label for="new_password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
                     <input
                       id="new_password"
                       v-model="passwordForm.new_password"
                       type="password"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                      :class="{ 'border-red-500 focus:ring-red-500': passwordErrors.new_password }"
+                      required
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     />
-                    <p v-if="passwordErrors.new_password" class="mt-2 text-sm text-red-600">{{ passwordErrors.new_password }}</p>
-                  </div>
-
-                  <div>
-                    <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                    <input
-                      id="new_password_confirmation"
-                      v-model="passwordForm.new_password_confirmation"
-                      type="password"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                      :class="{ 'border-red-500 focus:ring-red-500': passwordErrors.new_password_confirmation }"
-                    />
-                    <p v-if="passwordErrors.new_password_confirmation" class="mt-2 text-sm text-red-600">{{ passwordErrors.new_password_confirmation }}</p>
                   </div>
                 </div>
 
                 <div class="mt-6">
+                  <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                  <input
+                    id="new_password_confirmation"
+                    v-model="passwordForm.new_password_confirmation"
+                    type="password"
+                    required
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  />
+                </div>
+
+                <div class="mt-6 flex justify-end">
                   <button
                     type="submit"
                     :disabled="passwordLoading"
-                    class="w-full sm:w-auto px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-colors duration-200 disabled:opacity-50"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                   >
+                    <svg v-if="passwordLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                     {{ passwordLoading ? 'Changing...' : 'Change Password' }}
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-
-          <!-- Success/Error Messages -->
-          <div v-if="successMessage" class="mt-6 bg-green-50 border border-green-200 rounded-md p-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="ml-3">
-                <p class="text-sm text-green-800">{{ successMessage }}</p>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="errorMessage" class="mt-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="ml-3">
-                <p class="text-sm text-red-800">{{ errorMessage }}</p>
-              </div>
             </div>
           </div>
         </div>
@@ -230,12 +194,18 @@
 </template>
 
 <script>
+import Navigation from '../shared/Navigation.vue'
+
 export default {
   name: 'Profile',
+  components: {
+    Navigation
+  },
   data() {
     return {
-      userMenuOpen: false,
-      user: {},
+      loading: false,
+      passwordLoading: false,
+      user: JSON.parse(localStorage.getItem('user') || '{}'),
       form: {
         name: '',
         email: '',
@@ -248,12 +218,7 @@ export default {
         new_password: '',
         new_password_confirmation: ''
       },
-      errors: {},
-      passwordErrors: {},
-      loading: false,
-      passwordLoading: false,
-      successMessage: '',
-      errorMessage: ''
+      selectedFile: null
     }
   },
   computed: {
@@ -261,73 +226,125 @@ export default {
       return this.user.name ? this.user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
     }
   },
-  async mounted() {
-    await this.loadUserProfile();
+  mounted() {
+    this.loadUserData();
   },
   methods: {
-    async loadUserProfile() {
-      try {
-        const response = await axios.get('/api/user');
-        this.user = response.data;
-        this.form = {
-          name: this.user.name || '',
-          email: this.user.email || '',
-          phone: this.user.phone || '',
-          company: this.user.company || '',
-          bio: this.user.bio || ''
-        };
-      } catch (error) {
-        console.error('Error loading user profile:', error);
+    loadUserData() {
+      this.form = {
+        name: this.user.name || '',
+        email: this.user.email || '',
+        phone: this.user.phone || '',
+        company: this.user.company || '',
+        bio: this.user.bio || ''
+      };
+    },
+    
+    handleProfilePictureChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+          alert('File size must be less than 2MB');
+          return;
+        }
+        this.selectedFile = file;
       }
     },
+    
     async updateProfile() {
-      this.loading = true;
-      this.errors = {};
-      this.successMessage = '';
-      this.errorMessage = '';
-
       try {
-        const response = await axios.put('/api/user', this.form);
-        this.user = response.data;
-        this.successMessage = 'Profile updated successfully!';
-      } catch (error) {
-        if (error.response && error.response.data.errors) {
-          this.errors = error.response.data.errors;
-        } else {
-          this.errorMessage = 'An error occurred while updating your profile.';
+        this.loading = true;
+        
+        const formData = new FormData();
+        formData.append('name', this.form.name);
+        formData.append('phone', this.form.phone);
+        formData.append('company', this.form.company);
+        formData.append('bio', this.form.bio);
+        
+        if (this.selectedFile) {
+          formData.append('profile_picture', this.selectedFile);
         }
+        
+        console.log('Sending profile update request...');
+        const response = await fetch('/api/user', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: formData
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Profile update successful:', data);
+          this.user = data.data;
+          localStorage.setItem('user', JSON.stringify(data.data));
+          alert('Profile updated successfully!');
+          // Reset the file input
+          this.selectedFile = null;
+          if (this.$refs.profilePictureInput) {
+            this.$refs.profilePictureInput.value = '';
+          }
+        } else {
+          const errorText = await response.text();
+          console.error('Profile update failed:', errorText);
+          let errorMessage = 'Failed to update profile';
+          
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (e) {
+            errorMessage = errorText || errorMessage;
+          }
+          
+          alert(errorMessage);
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Failed to update profile: ' + error.message);
       } finally {
         this.loading = false;
       }
     },
+    
     async changePassword() {
-      this.passwordLoading = true;
-      this.passwordErrors = {};
-      this.successMessage = '';
-      this.errorMessage = '';
-
+      if (this.passwordForm.new_password !== this.passwordForm.new_password_confirmation) {
+        alert('New passwords do not match');
+        return;
+      }
+      
       try {
-        await axios.put('/api/user/password', this.passwordForm);
-        this.passwordForm = {
-          current_password: '',
-          new_password: '',
-          new_password_confirmation: ''
-        };
-        this.successMessage = 'Password changed successfully!';
-      } catch (error) {
-        if (error.response && error.response.data.errors) {
-          this.passwordErrors = error.response.data.errors;
+        this.passwordLoading = true;
+        
+        const response = await fetch('/api/user/password', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(this.passwordForm)
+        });
+        
+        if (response.ok) {
+          alert('Password changed successfully!');
+          this.passwordForm = {
+            current_password: '',
+            new_password: '',
+            new_password_confirmation: ''
+          };
         } else {
-          this.errorMessage = 'An error occurred while changing your password.';
+          const error = await response.json();
+          alert(error.message || 'Failed to change password');
         }
+      } catch (error) {
+        console.error('Error changing password:', error);
+        alert('Failed to change password');
       } finally {
         this.passwordLoading = false;
       }
-    },
-    logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      this.$router.push('/login');
     }
   }
 }

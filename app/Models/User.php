@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'company',
         'bio',
         'status',
+        'profile_picture',
     ];
 
     /**
@@ -51,6 +53,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the profile picture URL
+     */
+    public function getProfilePictureAttribute($value)
+    {
+        if ($value) {
+            return Storage::disk('public')->url($value);
+        }
+        return null;
     }
 
     /**

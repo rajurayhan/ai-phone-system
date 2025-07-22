@@ -4,86 +4,135 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /**
-     * Get authenticated user
-     */
-    public function show(Request $request)
+    public function show(): JsonResponse
     {
-        return response()->json($request->user());
+        $user = Auth::user();
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
     }
 
-    /**
-     * Update authenticated user
-     */
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
-        $user = $request->user();
-
+        $user = Auth::user();
+        
+        // Debug logging
+        \Log::info('Profile update request received', [
+            'user_id' => $user->id,
+            'request_data' => $request->all(),
+            'has_file' => $request->hasFile('profile_picture')
+        ]);
+        
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'company' => 'nullable|string|max:255',
             'bio' => 'nullable|string|max:1000',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $user->update($request->only(['name', 'email', 'phone', 'company', 'bio']));
+        $user->name = $request->name;
+        $user->phone = $request->phone;
+        $user->company = $request->company;
+        $user->bio = $request->bio;
 
-        return response()->json($user);
+        // Handle profile picture upload
+        if ($request->hasFile('profile_picture')) {
+            // Delete old profile picture if exists
+            if ($user->profile_picture) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+
+            // Store new profile picture
+            $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+            $user->profile_picture = $path;
+            
+            \Log::info('Profile picture uploaded', ['path' => $path]);
+        }
+
+        $user->save();
+
+        \Log::info('Profile updated successfully', ['user_id' => $user->id]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'Profile updated successfully'
+        ]);
     }
 
-    /**
-     * Update user password
-     */
-    public function updatePassword(Request $request)
+    public function changePassword(Request $request): JsonResponse
     {
         $request->validate([
             'current_password' => 'required|string',
             'new_password' => 'required|string|min:8|confirmed',
+            'new_password_confirmation' => 'required|string'
         ]);
 
-        $user = $request->user();
+        $user = Auth::user();
 
+        // Check current password
         if (!Hash::check($request->current_password, $user->password)) {
-            throw ValidationException::withMessages([
-                'current_password' => ['The provided password does not match your current password.'],
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Current password is incorrect'
+            ], 400);
         }
 
-        $user->update([
-            'password' => Hash::make($request->new_password),
-        ]);
+        // Update password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
 
         return response()->json([
-            'message' => 'Password updated successfully',
+            'success' => true,
+            'message' => 'Password changed successfully'
         ]);
     }
 
-    /**
-     * Get all users (admin only)
-     */
-    public function index()
+    // Admin methods
+    public function index(): JsonResponse
     {
+        // Only admin can access this
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
         $users = User::all();
-        return response()->json($users);
+
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
     }
 
-    /**
-     * Create new user (admin only)
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
+        // Only admin can access this
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:user,admin',
-            'status' => 'required|in:active,suspended',
+            'role' => ['required', Rule::in(['admin', 'user'])],
+            'status' => ['required', Rule::in(['active', 'inactive'])]
         ]);
 
         $user = User::create([
@@ -91,38 +140,98 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-            'status' => $request->status,
+            'status' => $request->status
         ]);
 
-        return response()->json($user, 201);
+        return response()->json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'User created successfully'
+        ], 201);
     }
 
-    /**
-     * Update user (admin only)
-     */
-    public function updateUser(Request $request, User $user)
+    public function updateUser(Request $request, User $user): JsonResponse
     {
+        // Only admin can access this
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:user,admin',
-            'status' => 'required|in:active,suspended',
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'role' => ['required', Rule::in(['admin', 'user'])],
+            'status' => ['required', Rule::in(['active', 'inactive'])]
         ]);
 
-        $user->update($request->only(['name', 'email', 'role', 'status']));
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->role = $request->role;
+        $user->status = $request->status;
+        $user->save();
 
-        return response()->json($user);
+        return response()->json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'User updated successfully'
+        ]);
     }
 
-    /**
-     * Delete user (admin only)
-     */
-    public function destroy(User $user)
+    public function destroy(User $user): JsonResponse
     {
+        // Only admin can access this
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        // Prevent admin from deleting themselves
+        if ($user->id === Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete your own account'
+            ], 400);
+        }
+
         $user->delete();
 
         return response()->json([
-            'message' => 'User deleted successfully',
+            'success' => true,
+            'message' => 'User deleted successfully'
+        ]);
+    }
+
+    public function toggleStatus(User $user): JsonResponse
+    {
+        // Only admin can access this
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        // Prevent admin from deactivating themselves
+        if ($user->id === Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot deactivate your own account'
+            ], 400);
+        }
+
+        // Toggle status
+        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'User status updated successfully'
         ]);
     }
 }

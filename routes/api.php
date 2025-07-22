@@ -25,11 +25,11 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-// User routes (protected)
+// User profile routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', [UserController::class, 'show']);
-    Route::put('/user', [UserController::class, 'update']);
-    Route::put('/user/password', [UserController::class, 'updatePassword']);
+    Route::get('/user', [App\Http\Controllers\UserController::class, 'show']);
+    Route::put('/user', [App\Http\Controllers\UserController::class, 'update']);
+    Route::put('/user/password', [App\Http\Controllers\UserController::class, 'changePassword']);
 });
 
 // Admin routes (protected)
@@ -38,6 +38,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/admin/users', [UserController::class, 'store']);
     Route::put('/admin/users/{user}', [UserController::class, 'updateUser']);
     Route::delete('/admin/users/{user}', [UserController::class, 'destroy']);
+    Route::put('/admin/users/{user}/toggle-status', [UserController::class, 'toggleStatus']);
 });
 
 // Assistant routes (protected)
@@ -65,5 +66,14 @@ Route::get('/test-vapi', function () {
         'success' => true,
         'data' => $assistants,
         'count' => count($assistants)
+    ]);
+});
+
+// Test route for profile update debugging
+Route::middleware('auth:sanctum')->get('/test-profile', function (Request $request) {
+    return response()->json([
+        'success' => true,
+        'user' => $request->user(),
+        'message' => 'Profile test route working'
     ]);
 });

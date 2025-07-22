@@ -24,9 +24,34 @@ class AssistantController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
-        $assistants = Assistant::forUser($user->id)
-            ->with(['user', 'creator'])
-            ->get();
+        
+        $query = Assistant::with(['user', 'creator']);
+        
+        // If user is admin, show all assistants
+        if ($user->isAdmin()) {
+            // No additional filtering needed
+        } else {
+            // For regular users, only show their own assistants
+            $query->forUser($user->id);
+        }
+        
+        // Search by name
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%");
+        }
+        
+        // Sort by name (default) or other fields
+        $sortBy = $request->get('sort_by', 'name');
+        $sortOrder = $request->get('sort_order', 'asc');
+        
+        if (in_array($sortBy, ['name', 'created_at', 'user_id'])) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc'); // Default fallback
+        }
+        
+        $assistants = $query->get();
 
         // Return basic database data without Vapi details for list view
         return response()->json([
@@ -40,17 +65,26 @@ class AssistantController extends Controller
      */
     public function adminIndex(Request $request): JsonResponse
     {
-        if (!Auth::user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized'
-            ], 403);
+        $query = Assistant::with(['user', 'creator']);
+        
+        // Search by name
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%");
         }
+        
+        // Sort by name (default) or other fields
+        $sortBy = $request->get('sort_by', 'name');
+        $sortOrder = $request->get('sort_order', 'asc');
+        
+        if (in_array($sortBy, ['name', 'created_at', 'user_id'])) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc'); // Default fallback
+        }
+        
+        $assistants = $query->get();
 
-        $assistants = Assistant::with(['user', 'creator'])
-            ->get();
-
-        // Return basic database data without Vapi details for list view
         return response()->json([
             'success' => true,
             'data' => $assistants
