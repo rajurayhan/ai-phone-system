@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
         // Create admin user
         $adminUser = User::create([
             'name' => 'Admin User',
-            'email' => 'admin@lhgraphics.com',
-            'password' => Hash::make('password'),
+            'email' => 'raju@lhgraphics.com',
+            'password' => Hash::make('raju@2025'),
             'role' => 'admin',
             'status' => 'active',
             'email_verified_at' => now(),
@@ -34,26 +34,26 @@ class DatabaseSeeder extends Seeder
 
         // Create test user
         $testUser = User::create([
-            'name' => 'Test User',
-            'email' => 'test@lhgraphics.com',
+            'name' => 'Kim',
+            'email' => 'kim@lhgraphics.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
+            'role' => 'admin',
             'status' => 'active',
             'email_verified_at' => now(),
         ]);
 
         // Create additional test users
         User::create([
-            'name' => 'Josh Smith',
+            'name' => 'Josh',
             'email' => 'josh@lhgraphics.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
+            'role' => 'admin',
             'status' => 'active',
             'email_verified_at' => now(),
         ]);
 
         User::create([
-            'name' => 'Sean Johnson',
+            'name' => 'Sean',
             'email' => 'sean@lhgraphics.com',
             'password' => Hash::make('password'),
             'role' => 'user',
