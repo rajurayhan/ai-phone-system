@@ -107,16 +107,25 @@ class AssistantController extends Controller
             'metadata.industry' => 'string|max:255',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
+            'user_id' => 'nullable|integer|exists:users,id', // Allow admin to assign to specific user
         ]);
 
         $user = Auth::user();
+        
+        // Determine the user_id for the assistant
+        $assistantUserId = $user->id; // Default to current user
+        
+        // If admin is creating and has specified a user_id, use that
+        if ($user->isAdmin() && $request->has('user_id') && $request->user_id) {
+            $assistantUserId = $request->user_id;
+        }
         
         // Add user_id to metadata
         $data = $request->all();
         if (!isset($data['metadata'])) {
             $data['metadata'] = [];
         }
-        $data['metadata']['user_id'] = $user->id;
+        $data['metadata']['user_id'] = $assistantUserId;
         $data['voice']['voiceId'] = 'Spencer';
 
         // Create assistant in Vapi
@@ -132,7 +141,7 @@ class AssistantController extends Controller
         // Store in database
         $assistant = Assistant::create([
             'name' => $data['name'],
-            'user_id' => $user->id,
+            'user_id' => $assistantUserId,
             'vapi_assistant_id' => $vapiAssistant['id'],
             'created_by' => $user->id,
         ]);
@@ -201,6 +210,7 @@ class AssistantController extends Controller
             'metadata.industry' => 'string|max:255',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
+            'user_id' => 'nullable|integer|exists:users,id', // Allow admin to reassign to different user
         ]);
 
         $user = Auth::user();
@@ -235,10 +245,18 @@ class AssistantController extends Controller
             ], 500);
         }
 
-        // Update in database
-        $assistant->update([
+        // Prepare update data
+        $updateData = [
             'name' => $request->name,
-        ]);
+        ];
+        
+        // If admin is updating and has specified a new user_id, update it
+        if ($user->isAdmin() && $request->has('user_id') && $request->user_id && $request->user_id != $assistant->user_id) {
+            $updateData['user_id'] = $request->user_id;
+        }
+
+        // Update in database
+        $assistant->update($updateData);
 
         return response()->json([
             'success' => true,

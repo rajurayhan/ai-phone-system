@@ -278,6 +278,38 @@ You are a professional customer service representative for {{company_name}}..."
             </div>
           </div>
         </div>
+
+        <!-- User Assignment (Admin Only) -->
+        <div v-if="isAdmin" class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">User Assignment</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Assign to User *</label>
+            <div v-if="loadingUsers" class="flex items-center space-x-2">
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+              <span class="text-sm text-gray-500">Loading users...</span>
+            </div>
+            <select
+              v-else
+              v-model="form.user_id"
+              required
+              :class="[
+                'w-full px-3 py-2 border rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500',
+                'border-gray-300 focus:border-green-500 bg-white'
+              ]"
+            >
+              <option value="">Select a user to assign this assistant to</option>
+              <option
+                v-for="user in users"
+                :key="user.id"
+                :value="user.id"
+              >
+                {{ user.name }} ({{ user.email }}) - {{ user.role }}
+              </option>
+            </select>
+            <p v-if="fieldErrors.user_assignment" class="text-xs text-red-600 mt-1">{{ fieldErrors.user_assignment }}</p>
+            <p v-else class="text-xs text-gray-500 mt-1">Choose which user will own this assistant</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -297,6 +329,12 @@ export default {
     const loading = ref(false)
     const submitting = ref(false)
     const error = ref(null)
+    
+    // User assignment for admin
+    const users = ref([])
+    const loadingUsers = ref(false)
+    const currentUser = ref(JSON.parse(localStorage.getItem('user') || '{}'))
+    const isAdmin = computed(() => currentUser.value.role === 'admin')
     
     // Check if we're creating a new assistant or editing an existing one
     const isCreating = computed(() => {
@@ -336,7 +374,8 @@ You embody the highest standards of customer service that {{company_name}} would
         industry: '',
         services_products: '',
         sms_phone_number: ''
-      }
+      },
+      user_id: null // Will be set based on isAdmin computed value
     })
 
     // Field-specific error states
@@ -348,7 +387,8 @@ You embody the highest standards of customer service that {{company_name}} would
       company_name: '',
       industry: '',
       services_products: '',
-      sms_phone_number: ''
+      sms_phone_number: '',
+      user_assignment: '' // Added for admin user assignment
     })
 
     // Computed property to process system prompt with company information
@@ -434,6 +474,11 @@ You embody the highest standards of customer service that {{company_name}} would
           form.value.metadata.services_products = assistant.vapi_data.metadata.services_products || ''
           form.value.metadata.sms_phone_number = assistant.vapi_data.metadata.sms_phone_number || ''
         }
+        
+        // Map user_id for admin assignment
+        if (isAdmin.value) {
+          form.value.user_id = assistant.user_id || null
+        }
       } catch (err) {
         console.error('Error loading assistant:', err)
         
@@ -473,6 +518,20 @@ You embody the highest standards of customer service that {{company_name}} would
         }
       } finally {
         loading.value = false
+      }
+    }
+
+    const loadUsers = async () => {
+      if (!isAdmin.value) return
+      
+      try {
+        loadingUsers.value = true
+        const response = await axios.get('/api/admin/users/for-assignment')
+        users.value = response.data.data || []
+      } catch (error) {
+        console.error('Error loading users:', error)
+      } finally {
+        loadingUsers.value = false
       }
     }
 
@@ -519,6 +578,12 @@ You embody the highest standards of customer service that {{company_name}} would
           hasErrors = true
         }
         
+        // Admin user assignment validation
+        if (isAdmin.value && !form.value.user_id) {
+          fieldErrors.value.user_assignment = 'Please select a user to assign this assistant to'
+          hasErrors = true
+        }
+        
         if (hasErrors) {
           return
         }
@@ -543,17 +608,17 @@ You embody the highest standards of customer service that {{company_name}} would
           endCallMessage: processedEndCallMessage.value, // Use processed end call message
           metadata: {
             ...form.value.metadata,
-            user_id: JSON.parse(localStorage.getItem('user') || '{}').id,
-            user_email: JSON.parse(localStorage.getItem('user') || '{}').email,
+            user_id: form.value.user_id || currentUser.value.id,
+            user_email: currentUser.value.email,
             updated_at: new Date().toISOString()
-          }
+          },
+          user_id: form.value.user_id || currentUser.value.id // Add user_id to main data
         }
         
         if (isCreating.value) {
           await axios.post('/api/assistants', assistantData)
           // Navigate based on user role
-          const user = JSON.parse(localStorage.getItem('user') || '{}');
-          if (user.role === 'admin') {
+          if (isAdmin.value) {
             router.push('/admin/assistants')
           } else {
             router.push('/assistants')
@@ -561,8 +626,7 @@ You embody the highest standards of customer service that {{company_name}} would
         } else {
           await axios.put(`/api/assistants/${route.params.id}`, assistantData)
           // Navigate based on user role
-          const user = JSON.parse(localStorage.getItem('user') || '{}');
-          if (user.role === 'admin') {
+          if (isAdmin.value) {
             router.push('/admin/assistants')
           } else {
             router.push('/assistants')
@@ -592,7 +656,8 @@ You embody the highest standards of customer service that {{company_name}} would
                     'metadata.company_name': 'company_name',
                     'metadata.industry': 'industry',
                     'metadata.services_products': 'services_products',
-                    'metadata.sms_phone_number': 'sms_phone_number'
+                    'metadata.sms_phone_number': 'sms_phone_number',
+                    'user_id': 'user_assignment' // Map user_id to user_assignment
                   }
                   
                   const mappedField = fieldMapping[field] || fieldName
@@ -600,53 +665,53 @@ You embody the highest standards of customer service that {{company_name}} would
                     fieldErrors.value[mappedField] = errorMessage
                   }
                 })
-                showErrorToast(this.$toast, 'Please check the form and fix the errors.');
+                showErrorToast('Please check the form and fix the errors.');
               } else if (data.message) {
                 error.value = data.message
-                showErrorToast(this.$toast, data.message);
+                showErrorToast(data.message);
               } else {
                 error.value = 'Invalid data provided. Please check your inputs and try again.'
-                showErrorToast(this.$toast, 'Invalid data provided. Please check your inputs and try again.');
+                showErrorToast('Invalid data provided. Please check your inputs and try again.');
               }
               break
               
             case 401:
               error.value = 'You are not authorized to update this assistant. Please log in again.'
-              showErrorToast(this.$toast, 'You are not authorized to update this assistant. Please log in again.');
+              showErrorToast('You are not authorized to update this assistant. Please log in again.');
               break
               
             case 403:
               error.value = 'You do not have permission to update this assistant.'
-              showErrorToast(this.$toast, 'You do not have permission to update this assistant.');
+              showErrorToast('You do not have permission to update this assistant.');
               break
               
             case 404:
               error.value = 'Assistant not found. Please check the URL and try again.'
-              showErrorToast(this.$toast, 'Assistant not found. Please check the URL and try again.');
+              showErrorToast('Assistant not found. Please check the URL and try again.');
               break
               
             case 500:
               error.value = 'Server error occurred. Please try again later.'
-              showErrorToast(this.$toast, 'Server error occurred. Please try again later.');
+              showErrorToast('Server error occurred. Please try again later.');
               break
               
             default:
               if (data.message) {
                 error.value = data.message
-                showErrorToast(this.$toast, data.message);
+                showErrorToast(data.message);
               } else {
                 error.value = `Failed to update assistant (Status: ${status}). Please try again.`
-                showErrorToast(this.$toast, `Failed to update assistant (Status: ${status}). Please try again.`);
+                showErrorToast(`Failed to update assistant (Status: ${status}). Please try again.`);
               }
           }
         } else if (err.request) {
           // Network error
           error.value = 'Network error. Please check your internet connection and try again.'
-          showErrorToast(this.$toast, 'Network error. Please check your internet connection and try again.');
+          showErrorToast('Network error. Please check your internet connection and try again.');
         } else {
           // Other errors
           error.value = 'An unexpected error occurred. Please try again.'
-          showErrorToast(this.$toast, 'An unexpected error occurred. Please try again.');
+          showErrorToast('An unexpected error occurred. Please try again.');
         }
       } finally {
         submitting.value = false
@@ -802,8 +867,7 @@ When gathering details, ask:
         router.go(-1)
       } else {
         // Fallback based on user role
-        const user = JSON.parse(localStorage.getItem('user') || '{}')
-        if (user.role === 'admin') {
+        if (isAdmin.value) {
           router.push('/admin/assistants')
         } else {
           router.push('/assistants')
@@ -813,6 +877,7 @@ When gathering details, ask:
 
     onMounted(() => {
       loadAssistant()
+      loadUsers()
     })
 
     return {
@@ -830,7 +895,10 @@ When gathering details, ask:
       loadDefaultTemplate,
       loadDefaultFirstMessage,
       loadDefaultEndCallMessage,
-      goBack
+      goBack,
+      users,
+      loadingUsers,
+      isAdmin
     }
   }
 }

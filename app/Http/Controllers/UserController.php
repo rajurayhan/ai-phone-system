@@ -123,6 +123,27 @@ class UserController extends Controller
         ]);
     }
 
+    public function getUsersForAssignment(): JsonResponse
+    {
+        // Only admin can access this
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $users = User::where('status', 'active')
+            ->select('id', 'name', 'email', 'role')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         // Only admin can access this

@@ -35,6 +35,9 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('/admin/users/{user}', [UserController::class, 'updateUser']);
     Route::delete('/admin/users/{user}', [UserController::class, 'destroy']);
     Route::put('/admin/users/{user}/toggle-status', [UserController::class, 'toggleStatus']);
+    
+    // Get users for assistant assignment
+    Route::get('/admin/users/for-assignment', [UserController::class, 'getUsersForAssignment']);
 });
 
 // Assistant routes (protected)
