@@ -69,9 +69,9 @@
                   Email Support
                 </li>
               </ul>
-              <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors">
+              <router-link to="/subscription" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors inline-block text-center">
                 Get Started
-              </button>
+              </router-link>
             </div>
           </div>
 
@@ -116,9 +116,9 @@
                   Custom Integrations
                 </li>
               </ul>
-              <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors">
+              <router-link to="/subscription" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors inline-block text-center">
                 Get Started
-              </button>
+              </router-link>
             </div>
           </div>
 
@@ -160,9 +160,9 @@
                   Dedicated Account Manager
                 </li>
               </ul>
-              <button class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-                Contact Sales
-              </button>
+              <router-link to="/subscription" class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors inline-block text-center">
+                Get Started
+              </router-link>
             </div>
           </div>
         </div>

@@ -18,6 +18,21 @@
             <div>
               <h1 class="text-2xl font-bold text-gray-900">{{ isCreating ? 'Create Assistant' : 'Edit Assistant' }}</h1>
               <p class="text-gray-600">{{ isCreating ? 'Create a new voice assistant' : 'Update your voice assistant configuration' }}</p>
+              <!-- Subscription Status (only show when creating) -->
+              <div v-if="isCreating && subscriptionInfo" class="mt-2 text-sm">
+                <span class="text-gray-500">Current Plan: {{ subscriptionInfo.plan }}</span>
+                <span class="mx-2 text-gray-300">|</span>
+                <span class="text-gray-500">Assistants: {{ subscriptionInfo.used }}/{{ subscriptionInfo.limit }}</span>
+                <span v-if="subscriptionInfo.remaining > 0" class="ml-2 text-green-600">
+                  ({{ subscriptionInfo.remaining }} remaining)
+                </span>
+                <span v-else class="ml-2 text-red-600">
+                  (Limit reached)
+                </span>
+                <router-link v-if="subscriptionInfo.remaining <= 0" to="/subscription" class="ml-2 text-blue-600 hover:text-blue-700 underline">
+                  Upgrade Plan
+                </router-link>
+              </div>
             </div>
           </div>
           <div class="flex items-center space-x-3">
@@ -683,8 +698,13 @@ You embody the highest standards of customer service that {{company_name}} would
               break
               
             case 403:
-              error.value = 'You do not have permission to update this assistant.'
-              await showError('Permission Denied', 'You do not have permission to update this assistant.');
+              if (data.message && data.message.includes('assistant limit')) {
+                error.value = 'You have reached your assistant limit for your current subscription plan. Please upgrade your plan to create more assistants.'
+                await showError('Subscription Limit Reached', 'You have reached your assistant limit for your current subscription plan. Please upgrade your plan to create more assistants.');
+              } else {
+                error.value = 'You do not have permission to update this assistant.'
+                await showError('Permission Denied', 'You do not have permission to update this assistant.');
+              }
               break
               
             case 404:

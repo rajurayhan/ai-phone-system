@@ -106,6 +106,7 @@
               </div>
               <router-link to="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</router-link>
               <router-link to="/pricing" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pricing</router-link>
+              <router-link to="/subscription" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Subscription</router-link>
               <button @click="logout" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</button>
             </div>
           </div>
