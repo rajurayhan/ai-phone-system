@@ -62,6 +62,28 @@
             >
               All Assistants
             </router-link>
+            <router-link 
+              to="/pricing" 
+              :class="[
+                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                $route.path === '/pricing' 
+                  ? 'border-green-500 text-green-600' 
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              ]"
+            >
+              Pricing
+            </router-link>
+            <router-link 
+              to="/subscription" 
+              :class="[
+                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                $route.path === '/subscription' 
+                  ? 'border-green-500 text-green-600' 
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              ]"
+            >
+              Subscription
+            </router-link>
           </div>
         </div>
         <div class="flex items-center">

@@ -15,6 +15,7 @@ import LandingPage from './components/landing/LandingPage.vue';
 import AssistantForm from './components/assistant/AssistantForm.vue';
 import UserAssistants from './components/dashboard/UserAssistants.vue';
 import Pricing from './components/pricing/Pricing.vue';
+import SubscriptionManager from './components/subscription/SubscriptionManager.vue';
 
 // Create router
 const router = createRouter({
@@ -90,6 +91,12 @@ const router = createRouter({
             path: '/pricing',
             name: 'pricing',
             component: Pricing,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/subscription',
+            name: 'subscription',
+            component: SubscriptionManager,
             meta: { requiresAuth: true }
         }
     ]

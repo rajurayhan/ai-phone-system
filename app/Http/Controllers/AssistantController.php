@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\User; // Added this import for User model
 
 class AssistantController extends Controller
 {
@@ -112,12 +113,29 @@ class AssistantController extends Controller
 
         $user = Auth::user();
         
+        // Check if user can create more assistants
+        if (!$user->canCreateAssistant()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have reached your assistant limit for your current subscription plan. Please upgrade your plan to create more assistants.'
+            ], 403);
+        }
+        
         // Determine the user_id for the assistant
         $assistantUserId = $user->id; // Default to current user
         
         // If admin is creating and has specified a user_id, use that
         if ($user->isAdmin() && $request->has('user_id') && $request->user_id) {
             $assistantUserId = $request->user_id;
+            
+            // Check if the target user can create more assistants
+            $targetUser = User::find($assistantUserId);
+            if (!$targetUser->canCreateAssistant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The selected user has reached their assistant limit for their current subscription plan.'
+                ], 403);
+            }
         }
         
         // Add user_id to metadata

@@ -17,42 +17,49 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create subscription packages
+        $this->call([
+            SubscriptionPackageSeeder::class,
+        ]);
+
         // Create admin user
-        $adminUser = User::firstOrCreate(
-            ['email' => 'raju@lhgraphics.com'],
-            [
-                'name' => 'Raju',
-                'password' => Hash::make('raju@2025'),
-                'role' => 'admin',
-                'status' => 'active',
-                'company' => 'Voice AI',
-                'bio' => 'System Administrator',
-            ]
-        );
+        $adminUser = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@applicatehive.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'status' => 'active',
+            'email_verified_at' => now(),
+        ]);
 
         // Create test user
-        $testUser = User::firstOrCreate(
-            ['email' => 'josh@lhgraphics.com'],
-            [
-                'name' => 'Josh',
-                'password' => Hash::make('josh@2025'),
-                'role' => 'admin',
-                'status' => 'active',
-                'company' => 'Test Company',
-                'bio' => 'Test user for development',
-            ]
-        );
-        $testUser2 = User::firstOrCreate(
-            ['email' => 'sean@lhgraphics.com'],
-            [
-                'name' => 'Sean',
-                'password' => Hash::make('sean@2025'),
-                'role' => 'user',
-                'status' => 'active',
-                'company' => 'Test Company',
-                'bio' => 'Test user for development',
-            ]
-        );
+        $testUser = User::create([
+            'name' => 'Test User',
+            'email' => 'test@applicatehive.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+            'status' => 'active',
+            'email_verified_at' => now(),
+        ]);
+
+        // Create additional test users
+        User::create([
+            'name' => 'Josh Smith',
+            'email' => 'josh@applicatehive.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+            'status' => 'active',
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'name' => 'Sean Johnson',
+            'email' => 'sean@applicatehive.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+            'status' => 'active',
+            'email_verified_at' => now(),
+        ]);
 
         // Import assistants from Vapi API
         $this->importVapiAssistants($adminUser, $testUser);

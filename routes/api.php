@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,6 +114,21 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
             'data' => []
         ]);
     });
+});
+
+// Subscription routes (protected)
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/subscriptions/packages', [SubscriptionController::class, 'getPackages']);
+    Route::get('/subscriptions/current', [SubscriptionController::class, 'getCurrentSubscription']);
+    Route::post('/subscriptions/subscribe', [SubscriptionController::class, 'subscribe']);
+    Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel']);
+    Route::post('/subscriptions/upgrade', [SubscriptionController::class, 'upgrade']);
+    Route::get('/subscriptions/usage', [SubscriptionController::class, 'getUsage']);
+});
+
+// Admin subscription routes (protected)
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/admin/subscriptions', [SubscriptionController::class, 'adminGetSubscriptions']);
 });
 
 // Test route for debugging request headers

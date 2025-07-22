@@ -319,7 +319,7 @@ You are a professional customer service representative for {{company_name}}..."
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
-import { showErrorToast } from '../../utils/toaster.js'
+import { showError, showSuccess } from '../../utils/sweetalert.js'
 
 export default {
   name: 'AssistantForm',
@@ -617,6 +617,7 @@ You embody the highest standards of customer service that {{company_name}} would
         
         if (isCreating.value) {
           await axios.post('/api/assistants', assistantData)
+          await showSuccess('Success', 'Assistant created successfully!')
           // Navigate based on user role
           if (isAdmin.value) {
             router.push('/admin/assistants')
@@ -625,6 +626,7 @@ You embody the highest standards of customer service that {{company_name}} would
           }
         } else {
           await axios.put(`/api/assistants/${route.params.id}`, assistantData)
+          await showSuccess('Success', 'Assistant updated successfully!')
           // Navigate based on user role
           if (isAdmin.value) {
             router.push('/admin/assistants')
@@ -665,53 +667,53 @@ You embody the highest standards of customer service that {{company_name}} would
                     fieldErrors.value[mappedField] = errorMessage
                   }
                 })
-                showErrorToast('Please check the form and fix the errors.');
+                await showError('Validation Error', 'Please check the form and fix the errors.');
               } else if (data.message) {
                 error.value = data.message
-                showErrorToast(data.message);
+                await showError('Update Failed', data.message);
               } else {
                 error.value = 'Invalid data provided. Please check your inputs and try again.'
-                showErrorToast('Invalid data provided. Please check your inputs and try again.');
+                await showError('Update Failed', 'Invalid data provided. Please check your inputs and try again.');
               }
               break
               
             case 401:
               error.value = 'You are not authorized to update this assistant. Please log in again.'
-              showErrorToast('You are not authorized to update this assistant. Please log in again.');
+              await showError('Authentication Error', 'You are not authorized to update this assistant. Please log in again.');
               break
               
             case 403:
               error.value = 'You do not have permission to update this assistant.'
-              showErrorToast('You do not have permission to update this assistant.');
+              await showError('Permission Denied', 'You do not have permission to update this assistant.');
               break
               
             case 404:
               error.value = 'Assistant not found. Please check the URL and try again.'
-              showErrorToast('Assistant not found. Please check the URL and try again.');
+              await showError('Not Found', 'Assistant not found. Please check the URL and try again.');
               break
               
             case 500:
               error.value = 'Server error occurred. Please try again later.'
-              showErrorToast('Server error occurred. Please try again later.');
+              await showError('Server Error', 'Server error occurred. Please try again later.');
               break
               
             default:
               if (data.message) {
                 error.value = data.message
-                showErrorToast(data.message);
+                await showError('Update Failed', data.message);
               } else {
                 error.value = `Failed to update assistant (Status: ${status}). Please try again.`
-                showErrorToast(`Failed to update assistant (Status: ${status}). Please try again.`);
+                await showError('Update Failed', `Failed to update assistant (Status: ${status}). Please try again.`);
               }
           }
         } else if (err.request) {
           // Network error
           error.value = 'Network error. Please check your internet connection and try again.'
-          showErrorToast('Network error. Please check your internet connection and try again.');
+          await showError('Network Error', 'Network error. Please check your internet connection and try again.');
         } else {
           // Other errors
           error.value = 'An unexpected error occurred. Please try again.'
-          showErrorToast('An unexpected error occurred. Please try again.');
+          await showError('Error', 'An unexpected error occurred. Please try again.');
         }
       } finally {
         submitting.value = false

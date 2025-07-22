@@ -85,16 +85,63 @@ class User extends Authenticatable
     /**
      * Get the assistants owned by the user.
      */
-    public function assistants(): HasMany
+    public function assistants()
     {
         return $this->hasMany(Assistant::class);
     }
 
-    /**
-     * Get the assistants created by the user.
-     */
-    public function createdAssistants(): HasMany
+    public function subscriptions()
     {
-        return $this->hasMany(Assistant::class, 'created_by');
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(UserSubscription::class)->where('status', 'active')->orWhere('status', 'trial');
+    }
+
+    public function hasActiveSubscription()
+    {
+        return $this->activeSubscription()->exists();
+    }
+
+    public function getCurrentSubscriptionAttribute()
+    {
+        return $this->activeSubscription;
+    }
+
+    public function canCreateAssistant()
+    {
+        if (!$this->hasActiveSubscription()) {
+            return false;
+        }
+
+        $subscription = $this->currentSubscription;
+        $package = $subscription->package;
+        
+        // Check if unlimited or within limit
+        if ($package->isUnlimited('voice_agents_limit')) {
+            return true;
+        }
+
+        $currentCount = $this->assistants()->count();
+        return $currentCount < $package->voice_agents_limit;
+    }
+
+    public function getRemainingAssistantsAttribute()
+    {
+        if (!$this->hasActiveSubscription()) {
+            return 0;
+        }
+
+        $subscription = $this->currentSubscription;
+        $package = $subscription->package;
+        
+        if ($package->isUnlimited('voice_agents_limit')) {
+            return -1; // Unlimited
+        }
+
+        $currentCount = $this->assistants()->count();
+        return max(0, $package->voice_agents_limit - $currentCount);
     }
 }
