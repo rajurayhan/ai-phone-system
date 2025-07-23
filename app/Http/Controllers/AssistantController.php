@@ -113,12 +113,21 @@ class AssistantController extends Controller
 
         $user = Auth::user();
         
-        // Check if user can create more assistants
-        if (!$user->canCreateAssistant()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You have reached your assistant limit for your current subscription plan. Please upgrade your plan to create more assistants.'
-            ], 403);
+        // Check if user can create more assistants (skip for admin users)
+        if (!$user->isAdmin()) {
+            if (!$user->canCreateAssistant()) {
+                if (!$user->hasActiveSubscription()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You need an active subscription to create assistants. Please subscribe to a plan to get started.'
+                    ], 403);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You have reached your assistant limit for your current subscription plan. Please upgrade your plan to create more assistants.'
+                    ], 403);
+                }
+            }
         }
         
         // Determine the user_id for the assistant

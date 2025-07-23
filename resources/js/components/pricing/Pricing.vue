@@ -69,7 +69,10 @@
                   Email Support
                 </li>
               </ul>
-              <router-link to="/subscription" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors inline-block text-center">
+              <router-link 
+                :to="`/payment?package_id=${starterPlan.id}`" 
+                class="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              >
                 Get Started
               </router-link>
             </div>
@@ -116,7 +119,10 @@
                   Custom Integrations
                 </li>
               </ul>
-              <router-link to="/subscription" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors inline-block text-center">
+              <router-link 
+                :to="`/payment?package_id=${professionalPlan.id}`" 
+                class="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              >
                 Get Started
               </router-link>
             </div>
@@ -160,7 +166,10 @@
                   Dedicated Account Manager
                 </li>
               </ul>
-              <router-link to="/subscription" class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors inline-block text-center">
+              <router-link 
+                :to="`/payment?package_id=${enterprisePlan.id}`" 
+                class="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              >
                 Get Started
               </router-link>
             </div>

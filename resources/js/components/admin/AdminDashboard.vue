@@ -133,8 +133,44 @@
                 </div>
               </div>
               <div class="mt-6">
-                <router-link to="/admin/assistants" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                  Manage Assistants
+                <router-link 
+                  to="/admin/assistants" 
+                  class="group relative rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div>
+                    <span class="rounded-lg inline-flex p-3 bg-blue-50 text-blue-600 ring-4 ring-white">
+                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </span>
+                  </div>
+                  <div class="mt-4">
+                    <h3 class="text-lg font-medium">
+                      <span class="absolute inset-0" aria-hidden="true"></span>
+                      Voice Assistants
+                    </h3>
+                    <p class="mt-2 text-sm text-gray-500">Manage all voice assistants</p>
+                  </div>
+                </router-link>
+
+                <router-link 
+                  to="/admin/transactions" 
+                  class="group relative rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div>
+                    <span class="rounded-lg inline-flex p-3 bg-green-50 text-green-600 ring-4 ring-white">
+                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                    </span>
+                  </div>
+                  <div class="mt-4">
+                    <h3 class="text-lg font-medium">
+                      <span class="absolute inset-0" aria-hidden="true"></span>
+                      Transactions
+                    </h3>
+                    <p class="mt-2 text-sm text-gray-500">View payment history and manage transactions</p>
+                  </div>
                 </router-link>
               </div>
             </div>

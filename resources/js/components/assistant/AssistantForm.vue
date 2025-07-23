@@ -18,8 +18,8 @@
             <div>
               <h1 class="text-2xl font-bold text-gray-900">{{ isCreating ? 'Create Assistant' : 'Edit Assistant' }}</h1>
               <p class="text-gray-600">{{ isCreating ? 'Create a new voice assistant' : 'Update your voice assistant configuration' }}</p>
-              <!-- Subscription Status (only show when creating) -->
-              <div v-if="isCreating && subscriptionInfo" class="mt-2 text-sm">
+              <!-- Subscription Status (only show when creating and not admin) -->
+              <div v-if="isCreating && subscriptionInfo && !isAdmin" class="mt-2 text-sm">
                 <span class="text-gray-500">Current Plan: {{ subscriptionInfo.plan }}</span>
                 <span class="mx-2 text-gray-300">|</span>
                 <span class="text-gray-500">Assistants: {{ subscriptionInfo.used }}/{{ subscriptionInfo.limit }}</span>
@@ -33,19 +33,33 @@
                   Upgrade Plan
                 </router-link>
               </div>
+              <!-- No Subscription Warning (only show when creating and not admin) -->
+              <div v-else-if="isCreating && !subscriptionInfo?.hasSubscription && !isAdmin" class="mt-2 text-sm">
+                <span class="text-red-600 font-medium">No Active Subscription</span>
+                <span class="mx-2 text-gray-300">|</span>
+                <span class="text-gray-500">Subscribe to create assistants</span>
+                <router-link to="/subscription" class="ml-2 text-blue-600 hover:text-blue-700 underline">
+                  Subscribe Now
+                </router-link>
+              </div>
             </div>
           </div>
           <div class="flex items-center space-x-3">
             <button
               @click="saveAssistant"
-              :disabled="submitting"
+              :disabled="submitting || (isCreating && subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin)"
               class="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg flex items-center"
             >
               <svg v-if="submitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {{ submitting ? (isCreating ? 'Creating...' : 'Updating...') : (isCreating ? 'Create Assistant' : 'Update Assistant') }}
+              <span v-if="isCreating && subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin">
+                Subscribe to Create Assistant
+              </span>
+              <span v-else>
+                {{ submitting ? (isCreating ? 'Creating...' : 'Updating...') : (isCreating ? 'Create Assistant' : 'Update Assistant') }}
+              </span>
             </button>
           </div>
         </div>
@@ -555,27 +569,50 @@ You embody the highest standards of customer service that {{company_name}} would
 
     const loadSubscriptionInfo = async () => {
       if (!isCreating.value) return // Only load for creation
+      if (isAdmin.value) return // Don't load for admin users
       
       try {
         const response = await axios.get('/api/subscriptions/usage')
         const usage = response.data.data
         
-        if (usage && usage.subscription) {
+        if (usage && usage.package) {
           subscriptionInfo.value = {
-            plan: usage.subscription.package?.name || 'No Plan',
-            used: usage.subscription.assistants_used || 0,
-            limit: usage.subscription.package?.voice_agents_limit || 0,
-            remaining: (usage.subscription.package?.voice_agents_limit || 0) - (usage.subscription.assistants_used || 0)
+            plan: usage.package.name || 'No Plan',
+            used: usage.assistants.used || 0,
+            limit: usage.assistants.limit || 0,
+            remaining: usage.assistants.remaining || 0,
+            hasSubscription: true
+          }
+        } else {
+          // No active subscription
+          subscriptionInfo.value = {
+            plan: 'No Plan',
+            used: 0,
+            limit: 0,
+            remaining: 0,
+            hasSubscription: false
           }
         }
       } catch (error) {
         console.error('Error loading subscription info:', error)
-        // Set default values if API fails
-        subscriptionInfo.value = {
-          plan: 'Unknown',
-          used: 0,
-          limit: 0,
-          remaining: 0
+        // If 404, it means no active subscription
+        if (error.response && error.response.status === 404) {
+          subscriptionInfo.value = {
+            plan: 'No Plan',
+            used: 0,
+            limit: 0,
+            remaining: 0,
+            hasSubscription: false
+          }
+        } else {
+          // Set default values if API fails - assume no subscription
+          subscriptionInfo.value = {
+            plan: 'Unknown',
+            used: 0,
+            limit: 0,
+            remaining: 0,
+            hasSubscription: false
+          }
         }
       }
     }
@@ -728,7 +765,10 @@ You embody the highest standards of customer service that {{company_name}} would
               break
               
             case 403:
-              if (data.message && data.message.includes('assistant limit')) {
+              if (data.message && data.message.includes('need an active subscription')) {
+                error.value = 'You need an active subscription to create assistants. Please subscribe to a plan to get started.'
+                await showError('Subscription Required', 'You need an active subscription to create assistants. Please subscribe to a plan to get started.');
+              } else if (data.message && data.message.includes('assistant limit')) {
                 error.value = 'You have reached your assistant limit for your current subscription plan. Please upgrade your plan to create more assistants.'
                 await showError('Subscription Limit Reached', 'You have reached your assistant limit for your current subscription plan. Please upgrade your plan to create more assistants.');
               } else {

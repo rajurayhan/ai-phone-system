@@ -124,11 +124,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel']);
     Route::post('/subscriptions/upgrade', [SubscriptionController::class, 'upgrade']);
     Route::get('/subscriptions/usage', [SubscriptionController::class, 'getUsage']);
+    
+    // Transaction routes
+    Route::prefix('transactions')->group(function () {
+        Route::get('/', [App\Http\Controllers\TransactionController::class, 'index']);
+        Route::post('/', [App\Http\Controllers\TransactionController::class, 'store']);
+        Route::get('/{transactionId}', [App\Http\Controllers\TransactionController::class, 'show']);
+        Route::put('/{transactionId}/status', [App\Http\Controllers\TransactionController::class, 'updateStatus']);
+        Route::post('/{transactionId}/process', [App\Http\Controllers\TransactionController::class, 'processPayment']);
+    });
 });
 
 // Admin subscription routes (protected)
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/admin/subscriptions', [SubscriptionController::class, 'adminGetSubscriptions']);
+    
+    // Admin transaction routes
+    Route::prefix('admin/transactions')->group(function () {
+        Route::get('/', [App\Http\Controllers\TransactionController::class, 'adminIndex']);
+        Route::get('/stats', [App\Http\Controllers\TransactionController::class, 'adminStats']);
+    });
 });
 
 // Test route for debugging request headers

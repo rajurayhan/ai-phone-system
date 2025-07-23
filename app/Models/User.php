@@ -95,6 +95,11 @@ class User extends Authenticatable
         return $this->hasMany(UserSubscription::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     public function activeSubscription()
     {
         return $this->hasOne(UserSubscription::class)->where('status', 'active')->orWhere('status', 'trial');

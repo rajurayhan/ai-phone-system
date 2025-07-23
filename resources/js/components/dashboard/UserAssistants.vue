@@ -16,12 +16,41 @@
             </p>
           </div>
           <div class="mt-4 flex md:mt-0 md:ml-4">
-            <button @click="createAssistant" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            <button 
+              @click="createAssistant" 
+              :disabled="subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin"
+              class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Create Assistant
+              <span v-if="subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin">Subscribe to Create</span>
+              <span v-else>Create Assistant</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Subscription Status Banner -->
+        <div v-if="subscriptionInfo && !subscriptionInfo.hasSubscription" class="mt-6 bg-yellow-50 border border-yellow-200 rounded-md p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-yellow-800">
+                No Active Subscription
+              </h3>
+              <div class="mt-2 text-sm text-yellow-700">
+                <p>You need an active subscription to create and manage voice assistants.</p>
+              </div>
+              <div class="mt-4">
+                <router-link to="/subscription" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-800 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                  Subscribe Now
+                </router-link>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -88,11 +117,16 @@
             <h3 class="mt-2 text-sm font-medium text-gray-900">No assistants</h3>
             <p class="mt-1 text-sm text-gray-500">Get started by creating your first voice assistant.</p>
             <div class="mt-6">
-              <button @click="createAssistant" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+              <button 
+                @click="createAssistant" 
+                :disabled="subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin"
+                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                Create Assistant
+                <span v-if="subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin">Subscribe to Create</span>
+                <span v-else>Create Assistant</span>
               </button>
             </div>
           </div>
@@ -314,7 +348,8 @@ export default {
       sortBy: 'name',
       sortOrder: 'asc',
       searchTimeout: null,
-      deletingAssistant: null // New state for tracking deletion
+      deletingAssistant: null, // New state for tracking deletion
+      subscriptionInfo: null // New state for subscription info
     }
   },
   computed: {
@@ -364,10 +399,15 @@ export default {
       }
       
       return pages;
+    },
+    isAdmin() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.role === 'admin';
     }
   },
   async mounted() {
     await this.loadAssistants();
+    await this.loadSubscriptionInfo(); // Load subscription info on mount
   },
   methods: {
     async loadAssistants() {
@@ -484,6 +524,53 @@ export default {
       this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
       this.currentPage = 1; // Reset to first page when sort order changes
       this.loadAssistants();
+    },
+
+    async loadSubscriptionInfo() {
+      try {
+        // Don't load subscription info for admin users
+        if (this.isAdmin) {
+          this.subscriptionInfo = null;
+          return;
+        }
+        
+        const response = await axios.get('/api/subscriptions/usage');
+        const usage = response.data.data;
+        
+        if (usage && usage.package) {
+          this.subscriptionInfo = {
+            hasSubscription: true,
+            plan: usage.package.name || 'No Plan',
+            used: usage.assistants.used || 0,
+            limit: usage.assistants.limit || 0
+          };
+        } else {
+          this.subscriptionInfo = {
+            hasSubscription: false,
+            plan: 'No Plan',
+            used: 0,
+            limit: 0
+          };
+        }
+      } catch (error) {
+        console.error('Error loading subscription info:', error);
+        // If 404, it means no active subscription
+        if (error.response && error.response.status === 404) {
+          this.subscriptionInfo = {
+            hasSubscription: false,
+            plan: 'No Plan',
+            used: 0,
+            limit: 0
+          };
+        } else {
+          this.subscriptionInfo = {
+            hasSubscription: false,
+            plan: 'Unknown',
+            used: 0,
+            limit: 0
+          };
+        }
+      }
     }
   }
 }

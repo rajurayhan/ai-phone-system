@@ -84,6 +84,17 @@
             >
               Subscription
             </router-link>
+            <router-link 
+              to="/transactions" 
+              :class="[
+                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                $route.path === '/transactions' 
+                  ? 'border-green-500 text-green-600' 
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              ]"
+            >
+              Transactions
+            </router-link>
           </div>
         </div>
         <div class="flex items-center">
@@ -107,6 +118,7 @@
               <router-link to="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</router-link>
               <router-link to="/pricing" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pricing</router-link>
               <router-link to="/subscription" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Subscription</router-link>
+              <router-link to="/transactions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Transactions</router-link>
               <button @click="logout" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</button>
             </div>
           </div>

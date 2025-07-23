@@ -148,6 +148,15 @@
                   >
                     {{ loading ? 'Processing...' : 'Subscribe' }}
                   </button>
+                  <router-link 
+                    :to="`/payment?package_id=${pkg.id}`" 
+                    class="mt-2 w-full inline-flex justify-center items-center bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    Pay Now
+                  </router-link>
                 </div>
               </div>
             </div>
