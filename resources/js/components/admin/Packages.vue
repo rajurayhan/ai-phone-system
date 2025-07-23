@@ -53,11 +53,11 @@
               <div class="space-y-2 mb-4">
                 <div class="flex justify-between text-sm">
                   <span class="text-gray-500">Voice Agents:</span>
-                  <span class="font-medium">{{ pkg.formatted_voice_agents_limit }}</span>
+                  <span class="font-medium">{{ pkg.voice_agents_limit < 0 ? 'Unlimited' : pkg.voice_agents_limit }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
                   <span class="text-gray-500">Monthly Minutes:</span>
-                  <span class="font-medium">{{ pkg.formatted_minutes_limit }}</span>
+                  <span class="font-medium">{{ pkg.monthly_minutes_limit }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
                   <span class="text-gray-500">Support:</span>
