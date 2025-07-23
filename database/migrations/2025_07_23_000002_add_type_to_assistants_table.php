@@ -3,17 +3,18 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Traits\SafeMigrationTrait;
 
 return new class extends Migration
 {
+    use SafeMigrationTrait;
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::table('assistants', function (Blueprint $table) {
-            $table->enum('type', ['demo', 'production'])->default('demo')->after('vapi_assistant_id');
-        });
+        $this->safeAddEnumColumn('assistants', 'type', ['demo', 'production'], 'demo', 'vapi_assistant_id');
     }
 
     /**
@@ -21,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('assistants', function (Blueprint $table) {
-            $table->dropColumn('type');
-        });
+        $this->safeDropColumn('assistants', 'type');
     }
 }; 
