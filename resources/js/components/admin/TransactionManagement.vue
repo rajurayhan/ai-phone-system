@@ -104,7 +104,7 @@
         <div class="mt-6 bg-white shadow rounded-lg">
           <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Filters</h3>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Status</label>
                 <select v-model="filters.status" @change="loadTransactions" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
@@ -140,14 +140,68 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700">User ID</label>
-                <input 
-                  v-model="filters.user_id" 
-                  type="number" 
-                  @change="loadTransactions"
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Filter by user ID"
-                />
+                <label class="block text-sm font-medium text-gray-700">Date Range</label>
+                <select v-model="filters.date_range" @change="loadTransactions" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
+                  <option value="">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="quarter">This Quarter</option>
+                  <option value="year">This Year</option>
+                </select>
+              </div>
+
+              <div class="relative">
+                <label class="block text-sm font-medium text-gray-700">Users</label>
+                <div class="mt-1">
+                  <div class="flex flex-wrap gap-1 p-2 border border-gray-300 rounded-md min-h-[38px] bg-white cursor-pointer" @click="showUserDropdown = !showUserDropdown">
+                    <span v-if="filters.user_id.length === 0" class="text-gray-400 text-sm">All Users</span>
+                    <span 
+                      v-for="userId in filters.user_id" 
+                      :key="userId"
+                      class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800"
+                    >
+                      {{ getUserName(userId) }}
+                      <button 
+                        @click.stop="removeUser(userId)" 
+                        class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-green-600 hover:bg-green-200"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+                
+                <!-- User Dropdown -->
+                <div v-if="showUserDropdown" class="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                  <div class="p-2">
+                    <div class="text-xs font-medium text-gray-500 mb-2">Select Users</div>
+                    <div 
+                      v-for="user in users" 
+                      :key="user.id"
+                      @click="toggleUser(user.id)"
+                      class="flex items-center px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer rounded"
+                      :class="{ 'bg-green-50': filters.user_id.includes(user.id) }"
+                    >
+                      <div class="flex items-center">
+                        <div class="w-4 h-4 border border-gray-300 rounded mr-3 flex items-center justify-center"
+                             :class="{ 'bg-green-600 border-green-600': filters.user_id.includes(user.id) }">
+                          <svg v-if="filters.user_id.includes(user.id)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <span>{{ user.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -200,7 +254,7 @@
                       <div class="text-sm font-medium text-gray-900">{{ transaction.package?.name || 'Unknown' }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-gray-900">{{ transaction.formatted_amount }}</div>
+                      <div class="text-sm font-medium text-gray-900">{{ transaction.amount }}</div>
                       <div class="text-sm text-gray-500">{{ transaction.currency }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -293,17 +347,28 @@ export default {
       transactions: [],
       stats: {},
       pagination: null,
+      users: [],
       filters: {
         status: '',
         type: '',
         payment_method: '',
-        user_id: ''
-      }
+        user_id: [],
+        date_range: ''
+      },
+      showUserDropdown: false
     }
   },
   async mounted() {
     await this.loadStats()
+    await this.loadUsers()
     await this.loadTransactions()
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', this.handleClickOutside)
+  },
+
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside)
   },
   methods: {
     async loadStats() {
@@ -324,12 +389,35 @@ export default {
       }
     },
 
+    async loadUsers() {
+      try {
+        const response = await axios.get('/api/admin/users', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        this.users = response.data.data || []
+        console.log('Users loaded:', this.users)
+      } catch (error) {
+        console.error('Error loading users:', error)
+        if (error.response && error.response.status === 401) {
+          this.$router.push('/login')
+        }
+      }
+    },
+
     async loadTransactions(page = 1) {
       try {
         this.loading = true
         const params = {
           page,
           ...this.filters
+        }
+        
+        // Handle multiple user selections
+        if (this.filters.user_id.length > 0) {
+          params.user_id = this.filters.user_id.join(',')
         }
         
         const response = await axios.get('/api/admin/transactions', { 
@@ -378,6 +466,36 @@ export default {
         'refund': 'bg-orange-100 text-orange-800',
         'trial': 'bg-indigo-100 text-indigo-800'
       }[type] || 'bg-gray-100 text-gray-800'
+    },
+
+    getUserName(userId) {
+      const user = this.users.find(u => u.id === userId)
+      return user ? user.name : 'Unknown User'
+    },
+
+    toggleUser(userId) {
+      const index = this.filters.user_id.indexOf(userId)
+      if (index > -1) {
+        this.filters.user_id.splice(index, 1)
+      } else {
+        this.filters.user_id.push(userId)
+      }
+      this.loadTransactions()
+    },
+
+    removeUser(userId) {
+      const index = this.filters.user_id.indexOf(userId)
+      if (index > -1) {
+        this.filters.user_id.splice(index, 1)
+        this.loadTransactions()
+      }
+    },
+
+    handleClickOutside(event) {
+      const dropdown = event.target.closest('.relative')
+      if (!dropdown) {
+        this.showUserDropdown = false
+      }
     }
   }
 }

@@ -25,30 +25,59 @@ class TransactionController extends Controller
             ->orderBy('created_at', 'desc');
 
         // Apply filters
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->has('type')) {
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        if ($request->has('payment_method')) {
+        if ($request->filled('payment_method')) {
             $query->where('payment_method', $request->payment_method);
+        }
+
+        if ($request->filled('date_range')) {
+            $dateRange = $request->date_range;
+            $now = \Carbon\Carbon::now();
+            
+            switch ($dateRange) {
+                case 'today':
+                    $query->whereDate('created_at', $now->toDateString());
+                    break;
+                case 'week':
+                    $query->whereBetween('created_at', [$now->startOfWeek()->toDateTimeString(), $now->endOfWeek()->toDateTimeString()]);
+                    break;
+                case 'month':
+                    $query->whereBetween('created_at', [$now->startOfMonth()->toDateTimeString(), $now->endOfMonth()->toDateTimeString()]);
+                    break;
+                case 'quarter':
+                    $query->whereBetween('created_at', [$now->startOfQuarter()->toDateTimeString(), $now->endOfQuarter()->toDateTimeString()]);
+                    break;
+                case 'year':
+                    $query->whereBetween('created_at', [$now->startOfYear()->toDateTimeString(), $now->endOfYear()->toDateTimeString()]);
+                    break;
+            }
         }
 
         // Pagination
         $perPage = $request->get('per_page', 15);
         $transactions = $query->paginate($perPage);
 
+        // Create a clone of the query for summary calculations
+        $summaryQuery = clone $query;
+        $summaryQuery->getQuery()->orders = null; // Remove ordering for summary
+        $summaryQuery->getQuery()->limit = null; // Remove limit for summary
+        $summaryQuery->getQuery()->offset = null; // Remove offset for summary
+
         return response()->json([
             'success' => true,
             'data' => $transactions,
             'summary' => [
-                'total_transactions' => $user->transactions()->count(),
-                'total_amount' => $user->transactions()->completed()->sum('amount'),
-                'pending_transactions' => $user->transactions()->pending()->count(),
-                'failed_transactions' => $user->transactions()->failed()->count(),
+                'total_transactions' => $summaryQuery->count(),
+                'total_amount' => $summaryQuery->where('status', 'completed')->sum('amount'),
+                'pending_transactions' => $summaryQuery->where('status', 'pending')->count(),
+                'failed_transactions' => $summaryQuery->where('status', 'failed')->count(),
             ]
         ]);
     }
@@ -366,34 +395,64 @@ class TransactionController extends Controller
             ->orderBy('created_at', 'desc');
 
         // Apply filters
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->has('type')) {
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        if ($request->has('payment_method')) {
+        if ($request->filled('payment_method')) {
             $query->where('payment_method', $request->payment_method);
         }
 
-        if ($request->has('user_id')) {
-            $query->where('user_id', $request->user_id);
+        if ($request->filled('user_id')) {
+            $userIds = explode(',', $request->user_id);
+            $query->whereIn('user_id', $userIds);
+        }
+
+        if ($request->filled('date_range')) {
+            $dateRange = $request->date_range;
+            $now = \Carbon\Carbon::now();
+            
+            switch ($dateRange) {
+                case 'today':
+                    $query->whereDate('created_at', $now->toDateString());
+                    break;
+                case 'week':
+                    $query->whereBetween('created_at', [$now->startOfWeek()->toDateTimeString(), $now->endOfWeek()->toDateTimeString()]);
+                    break;
+                case 'month':
+                    $query->whereBetween('created_at', [$now->startOfMonth()->toDateTimeString(), $now->endOfMonth()->toDateTimeString()]);
+                    break;
+                case 'quarter':
+                    $query->whereBetween('created_at', [$now->startOfQuarter()->toDateTimeString(), $now->endOfQuarter()->toDateTimeString()]);
+                    break;
+                case 'year':
+                    $query->whereBetween('created_at', [$now->startOfYear()->toDateTimeString(), $now->endOfYear()->toDateTimeString()]);
+                    break;
+            }
         }
 
         // Pagination
         $perPage = $request->get('per_page', 15);
         $transactions = $query->paginate($perPage);
 
+        // Create a clone of the query for summary calculations
+        $summaryQuery = clone $query;
+        $summaryQuery->getQuery()->orders = null; // Remove ordering for summary
+        $summaryQuery->getQuery()->limit = null; // Remove limit for summary
+        $summaryQuery->getQuery()->offset = null; // Remove offset for summary
+
         return response()->json([
             'success' => true,
             'data' => $transactions,
             'summary' => [
-                'total_transactions' => Transaction::count(),
-                'total_amount' => Transaction::completed()->sum('amount'),
-                'pending_transactions' => Transaction::pending()->count(),
-                'failed_transactions' => Transaction::failed()->count(),
+                'total_transactions' => $summaryQuery->count(),
+                'total_amount' => $summaryQuery->where('status', 'completed')->sum('amount'),
+                'pending_transactions' => $summaryQuery->where('status', 'pending')->count(),
+                'failed_transactions' => $summaryQuery->where('status', 'failed')->count(),
             ]
         ]);
     }

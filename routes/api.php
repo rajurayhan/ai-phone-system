@@ -161,6 +161,18 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::put('/{id}', [App\Http\Controllers\FeatureController::class, 'update']);
         Route::delete('/{id}', [App\Http\Controllers\FeatureController::class, 'destroy']);
     });
+    
+    // Admin users routes
+    Route::get('/admin/users', function (Request $request) {
+        $users = \App\Models\User::select('id', 'name', 'email', 'role', 'status')
+            ->orderBy('name')
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    });
 });
 
 // Test route for debugging request headers

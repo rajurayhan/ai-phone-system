@@ -238,31 +238,37 @@ class SubscriptionController extends Controller
                     $query->whereDate('created_at', $now->toDateString());
                     break;
                 case 'week':
-                    $query->whereBetween('created_at', [$now->startOfWeek(), $now->endOfWeek()]);
+                    $query->whereBetween('created_at', [$now->startOfWeek()->toDateTimeString(), $now->endOfWeek()->toDateTimeString()]);
                     break;
                 case 'month':
-                    $query->whereBetween('created_at', [$now->startOfMonth(), $now->endOfMonth()]);
+                    $query->whereBetween('created_at', [$now->startOfMonth()->toDateTimeString(), $now->endOfMonth()->toDateTimeString()]);
                     break;
                 case 'quarter':
-                    $query->whereBetween('created_at', [$now->startOfQuarter(), $now->endOfQuarter()]);
+                    $query->whereBetween('created_at', [$now->startOfQuarter()->toDateTimeString(), $now->endOfQuarter()->toDateTimeString()]);
                     break;
                 case 'year':
-                    $query->whereBetween('created_at', [$now->startOfYear(), $now->endOfYear()]);
+                    $query->whereBetween('created_at', [$now->startOfYear()->toDateTimeString(), $now->endOfYear()->toDateTimeString()]);
                     break;
             }
         }
 
-        // Get statistics
-        $stats = [
-            'total' => UserSubscription::count(),
-            'active' => UserSubscription::where('status', 'active')->count(),
-            'pending' => UserSubscription::where('status', 'pending')->count(),
-            'cancelled' => UserSubscription::where('status', 'cancelled')->count(),
-        ];
-
         // Pagination
         $perPage = $request->get('per_page', 10);
         $subscriptions = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+        // Create a clone of the query for summary calculations
+        $summaryQuery = clone $query;
+        $summaryQuery->getQuery()->orders = null; // Remove ordering for summary
+        $summaryQuery->getQuery()->limit = null; // Remove limit for summary
+        $summaryQuery->getQuery()->offset = null; // Remove offset for summary
+
+        // Get statistics based on filtered query
+        $stats = [
+            'total' => $summaryQuery->count(),
+            'active' => $summaryQuery->where('status', 'active')->count(),
+            'pending' => $summaryQuery->where('status', 'pending')->count(),
+            'cancelled' => $summaryQuery->where('status', 'cancelled')->count(),
+        ];
 
         return response()->json([
             'success' => true,

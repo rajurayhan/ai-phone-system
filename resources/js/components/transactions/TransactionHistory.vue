@@ -104,7 +104,7 @@
         <div class="mt-6 bg-white shadow rounded-lg">
           <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Filters</h3>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Status</label>
                 <select v-model="filters.status" @change="loadTransactions" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
@@ -136,6 +136,18 @@
                   <option value="stripe">Stripe</option>
                   <option value="paypal">PayPal</option>
                   <option value="manual">Manual</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Date Range</label>
+                <select v-model="filters.date_range" @change="loadTransactions" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
+                  <option value="">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="quarter">This Quarter</option>
+                  <option value="year">This Year</option>
                 </select>
               </div>
             </div>
@@ -184,7 +196,7 @@
                     </div>
                   </div>
                   <div class="text-right">
-                    <p class="text-sm font-medium text-gray-900">{{ transaction.formatted_amount }}</p>
+                    <p class="text-sm font-medium text-gray-900">{{ transaction.amount }}</p>
                     <p class="text-sm text-gray-500">{{ transaction.currency }}</p>
                   </div>
                 </div>
@@ -266,7 +278,8 @@ export default {
       filters: {
         status: '',
         type: '',
-        payment_method: ''
+        payment_method: '',
+        date_range: ''
       }
     }
   },
@@ -282,7 +295,14 @@ export default {
           ...this.filters
         }
         
-        const response = await axios.get('/api/transactions', { params })
+        const response = await axios.get('/api/transactions', { 
+          params,
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        console.log('Transactions response:', response.data) // Added for debugging
         this.transactions = response.data.data.data || []
         this.summary = response.data.summary || {}
         this.pagination = response.data.data
