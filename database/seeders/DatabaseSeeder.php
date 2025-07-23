@@ -22,6 +22,11 @@ class DatabaseSeeder extends Seeder
             SubscriptionPackageSeeder::class,
         ]);
 
+        // Create settings and templates
+        $this->call([
+            SettingsSeeder::class,
+        ]);
+
         // Create admin user
         $adminUser = User::create([
             'name' => 'Admin User',

@@ -175,6 +175,18 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     });
 });
 
+// Settings routes (admin only)
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::prefix('admin/settings')->group(function () {
+        Route::get('/', [App\Http\Controllers\SettingController::class, 'index']);
+        Route::get('/{key}', [App\Http\Controllers\SettingController::class, 'show']);
+        Route::put('/{key}', [App\Http\Controllers\SettingController::class, 'update']);
+    });
+});
+
+// Public assistant templates endpoint
+Route::get('/assistant-templates', [App\Http\Controllers\SettingController::class, 'getAssistantTemplates']);
+
 // Test route for debugging request headers
 Route::post('/test-headers', function (Request $request) {
     return response()->json([

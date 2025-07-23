@@ -108,6 +108,7 @@
                 <router-link to="/admin/packages" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Packages</router-link>
                 <router-link to="/admin/subscriptions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Subscriptions</router-link>
                 <router-link to="/admin/transactions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Transactions</router-link>
+                <router-link to="/admin/templates" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Templates</router-link>
               </div>
             </div>
           </div>

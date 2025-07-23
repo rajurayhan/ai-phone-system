@@ -20,6 +20,7 @@ class Assistant extends Model
         'user_id',
         'vapi_assistant_id',
         'created_by',
+        'type',
     ];
 
     /**
@@ -52,5 +53,37 @@ class Assistant extends Model
     public function scopeCreatedBy($query, $userId)
     {
         return $query->where('created_by', $userId);
+    }
+
+    /**
+     * Scope to get demo assistants
+     */
+    public function scopeDemo($query)
+    {
+        return $query->where('type', 'demo');
+    }
+
+    /**
+     * Scope to get production assistants
+     */
+    public function scopeProduction($query)
+    {
+        return $query->where('type', 'production');
+    }
+
+    /**
+     * Check if assistant is a demo
+     */
+    public function isDemo(): bool
+    {
+        return $this->type === 'demo';
+    }
+
+    /**
+     * Check if assistant is production
+     */
+    public function isProduction(): bool
+    {
+        return $this->type === 'production';
     }
 }

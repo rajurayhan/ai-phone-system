@@ -118,6 +118,7 @@ class AssistantController extends Controller
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
             'user_id' => 'nullable|integer|exists:users,id', // Allow admin to assign to specific user
+            'type' => 'nullable|string|in:demo,production', // New type field
         ]);
 
         $user = Auth::user();
@@ -180,6 +181,7 @@ class AssistantController extends Controller
             'user_id' => $assistantUserId,
             'vapi_assistant_id' => $vapiAssistant['id'],
             'created_by' => $user->id,
+            'type' => $data['type'] ?? 'demo', // Default to demo
         ]);
 
         return response()->json([
@@ -247,6 +249,7 @@ class AssistantController extends Controller
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
             'user_id' => 'nullable|integer|exists:users,id', // Allow admin to reassign to different user
+            'type' => 'nullable|string|in:demo,production', // New type field
         ]);
 
         $user = Auth::user();
@@ -271,6 +274,50 @@ class AssistantController extends Controller
             ], 403);
         }
 
+        // If this is a demo assistant, use templates from settings
+        if ($assistant->isDemo()) {
+            $templates = \App\Models\Setting::getValue('assistant_system_prompt_template', '');
+            $firstMessageTemplate = \App\Models\Setting::getValue('assistant_first_message_template', '');
+            $endCallMessageTemplate = \App\Models\Setting::getValue('assistant_end_call_message_template', '');
+            
+            // Replace template variables with actual company data
+            $companyName = $request->input('metadata.company_name', '');
+            $companyIndustry = $request->input('metadata.industry', '');
+            $companyServices = $request->input('metadata.services_products', '');
+            
+            $processedSystemPrompt = str_replace(
+                ['{{company_name}}', '{{company_industry}}', '{{company_services}}'],
+                [$companyName, $companyIndustry, $companyServices],
+                $templates
+            );
+            
+            $processedFirstMessage = str_replace(
+                ['{{company_name}}', '{{company_industry}}', '{{company_services}}'],
+                [$companyName, $companyIndustry, $companyServices],
+                $firstMessageTemplate
+            );
+            
+            $processedEndCallMessage = str_replace(
+                ['{{company_name}}', '{{company_industry}}', '{{company_services}}'],
+                [$companyName, $companyIndustry, $companyServices],
+                $endCallMessageTemplate
+            );
+            
+            // Update the request data with processed templates
+            $request->merge([
+                'model' => array_merge($request->input('model', []), [
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => $processedSystemPrompt
+                        ]
+                    ]
+                ]),
+                'firstMessage' => $processedFirstMessage,
+                'endCallMessage' => $processedEndCallMessage
+            ]);
+        }
+
         // Update in Vapi
         $vapiData = $this->vapiService->updateAssistant($assistant->vapi_assistant_id, $request->all());
 
@@ -289,6 +336,11 @@ class AssistantController extends Controller
         // If admin is updating and has specified a new user_id, update it
         if ($user->isAdmin() && $request->has('user_id') && $request->user_id && $request->user_id != $assistant->user_id) {
             $updateData['user_id'] = $request->user_id;
+        }
+        
+        // Update type if provided
+        if ($request->has('type')) {
+            $updateData['type'] = $request->type;
         }
 
         // Update in database

@@ -14,6 +14,7 @@ import AdminAssistants from './components/admin/Assistants.vue';
 import AdminFeatures from './components/admin/Features.vue';
 import AdminPackages from './components/admin/Packages.vue';
 import AdminSubscriptions from './components/admin/Subscriptions.vue';
+import Templates from './components/admin/Templates.vue';
 import LandingPage from './components/landing/LandingPage.vue';
 import AssistantForm from './components/assistant/AssistantForm.vue';
 import UserAssistants from './components/dashboard/UserAssistants.vue';
@@ -96,6 +97,12 @@ const router = createRouter({
             path: '/admin/subscriptions',
             name: 'admin-subscriptions',
             component: AdminSubscriptions,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/templates',
+            name: 'admin-templates',
+            component: Templates,
             meta: { requiresAuth: true, requiresAdmin: true }
         },
         {
