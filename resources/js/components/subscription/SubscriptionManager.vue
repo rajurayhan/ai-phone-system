@@ -181,7 +181,7 @@
                     <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
-                    {{ pkg.price <= (currentSubscription?.package?.price || 0) ? 'Current Plan' : 'Lower Tier' }}
+                    {{ pkg.price === (currentSubscription?.package?.price || 0) ? 'Current Plan' : 'Lower or Same Tier' }}
                   </button>
                 </div>
               </div>
@@ -219,7 +219,7 @@
                 </div>
               </div>
               <div v-if="isPackageDisabled(pkg)" class="mt-2 text-xs text-gray-500">
-                {{ pkg.price <= (currentSubscription?.package?.price || 0) ? 'Current plan' : 'Lower tier' }}
+                {{ pkg.price === (currentSubscription?.package?.price || 0) ? 'Current plan' : 'Lower or same tier' }}
               </div>
             </div>
           </div>
@@ -359,7 +359,7 @@ export default {
     const isPackageDisabled = (pkg) => {
       const currentPackage = currentSubscription.value?.package;
       if (!currentPackage) return false; // No current subscription, so all packages are available
-      return pkg.price <= currentPackage.price;
+      return pkg.price <= currentPackage.price; // Disable packages with lower or equal prices
     };
 
     onMounted(() => {
