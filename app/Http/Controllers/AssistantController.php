@@ -204,9 +204,13 @@ class AssistantController extends Controller
         
         // Find assistant in database
         $assistant = Assistant::where('vapi_assistant_id', $assistantId)
-            ->orWhere('id', $assistantId)
+            // ->orWhere('id', $assistantId)
             ->with(['user', 'creator'])
             ->first();
+
+        
+
+        Log::info('Assistant found', ['assistant' => $assistant]);
 
         if (!$assistant) {
             return response()->json([
@@ -259,7 +263,7 @@ class AssistantController extends Controller
         
         // Find assistant in database
         $assistant = Assistant::where('vapi_assistant_id', $assistantId)
-            ->orWhere('id', $assistantId)
+            // ->orWhere('id', $assistantId)
             ->first();
 
         if (!$assistant) {
@@ -378,7 +382,7 @@ class AssistantController extends Controller
         
         // Find assistant in database
         $assistant = Assistant::where('vapi_assistant_id', $assistantId)
-            ->orWhere('id', $assistantId)
+            // ->orWhere('id', $assistantId)
             ->first();
 
         if (!$assistant) {
@@ -462,7 +466,7 @@ class AssistantController extends Controller
         
         // Find assistant in database
         $assistant = Assistant::where('vapi_assistant_id', $assistantId)
-            ->orWhere('id', $assistantId)
+            // ->orWhere('id', $assistantId)
             ->first();
 
         if (!$assistant) {
