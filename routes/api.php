@@ -17,7 +17,11 @@ use App\Http\Controllers\SubscriptionController;
 |
 */
 
-// Authentication routes
+// Public routes
+Route::get('/features', [App\Http\Controllers\FeatureController::class, 'index']);
+Route::get('/subscriptions/packages', [SubscriptionController::class, 'getPackages']);
+
+// Auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
@@ -118,7 +122,6 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
 // Subscription routes (protected)
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/subscriptions/packages', [SubscriptionController::class, 'getPackages']);
     Route::get('/subscriptions/current', [SubscriptionController::class, 'getCurrentSubscription']);
     Route::post('/subscriptions/subscribe', [SubscriptionController::class, 'subscribe']);
     Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel']);
@@ -137,12 +140,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // Admin subscription routes (protected)
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/admin/subscriptions', [SubscriptionController::class, 'adminGetSubscriptions']);
+    Route::prefix('admin/subscriptions')->group(function () {
+        Route::get('/', [App\Http\Controllers\SubscriptionController::class, 'adminGetSubscriptions']);
+        Route::get('/packages', [App\Http\Controllers\SubscriptionController::class, 'adminGetPackages']);
+        Route::post('/packages', [App\Http\Controllers\SubscriptionController::class, 'adminCreatePackage']);
+        Route::put('/packages/{id}', [App\Http\Controllers\SubscriptionController::class, 'adminUpdatePackage']);
+        Route::delete('/packages/{id}', [App\Http\Controllers\SubscriptionController::class, 'adminDeletePackage']);
+    });
     
     // Admin transaction routes
     Route::prefix('admin/transactions')->group(function () {
         Route::get('/', [App\Http\Controllers\TransactionController::class, 'adminIndex']);
         Route::get('/stats', [App\Http\Controllers\TransactionController::class, 'adminStats']);
+    });
+
+    // Admin feature routes
+    Route::prefix('admin/features')->group(function () {
+        Route::get('/', [App\Http\Controllers\FeatureController::class, 'adminIndex']);
+        Route::post('/', [App\Http\Controllers\FeatureController::class, 'store']);
+        Route::put('/{id}', [App\Http\Controllers\FeatureController::class, 'update']);
+        Route::delete('/{id}', [App\Http\Controllers\FeatureController::class, 'destroy']);
     });
 });
 

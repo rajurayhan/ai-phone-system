@@ -27,8 +27,7 @@ const router = createRouter({
         {
             path: '/',
             name: 'landing',
-            component: LandingPage,
-            meta: { requiresGuest: true }
+            component: LandingPage
         },
         {
             path: '/login',
@@ -99,8 +98,7 @@ const router = createRouter({
         {
             path: '/pricing',
             name: 'pricing',
-            component: Pricing,
-            meta: { requiresAuth: true }
+            component: Pricing
         },
         {
             path: '/subscription',

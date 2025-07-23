@@ -31,7 +31,7 @@
                     Active
                   </span>
                 </h3>
-                <p class="text-gray-600 mb-4">{{ currentSubscription.package?.name }} - {{ currentSubscription.package?.formatted_price }}/month</p>
+                <p class="text-gray-600 mb-4">{{ currentSubscription.package?.name }} - ${{ currentSubscription.package?.price }}/month</p>
                 <p v-if="currentSubscription.status === 'pending'" class="text-sm text-purple-600 mb-2">
                   ⚠️ Your subscription is pending payment. Please complete the payment to activate your subscription.
                 </p>
@@ -163,22 +163,26 @@
                     </li>
                   </ul>
                   
-                  <button
-                    @click="subscribeToPackage(pkg)"
-                    :disabled="loading"
-                    class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
-                  >
-                    {{ loading ? 'Processing...' : 'Subscribe' }}
-                  </button>
                   <router-link 
+                    v-if="!isPackageDisabled(pkg)"
                     :to="`/payment?package_id=${pkg.id}`" 
-                    class="mt-2 w-full inline-flex justify-center items-center bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    class="w-full inline-flex justify-center items-center py-2 px-4 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
                   >
                     <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
-                    Pay Now
+                    Pay ${{ pkg.price }}
                   </router-link>
+                  <button 
+                    v-else
+                    disabled
+                    class="w-full inline-flex justify-center items-center py-2 px-4 rounded-lg font-medium bg-gray-300 text-gray-500 cursor-not-allowed"
+                  >
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    {{ pkg.price <= (currentSubscription?.package?.price || 0) ? 'Current Plan' : 'Lower Tier' }}
+                  </button>
                 </div>
               </div>
             </div>
@@ -191,13 +195,18 @@
     <div v-if="showUpgradeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Upgrade Subscription</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Change Subscription Plan</h3>
           <div class="space-y-4">
             <div
               v-for="pkg in availableUpgrades"
               :key="pkg.id"
-              class="border rounded-lg p-4 cursor-pointer hover:border-green-500"
-              @click="upgradeToPackage(pkg)"
+              :class="[
+                'border rounded-lg p-4 transition-colors',
+                isPackageDisabled(pkg) 
+                  ? 'border-gray-200 bg-gray-50 cursor-not-allowed' 
+                  : 'cursor-pointer hover:border-green-500'
+              ]"
+              @click="!isPackageDisabled(pkg) && upgradeToPackage(pkg)"
             >
               <div class="flex justify-between items-center">
                 <div>
@@ -205,9 +214,12 @@
                   <p class="text-sm text-gray-600">{{ pkg.description }}</p>
                 </div>
                 <div class="text-right">
-                  <div class="font-semibold text-green-600">{{ pkg.formatted_price }}</div>
+                  <div class="font-semibold text-green-600">${{ pkg.price }}</div>
                   <div class="text-xs text-gray-500">per month</div>
                 </div>
+              </div>
+              <div v-if="isPackageDisabled(pkg)" class="mt-2 text-xs text-gray-500">
+                {{ pkg.price <= (currentSubscription?.package?.price || 0) ? 'Current plan' : 'Lower tier' }}
               </div>
             </div>
           </div>
@@ -340,9 +352,15 @@ export default {
     const availableUpgrades = computed(() => {
       if (!currentSubscription.value) return packages.value
       
-      const currentPackage = currentSubscription.value.package
-      return packages.value.filter(pkg => pkg.price > currentPackage.price)
+      // Return all packages but they will be disabled if they're current or lower tier
+      return packages.value
     })
+
+    const isPackageDisabled = (pkg) => {
+      const currentPackage = currentSubscription.value?.package;
+      if (!currentPackage) return false; // No current subscription, so all packages are available
+      return pkg.price <= currentPackage.price;
+    };
 
     onMounted(() => {
       loadCurrentSubscription()
@@ -361,7 +379,8 @@ export default {
       cancelSubscription,
       formatDate,
       getUsagePercentage,
-      availableUpgrades
+      availableUpgrades,
+      isPackageDisabled
     }
   }
 }

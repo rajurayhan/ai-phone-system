@@ -81,51 +81,19 @@
 
         <div class="mt-10">
           <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-            <div class="relative">
+            <div
+              v-for="feature in features"
+              :key="feature.id"
+              class="relative"
+            >
               <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="feature.icon" />
                 </svg>
               </div>
-              <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Natural Language Processing</p>
+              <p class="ml-16 text-lg leading-6 font-medium text-gray-900">{{ feature.title }}</p>
               <p class="mt-2 ml-16 text-base text-gray-500">
-                Advanced NLP capabilities that understand context, intent, and natural conversation flow.
-              </p>
-            </div>
-
-            <div class="relative">
-              <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Real-time Processing</p>
-              <p class="mt-2 ml-16 text-base text-gray-500">
-                Lightning-fast response times with real-time voice processing and analysis.
-              </p>
-            </div>
-
-            <div class="relative">
-              <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Analytics Dashboard</p>
-              <p class="mt-2 ml-16 text-base text-gray-500">
-                Comprehensive analytics to track performance, user engagement, and conversation insights.
-              </p>
-            </div>
-
-            <div class="relative">
-              <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Enterprise Security</p>
-              <p class="mt-2 ml-16 text-base text-gray-500">
-                Bank-level security with end-to-end encryption and compliance with industry standards.
+                {{ feature.description }}
               </p>
             </div>
           </div>
@@ -146,146 +114,41 @@
         </div>
 
         <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <!-- Starter Plan -->
-          <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
-            <div class="text-center">
-              <h3 class="text-2xl font-bold text-gray-900">Starter</h3>
-              <div class="mt-4">
-                <span class="text-4xl font-extrabold text-gray-900">$29</span>
-                <span class="text-gray-600">/month</span>
-              </div>
-              <p class="mt-2 text-sm text-gray-600">Perfect for small businesses</p>
-            </div>
-            <ul class="mt-8 space-y-4">
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">1 Voice Agent</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">1,000 minutes/month</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Basic Analytics</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Email Support</span>
-              </li>
-            </ul>
-            <div class="mt-8">
-              <router-link to="/register" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 block text-center">
-                Get Started
-              </router-link>
-            </div>
-          </div>
-
-          <!-- Professional Plan -->
-          <div class="bg-white rounded-lg shadow-lg border-2 border-primary-500 p-8 relative">
-            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <!-- Dynamic Package Cards -->
+          <div
+            v-for="(pkg, index) in packages"
+            :key="pkg.id"
+            :class="[
+              'bg-white rounded-lg shadow-lg border p-8',
+              pkg.is_popular ? 'border-2 border-primary-500 relative' : 'border-gray-200'
+            ]"
+          >
+            <div v-if="pkg.is_popular" class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
               <span class="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">Most Popular</span>
             </div>
             <div class="text-center">
-              <h3 class="text-2xl font-bold text-gray-900">Professional</h3>
+              <h3 class="text-2xl font-bold text-gray-900">{{ pkg.name }}</h3>
               <div class="mt-4">
-                <span class="text-4xl font-extrabold text-gray-900">$99</span>
+                <span class="text-4xl font-extrabold text-gray-900">${{ pkg.price }}</span>
                 <span class="text-gray-600">/month</span>
               </div>
-              <p class="mt-2 text-sm text-gray-600">Perfect for growing businesses</p>
+              <p class="mt-2 text-sm text-gray-600">{{ pkg.description }}</p>
             </div>
             <ul class="mt-8 space-y-4">
-              <li class="flex items-center">
+              <li
+                v-for="feature in pkg.features"
+                :key="feature"
+                class="flex items-center"
+              >
                 <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
-                <span class="ml-3 text-gray-700">5 Voice Agents</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">10,000 minutes/month</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Advanced Analytics</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Priority Support</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Custom Integrations</span>
+                <span class="ml-3 text-gray-700">{{ feature }}</span>
               </li>
             </ul>
             <div class="mt-8">
               <router-link to="/register" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 block text-center">
                 Get Started
-              </router-link>
-            </div>
-          </div>
-
-          <!-- Enterprise Plan -->
-          <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
-            <div class="text-center">
-              <h3 class="text-2xl font-bold text-gray-900">Enterprise</h3>
-              <div class="mt-4">
-                <span class="text-4xl font-extrabold text-gray-900">$299</span>
-                <span class="text-gray-600">/month</span>
-              </div>
-              <p class="mt-2 text-sm text-gray-600">For large organizations</p>
-            </div>
-            <ul class="mt-8 space-y-4">
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Unlimited Voice Agents</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Unlimited minutes</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Custom Analytics</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">24/7 Phone Support</span>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="ml-3 text-gray-700">Dedicated Account Manager</span>
-              </li>
-            </ul>
-            <div class="mt-8">
-              <router-link to="/register" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 block text-center">
-                Contact Sales
               </router-link>
             </div>
           </div>
@@ -360,7 +223,42 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
 export default {
-  name: 'LandingPage'
+  name: 'LandingPage',
+  setup() {
+    const packages = ref([])
+    const features = ref([])
+
+    const loadPackages = async () => {
+      try {
+        const response = await axios.get('/api/subscriptions/packages')
+        packages.value = response.data.data
+      } catch (error) {
+        console.error('Error loading packages:', error)
+      }
+    }
+
+    const loadFeatures = async () => {
+      try {
+        const response = await axios.get('/api/features')
+        features.value = response.data.data
+      } catch (error) {
+        console.error('Error loading features:', error)
+      }
+    }
+
+    onMounted(() => {
+      loadPackages()
+      loadFeatures()
+    })
+
+    return {
+      packages,
+      features
+    }
+  }
 }
 </script> 

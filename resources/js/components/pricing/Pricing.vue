@@ -1,12 +1,12 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Navigation -->
+    <!-- Simple Navigation for Pricing Page -->
     <nav class="bg-white shadow-sm border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex">
             <div class="flex-shrink-0 flex items-center">
-              <router-link to="/dashboard" class="flex items-center hover:opacity-80 transition-opacity">
+              <router-link to="/" class="flex items-center hover:opacity-80 transition-opacity">
                 <div class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center">
                   <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -18,9 +18,12 @@
               </router-link>
             </div>
           </div>
-          <div class="flex items-center">
-            <router-link to="/dashboard" class="text-gray-500 hover:text-gray-700 px-3 py-2">
-              Back to Dashboard
+          <div class="flex items-center space-x-4">
+            <router-link to="/login" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+              Login
+            </router-link>
+            <router-link to="/register" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+              Sign Up
             </router-link>
           </div>
         </div>
@@ -37,141 +40,50 @@
 
         <!-- Pricing Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Starter Plan -->
-          <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+          <!-- Dynamic Package Cards -->
+          <div
+            v-for="(pkg, index) in packages"
+            :key="pkg.id"
+            :class="[
+              'bg-white rounded-lg shadow-lg border border-gray-200 p-6',
+              pkg.is_popular ? 'relative' : ''
+            ]"
+          >
+            <div v-if="pkg.is_popular" class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                Most Popular
+              </span>
+            </div>
             <div class="text-center">
-              <h3 class="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
-              <div class="text-4xl font-bold text-green-600 mb-4">$29</div>
-              <p class="text-gray-600 mb-6">Perfect for small businesses</p>
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ pkg.name }}</h3>
+              <div class="text-4xl font-bold text-green-600 mb-4">${{ pkg.price }}</div>
+              <p class="text-gray-600 mb-6">{{ pkg.description }}</p>
               <ul class="text-left space-y-3 mb-8">
-                <li class="flex items-center">
+                <li
+                  v-for="feature in pkg.features"
+                  :key="feature"
+                  class="flex items-center"
+                >
                   <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  1 Voice Agent
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  1,000 minutes/month
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Basic Analytics
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Email Support
+                  {{ feature }}
                 </li>
               </ul>
               <router-link 
-                :to="`/payment?package_id=${starterPlan.id}`" 
-                class="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+                v-if="!isPackageDisabled(pkg)"
+                :to="isAuthenticated ? `/payment?package_id=${pkg.id}` : '/register'" 
+                class="w-full inline-flex justify-center items-center px-6 py-3 rounded-lg font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
               >
-                Get Started
+                {{ isAuthenticated ? `Get Started - $${pkg.price}` : 'Sign Up Now' }}
               </router-link>
-            </div>
-          </div>
-
-          <!-- Professional Plan -->
-          <div class="bg-white rounded-lg shadow-lg border-2 border-green-500 p-6 relative">
-            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">Most Popular</span>
-            </div>
-            <div class="text-center">
-              <h3 class="text-2xl font-bold text-gray-900 mb-2">Professional</h3>
-              <div class="text-4xl font-bold text-green-600 mb-4">$99</div>
-              <p class="text-gray-600 mb-6">Perfect for growing businesses</p>
-              <ul class="text-left space-y-3 mb-8">
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  5 Voice Agents
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  10,000 minutes/month
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Advanced Analytics
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Priority Support
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Custom Integrations
-                </li>
-              </ul>
-              <router-link 
-                :to="`/payment?package_id=${professionalPlan.id}`" 
-                class="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              <button 
+                v-else
+                disabled
+                class="w-full inline-flex justify-center items-center px-6 py-3 rounded-lg font-medium bg-gray-300 text-gray-500 cursor-not-allowed"
               >
-                Get Started
-              </router-link>
-            </div>
-          </div>
-
-          <!-- Enterprise Plan -->
-          <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
-            <div class="text-center">
-              <h3 class="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
-              <div class="text-4xl font-bold text-green-600 mb-4">$299</div>
-              <p class="text-gray-600 mb-6">For large organizations</p>
-              <ul class="text-left space-y-3 mb-8">
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Unlimited Voice Agents
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Unlimited minutes
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Custom Analytics
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  24/7 Phone Support
-                </li>
-                <li class="flex items-center">
-                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Dedicated Account Manager
-                </li>
-              </ul>
-              <router-link 
-                :to="`/payment?package_id=${enterprisePlan.id}`" 
-                class="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
-              >
-                Get Started
-              </router-link>
+                {{ pkg.price <= (currentSubscription?.package?.price || 0) ? 'Current Plan' : 'Lower Tier' }}
+              </button>
             </div>
           </div>
         </div>
@@ -184,41 +96,65 @@
               <thead class="bg-gray-50">
                 <tr>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feature</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Starter</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Professional</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Enterprise</th>
+                  <th 
+                    v-for="pkg in packages" 
+                    :key="pkg.id"
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {{ pkg.name }}
+                  </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Monthly Minutes</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">1,000</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">10,000</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Unlimited</td>
+                  <td 
+                    v-for="pkg in packages" 
+                    :key="pkg.id"
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"
+                  >
+                    {{ pkg.monthly_minutes_limit === -1 ? 'Unlimited' : pkg.monthly_minutes_limit.toLocaleString() }}
+                  </td>
                 </tr>
                 <tr>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Price per Month</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">$29</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">$99</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">$299</td>
+                  <td 
+                    v-for="pkg in packages" 
+                    :key="pkg.id"
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"
+                  >
+                    ${{ pkg.price }}
+                  </td>
                 </tr>
                 <tr>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Voice Agents</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">1</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">5</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Unlimited</td>
-                </tr>
-                <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Support</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Email</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Priority</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Dedicated</td>
+                  <td 
+                    v-for="pkg in packages" 
+                    :key="pkg.id"
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"
+                  >
+                    {{ pkg.voice_agents_limit === -1 ? 'Unlimited' : pkg.voice_agents_limit }}
+                  </td>
                 </tr>
                 <tr>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Analytics</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Basic</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Advanced</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Custom</td>
+                  <td 
+                    v-for="pkg in packages" 
+                    :key="pkg.id"
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"
+                  >
+                    {{ pkg.analytics_level }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Support</td>
+                  <td 
+                    v-for="pkg in packages" 
+                    :key="pkg.id"
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"
+                  >
+                    {{ pkg.support_level }}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -253,7 +189,66 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
 export default {
-  name: 'Pricing'
+  name: 'Pricing',
+  setup() {
+    const currentSubscription = ref(null)
+    const packages = ref([])
+    const isAuthenticated = ref(false)
+
+    const checkAuthStatus = () => {
+      const token = localStorage.getItem('token')
+      isAuthenticated.value = !!token
+    }
+
+    const loadCurrentSubscription = async () => {
+      if (!isAuthenticated.value) {
+        currentSubscription.value = null
+        return
+      }
+
+      try {
+        const response = await axios.get('/api/subscriptions/current')
+        currentSubscription.value = response.data.data
+      } catch (error) {
+        // No active subscription
+        currentSubscription.value = null
+      }
+    }
+
+    const loadPackages = async () => {
+      try {
+        const response = await axios.get('/api/subscriptions/packages')
+        packages.value = response.data.data
+      } catch (error) {
+        console.error('Error loading packages:', error)
+      }
+    }
+
+    const isPackageDisabled = (pkg) => {
+      // If user is not authenticated, all packages are available
+      if (!isAuthenticated.value) return false
+      
+      const currentPackage = currentSubscription.value?.package;
+      if (!currentPackage) return false; // No current subscription, so all packages are available
+      return pkg.price <= currentPackage.price;
+    }
+
+    onMounted(() => {
+      checkAuthStatus()
+      loadCurrentSubscription()
+      loadPackages()
+    })
+
+    return {
+      currentSubscription,
+      packages,
+      isAuthenticated,
+      isPackageDisabled
+    }
+  }
 }
 </script> 
