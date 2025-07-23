@@ -232,7 +232,18 @@ class AssistantController extends Controller
         // Get detailed data from Vapi
         $vapiData = $this->vapiService->getAssistant($assistant->vapi_assistant_id);
 
-        // Merge webhook URL from database with Vapi metadata
+        // Synchronize webhook URL between Vapi and local database
+        $vapiWebhookUrl = null;
+        if (isset($vapiData['server']['url'])) {
+            $vapiWebhookUrl = $vapiData['server']['url'];
+        }
+
+        // If Vapi has webhook URL but local database doesn't, use Vapi's value
+        if ($vapiWebhookUrl && !$assistant->webhook_url) {
+            $assistant->update(['webhook_url' => $vapiWebhookUrl]);
+        }
+
+        // Merge webhook URL from database with Vapi metadata for frontend
         if ($assistant->webhook_url && isset($vapiData['metadata'])) {
             $vapiData['metadata']['webhook_url'] = $assistant->webhook_url;
         }
@@ -347,6 +358,17 @@ class AssistantController extends Controller
         $updateData = [
             'name' => $request->name,
         ];
+        
+        // Synchronize webhook URL from Vapi response
+        $vapiWebhookUrl = null;
+        if (isset($vapiData['server']['url'])) {
+            $vapiWebhookUrl = $vapiData['server']['url'];
+        }
+
+        // If Vapi has webhook URL but local database doesn't, use Vapi's value
+        if ($vapiWebhookUrl && !$assistant->webhook_url) {
+            $updateData['webhook_url'] = $vapiWebhookUrl;
+        }
         
         // If admin is updating and has specified a new user_id, update it
         if ($user->isAdmin() && $request->has('user_id') && $request->user_id && $request->user_id != $assistant->user_id) {

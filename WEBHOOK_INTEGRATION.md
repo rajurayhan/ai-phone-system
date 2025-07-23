@@ -196,6 +196,19 @@ $request->validate([
 ]);
 ```
 
+### Webhook URL Synchronization
+The system automatically synchronizes webhook URLs between Vapi.ai and the local database:
+
+1. **When Loading Assistant (Show Method)**:
+   - If Vapi has webhook URL but local database doesn't → Use Vapi's value
+   - If both have values → Keep local database value
+   - If neither has value → Use default value
+
+2. **When Updating Assistant (Update Method)**:
+   - If Vapi response has webhook URL but local database doesn't → Sync from Vapi
+   - If request provides webhook URL → Use request value
+   - If neither has value → Keep existing value
+
 ### Database Operations
 ```php
 // Create assistant
@@ -398,7 +411,19 @@ The webhook URL is configured in Vapi.ai using:
 2. **Verify Vapi Data**
    ```php
    $vapiData = $vapiService->getAssistant($assistantId);
-   echo $vapiData['metadata']['webhook_url'] ?? 'Not set';
+   echo $vapiData['server']['url'] ?? 'Not set';
+   ```
+
+3. **Check Synchronization**
+   ```php
+   // Check if webhook URL was synced from Vapi
+   $assistant = Assistant::find($id);
+   $vapiData = $vapiService->getAssistant($assistant->vapi_assistant_id);
+   $vapiWebhook = $vapiData['server']['url'] ?? null;
+   
+   if ($vapiWebhook && !$assistant->webhook_url) {
+       echo "Webhook URL should be synced from Vapi: " . $vapiWebhook;
+   }
    ```
 
 3. **Test Webhook Endpoint**
