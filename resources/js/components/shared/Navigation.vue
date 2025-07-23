@@ -28,6 +28,7 @@
               Dashboard
             </router-link>
             <router-link 
+              v-if="!isAdmin"
               to="/assistants" 
               :class="[
                 'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
@@ -63,17 +64,7 @@
               All Assistants
             </router-link>
             <router-link 
-              to="/pricing" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path === '/pricing' 
-                  ? 'border-green-500 text-green-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Pricing
-            </router-link>
-            <router-link 
+              v-if="!isAdmin"
               to="/subscription" 
               :class="[
                 'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
@@ -95,6 +86,28 @@
             >
               Transactions
             </router-link>
+            <!-- Config Menu for Admin -->
+            <div v-if="isAdmin" class="relative inline-flex items-center">
+              <button 
+                @click="configMenuOpen = !configMenuOpen"
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path.startsWith('/admin/features') || $route.path.startsWith('/admin/packages') || $route.path.startsWith('/admin/subscriptions')
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Config
+                <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div v-if="configMenuOpen" class="absolute right-0 top-full mt-1 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 z-50">
+                <router-link to="/admin/features" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Features</router-link>
+                <router-link to="/admin/packages" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Packages</router-link>
+                <router-link to="/admin/subscriptions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Subscriptions</router-link>
+              </div>
+            </div>
           </div>
         </div>
         <div class="flex items-center">
@@ -116,8 +129,8 @@
                 <p class="text-xs text-gray-500">{{ user.email }}</p>
               </div>
               <router-link to="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</router-link>
-              <router-link to="/pricing" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pricing</router-link>
-              <router-link to="/subscription" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Subscription</router-link>
+              <router-link v-if="!isAdmin" to="/pricing" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pricing</router-link>
+              <router-link v-if="!isAdmin" to="/subscription" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Subscription</router-link>
               <router-link to="/transactions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Transactions</router-link>
               <button @click="logout" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</button>
             </div>
@@ -134,6 +147,7 @@ export default {
   data() {
     return {
       userMenuOpen: false,
+      configMenuOpen: false,
       user: JSON.parse(localStorage.getItem('user') || '{}')
     }
   },
@@ -173,10 +187,11 @@ export default {
     }
   },
   mounted() {
-    // Close menu when clicking outside
+    // Close menus when clicking outside
     document.addEventListener('click', (e) => {
       if (!this.$el.contains(e.target)) {
         this.userMenuOpen = false;
+        this.configMenuOpen = false;
       }
     });
   }

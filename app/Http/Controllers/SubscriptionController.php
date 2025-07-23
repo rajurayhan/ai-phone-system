@@ -199,9 +199,9 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Admin: Get all subscriptions
+     * Admin: Get all subscriptions with filtering
      */
-    public function adminGetSubscriptions(): JsonResponse
+    public function adminGetSubscriptions(Request $request): JsonResponse
     {
         if (!Auth::user()->isAdmin()) {
             return response()->json([
@@ -210,13 +210,195 @@ class SubscriptionController extends Controller
             ], 403);
         }
 
-        $subscriptions = UserSubscription::with(['user', 'package'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = UserSubscription::with(['user', 'package']);
+
+        // Apply filters
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('package_id')) {
+            $query->where('subscription_package_id', $request->package_id);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('date_range')) {
+            $dateRange = $request->date_range;
+            $now = Carbon::now();
+            
+            switch ($dateRange) {
+                case 'today':
+                    $query->whereDate('created_at', $now->toDateString());
+                    break;
+                case 'week':
+                    $query->whereBetween('created_at', [$now->startOfWeek(), $now->endOfWeek()]);
+                    break;
+                case 'month':
+                    $query->whereBetween('created_at', [$now->startOfMonth(), $now->endOfMonth()]);
+                    break;
+                case 'quarter':
+                    $query->whereBetween('created_at', [$now->startOfQuarter(), $now->endOfQuarter()]);
+                    break;
+                case 'year':
+                    $query->whereBetween('created_at', [$now->startOfYear(), $now->endOfYear()]);
+                    break;
+            }
+        }
+
+        // Get statistics
+        $stats = [
+            'total' => UserSubscription::count(),
+            'active' => UserSubscription::where('status', 'active')->count(),
+            'pending' => UserSubscription::where('status', 'pending')->count(),
+            'cancelled' => UserSubscription::where('status', 'cancelled')->count(),
+        ];
+
+        // Pagination
+        $perPage = $request->get('per_page', 10);
+        $subscriptions = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return response()->json([
             'success' => true,
-            'data' => $subscriptions
+            'data' => $subscriptions->items(),
+            'meta' => [
+                'current_page' => $subscriptions->currentPage(),
+                'last_page' => $subscriptions->lastPage(),
+                'per_page' => $subscriptions->perPage(),
+                'total' => $subscriptions->total(),
+            ],
+            'stats' => $stats
+        ]);
+    }
+
+    /**
+     * Admin: Get all packages
+     */
+    public function adminGetPackages(): JsonResponse
+    {
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $packages = SubscriptionPackage::orderBy('price')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $packages
+        ]);
+    }
+
+    /**
+     * Admin: Create a new package
+     */
+    public function adminCreatePackage(Request $request): JsonResponse
+    {
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|unique:subscription_packages,slug',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'voice_agents_limit' => 'required|integer',
+            'monthly_minutes_limit' => 'required|integer',
+            'features' => 'array',
+            'support_level' => 'required|string|in:email,priority,dedicated',
+            'analytics_level' => 'required|string|in:basic,advanced,custom',
+            'is_popular' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        $package = SubscriptionPackage::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'data' => $package,
+            'message' => 'Package created successfully'
+        ], 201);
+    }
+
+    /**
+     * Admin: Update a package
+     */
+    public function adminUpdatePackage(Request $request, $id): JsonResponse
+    {
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|unique:subscription_packages,slug,' . $id,
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'voice_agents_limit' => 'required|integer',
+            'monthly_minutes_limit' => 'required|integer',
+            'features' => 'array',
+            'support_level' => 'required|string|in:email,priority,dedicated',
+            'analytics_level' => 'required|string|in:basic,advanced,custom',
+            'is_popular' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        $package = SubscriptionPackage::findOrFail($id);
+        $package->update($request->all());
+
+        return response()->json([
+            'success' => true,
+            'data' => $package,
+            'message' => 'Package updated successfully'
+        ]);
+    }
+
+    /**
+     * Admin: Delete a package
+     */
+    public function adminDeletePackage($id): JsonResponse
+    {
+        if (!Auth::user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $package = SubscriptionPackage::findOrFail($id);
+        
+        // Check if package has active subscriptions
+        $activeSubscriptions = UserSubscription::where('subscription_package_id', $id)
+            ->whereIn('status', ['active', 'trial', 'pending'])
+            ->count();
+
+        if ($activeSubscriptions > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete package with active subscriptions'
+            ], 400);
+        }
+
+        $package->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Package deleted successfully'
         ]);
     }
 }

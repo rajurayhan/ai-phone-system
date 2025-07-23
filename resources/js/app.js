@@ -11,6 +11,9 @@ import Profile from './components/profile/Profile.vue';
 import AdminDashboard from './components/admin/AdminDashboard.vue';
 import AdminUsers from './components/admin/Users.vue';
 import AdminAssistants from './components/admin/Assistants.vue';
+import AdminFeatures from './components/admin/Features.vue';
+import AdminPackages from './components/admin/Packages.vue';
+import AdminSubscriptions from './components/admin/Subscriptions.vue';
 import LandingPage from './components/landing/LandingPage.vue';
 import AssistantForm from './components/assistant/AssistantForm.vue';
 import UserAssistants from './components/dashboard/UserAssistants.vue';
@@ -75,6 +78,24 @@ const router = createRouter({
             path: '/admin/transactions',
             name: 'admin-transactions',
             component: TransactionManagement,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/features',
+            name: 'admin-features',
+            component: AdminFeatures,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/packages',
+            name: 'admin-packages',
+            component: AdminPackages,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/subscriptions',
+            name: 'admin-subscriptions',
+            component: AdminSubscriptions,
             meta: { requiresAuth: true, requiresAdmin: true }
         },
         {
