@@ -27,23 +27,46 @@
 
         <!-- Search and Sort Controls -->
         <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <!-- Search -->
-          <div class="flex-1 max-w-sm">
-            <label for="search" class="sr-only">Search assistants</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+          <!-- Search Controls -->
+          <div class="flex-1 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <!-- Assistant Name Search -->
+            <div class="flex-1 max-w-sm">
+              <label for="search" class="sr-only">Search assistants</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input
+                  id="search"
+                  v-model="searchQuery"
+                  @input="debounceSearch"
+                  type="text"
+                  placeholder="Search assistants by name..."
+                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                />
               </div>
-              <input
-                id="search"
-                v-model="searchQuery"
-                @input="debounceSearch"
-                type="text"
-                placeholder="Search assistants by name..."
-                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
-              />
+            </div>
+
+            <!-- User Search -->
+            <div class="flex-1 max-w-sm">
+              <label for="userSearch" class="sr-only">Search by owner</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input
+                  id="userSearch"
+                  v-model="userSearchQuery"
+                  @input="debounceUserSearch"
+                  type="text"
+                  placeholder="Search by owner name or email..."
+                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                />
+              </div>
             </div>
           </div>
 
@@ -311,9 +334,11 @@ export default {
       selectedAssistant: null,
       stats: null,
       searchQuery: '',
+      userSearchQuery: '',
       sortBy: 'name',
       sortOrder: 'asc',
       searchTimeout: null,
+      userSearchTimeout: null,
       deletingAssistant: null // Added for loading state
     }
   },
@@ -376,7 +401,8 @@ export default {
         const params = {
           sort_by: this.sortBy,
           sort_order: this.sortOrder,
-          search: this.searchQuery
+          search: this.searchQuery,
+          user_search: this.userSearchQuery
         };
 
         const response = await axios.get('/api/admin/assistants', { params });
@@ -475,6 +501,14 @@ export default {
     debounceSearch() {
       clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(() => {
+        this.currentPage = 1; // Reset to first page on new search
+        this.loadAssistants();
+      }, 500);
+    },
+
+    debounceUserSearch() {
+      clearTimeout(this.userSearchTimeout);
+      this.userSearchTimeout = setTimeout(() => {
         this.currentPage = 1; // Reset to first page on new search
         this.loadAssistants();
       }, 500);

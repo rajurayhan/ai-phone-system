@@ -68,10 +68,19 @@ class AssistantController extends Controller
     {
         $query = Assistant::with(['user', 'creator']);
         
-        // Search by name
-        if ($request->has('search') && !empty($request->search)) {
+        // Search by assistant name
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where('name', 'like', "%{$search}%");
+        }
+        
+        // Search by user (owner) name or email
+        if ($request->filled('user_search')) {
+            $userSearch = $request->user_search;
+            $query->whereHas('user', function ($q) use ($userSearch) {
+                $q->where('name', 'like', "%{$userSearch}%")
+                  ->orWhere('email', 'like', "%{$userSearch}%");
+            });
         }
         
         // Sort by name (default) or other fields
