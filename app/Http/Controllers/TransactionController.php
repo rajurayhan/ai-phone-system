@@ -138,6 +138,11 @@ class TransactionController extends Controller
             'metadata' => $request->metadata,
         ]);
 
+        // If this is a subscription transaction, create a pending subscription
+        if ($request->type === Transaction::TYPE_SUBSCRIPTION) {
+            $this->createPendingSubscription($user, $transaction);
+        }
+
         return response()->json([
             'success' => true,
             'data' => $transaction->load(['package', 'subscription']),
@@ -240,16 +245,22 @@ class TransactionController extends Controller
         $success = rand(1, 10) > 2; // 80% success rate for demo
 
         if ($success) {
+            // Update transaction status
             $transaction->update([
                 'status' => Transaction::STATUS_COMPLETED,
                 'processed_at' => Carbon::now(),
                 'external_transaction_id' => 'EXT-' . strtoupper(uniqid()),
             ]);
 
+            // Create or update subscription if this is a subscription transaction
+            if ($transaction->type === Transaction::TYPE_SUBSCRIPTION) {
+                $this->createOrUpdateSubscription($user, $transaction);
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $transaction->load(['package', 'subscription']),
-                'message' => 'Payment processed successfully'
+                'message' => 'Payment processed successfully and subscription activated!'
             ]);
         } else {
             $transaction->update([
@@ -262,6 +273,81 @@ class TransactionController extends Controller
                 'message' => 'Payment processing failed'
             ], 400);
         }
+    }
+
+    /**
+     * Create or update subscription based on transaction
+     */
+    private function createOrUpdateSubscription($user, $transaction): void
+    {
+        // Cancel any existing active subscription
+        $existingSubscription = $user->activeSubscription;
+        if ($existingSubscription) {
+            $existingSubscription->update([
+                'status' => 'cancelled',
+                'cancelled_at' => Carbon::now(),
+                'ends_at' => $existingSubscription->current_period_end,
+            ]);
+        }
+
+        // Create new subscription
+        $package = $transaction->package;
+        $trialDays = 14; // 14-day trial
+        $currentPeriodStart = Carbon::now();
+        $currentPeriodEnd = Carbon::now()->addDays($trialDays);
+
+        $subscription = UserSubscription::create([
+            'user_id' => $user->id,
+            'subscription_package_id' => $package->id,
+            'status' => 'active',
+            'current_period_start' => $currentPeriodStart,
+            'current_period_end' => $currentPeriodEnd,
+            'trial_ends_at' => $currentPeriodEnd,
+            'created_by' => $user->id,
+        ]);
+
+        // Update transaction with subscription reference
+        $transaction->update([
+            'user_subscription_id' => $subscription->id,
+        ]);
+    }
+
+    /**
+     * Create a pending subscription for a new transaction.
+     * This is used when a subscription transaction is created but payment is not yet processed.
+     */
+    private function createPendingSubscription($user, $transaction): void
+    {
+        // Cancel any existing active subscription
+        $existingSubscription = $user->activeSubscription;
+        if ($existingSubscription) {
+            $existingSubscription->update([
+                'status' => 'cancelled',
+                'cancelled_at' => Carbon::now(),
+                'ends_at' => $existingSubscription->current_period_end,
+            ]);
+        }
+
+        // Create new pending subscription
+        $package = $transaction->package;
+        $trialDays = 14; // 14-day trial
+        $currentPeriodStart = Carbon::now();
+        $currentPeriodEnd = Carbon::now()->addDays($trialDays);
+
+        $subscription = UserSubscription::create([
+            'user_id' => $user->id,
+            'subscription_package_id' => $package->id,
+            'status' => 'pending', // Set status to pending
+            'current_period_start' => $currentPeriodStart,
+            'current_period_end' => $currentPeriodEnd,
+            'trial_ends_at' => $currentPeriodEnd,
+            'created_by' => $user->id,
+        ]);
+
+        // Update transaction with subscription reference
+        $transaction->update([
+            'user_subscription_id' => $subscription->id,
+        ]);
     }
 
     /**

@@ -47,6 +47,11 @@ class UserSubscription extends Model
         return $this->status === 'active';
     }
 
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+
     public function isCancelled()
     {
         return $this->status === 'cancelled';
@@ -83,6 +88,7 @@ class UserSubscription extends Model
             'trial' => 'bg-blue-100 text-blue-800',
             'cancelled' => 'bg-yellow-100 text-yellow-800',
             'expired' => 'bg-red-100 text-red-800',
+            'pending' => 'bg-purple-100 text-purple-800',
             default => 'bg-gray-100 text-gray-800',
         };
     }

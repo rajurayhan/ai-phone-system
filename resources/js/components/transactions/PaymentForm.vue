@@ -266,8 +266,8 @@ export default {
         const processResponse = await axios.post(`/api/transactions/${transaction.transaction_id}/process`)
         
         if (processResponse.data.success) {
-          await showSuccess('Payment Successful', 'Your payment has been processed successfully!')
-          this.$router.push('/transactions')
+          await showSuccess('Payment Successful', 'Your payment has been processed successfully and your subscription has been activated! You can now create voice assistants.')
+          this.$router.push('/subscription')
         } else {
           showError('Payment Failed', processResponse.data.message || 'Payment processing failed')
         }

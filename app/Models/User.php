@@ -102,12 +102,17 @@ class User extends Authenticatable
 
     public function activeSubscription()
     {
-        return $this->hasOne(UserSubscription::class)->where('status', 'active')->orWhere('status', 'trial');
+        return $this->hasOne(UserSubscription::class)->where('status', 'active')->orWhere('status', 'trial')->orWhere('status', 'pending');
     }
 
     public function hasActiveSubscription()
     {
         return $this->activeSubscription()->exists();
+    }
+
+    public function hasPendingSubscription()
+    {
+        return $this->subscriptions()->where('status', 'pending')->exists();
     }
 
     public function getCurrentSubscriptionAttribute()

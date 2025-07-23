@@ -20,11 +20,21 @@
         <div class="mt-8">
           <!-- Current Subscription -->
           <div v-if="currentSubscription" class="bg-white shadow rounded-lg p-6 mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Current Subscription</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="flex justify-between items-start">
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Plan</h4>
-                <p class="text-lg font-semibold text-gray-900">{{ currentSubscription.package.name }}</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                  Current Subscription
+                  <span v-if="currentSubscription.status === 'pending'" class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                    Pending Payment
+                  </span>
+                  <span v-else-if="currentSubscription.status === 'active'" class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Active
+                  </span>
+                </h3>
+                <p class="text-gray-600 mb-4">{{ currentSubscription.package?.name }} - {{ currentSubscription.package?.formatted_price }}/month</p>
+                <p v-if="currentSubscription.status === 'pending'" class="text-sm text-purple-600 mb-2">
+                  ⚠️ Your subscription is pending payment. Please complete the payment to activate your subscription.
+                </p>
               </div>
               <div>
                 <h4 class="text-sm font-medium text-gray-500">Status</h4>
@@ -76,13 +86,25 @@
 
             <!-- Actions -->
             <div class="mt-6 flex space-x-3">
+              <router-link 
+                v-if="currentSubscription.status === 'pending'"
+                :to="`/payment?package_id=${currentSubscription.package?.id}`"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              >
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                Complete Payment
+              </router-link>
               <button
+                v-if="currentSubscription.status === 'active'"
                 @click="showUpgradeModal = true"
                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
                 Upgrade Plan
               </button>
               <button
+                v-if="currentSubscription.status === 'active'"
                 @click="cancelSubscription"
                 class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
               >
