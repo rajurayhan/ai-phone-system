@@ -347,6 +347,33 @@ You are a professional customer service representative for {{company_name}}..."
               <p class="text-xs text-gray-500 mt-1">This is how your end call message will appear with the company information filled in.</p>
             </div>
           </div>
+          
+          <!-- Webhook Configuration -->
+          <div class="mt-6">
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-gray-700">Server URL (Webhook)</label>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                  End-of-Call Report Enabled
+                </span>
+              </div>
+            </div>
+            <input
+              v-model="form.metadata.webhook_url"
+              type="url"
+              placeholder="https://n8n.cloud.lhgdev.com/webhook/lhg-live-demo-agents"
+              :class="[
+                'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
+                fieldErrors.webhook_url 
+                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                  : 'border-gray-300 focus:border-green-500 bg-white'
+              ]"
+            />
+            <p v-if="fieldErrors.webhook_url" class="text-xs text-red-600 mt-1">{{ fieldErrors.webhook_url }}</p>
+            <p v-else class="text-xs text-gray-500 mt-1">
+              Server URL to receive webhook events. When provided, end-of-call reports will be automatically enabled and sent to this URL.
+            </p>
+          </div>
         </div>
 
 
@@ -456,7 +483,8 @@ You embody the highest standards of customer service that {{company_name}} would
         industry: '',
         services_products: '',
         sms_phone_number: '',
-        assistant_phone_number: ''
+        assistant_phone_number: '',
+        webhook_url: 'https://n8n.cloud.lhgdev.com/webhook/lhg-live-demo-agents'
       },
       user_id: null, // Will be set based on isAdmin computed value
       type: 'demo' // Default to demo
@@ -473,6 +501,7 @@ You embody the highest standards of customer service that {{company_name}} would
       services_products: '',
       sms_phone_number: '',
       assistant_phone_number: '',
+      webhook_url: '',
       user_assignment: '' // Added for admin user assignment
     })
 
@@ -559,11 +588,17 @@ You embody the highest standards of customer service that {{company_name}} would
           form.value.metadata.services_products = assistant.vapi_data.metadata.services_products || ''
           form.value.metadata.sms_phone_number = assistant.vapi_data.metadata.sms_phone_number || ''
           form.value.metadata.assistant_phone_number = assistant.vapi_data.metadata.assistant_phone_number || ''
+          form.value.metadata.webhook_url = assistant.vapi_data.metadata.webhook_url || ''
         }
         
         // Map phone_number from database
         if (assistant.phone_number) {
           form.value.metadata.assistant_phone_number = assistant.phone_number
+        }
+        
+        // Map webhook_url from database
+        if (assistant.webhook_url) {
+          form.value.metadata.webhook_url = assistant.webhook_url
         }
         
         // Map user_id for admin assignment

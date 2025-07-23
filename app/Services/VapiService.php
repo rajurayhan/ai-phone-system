@@ -117,6 +117,18 @@ class VapiService
                 ])
             ];
 
+            // Add server configuration for webhook URL
+            if (!empty($data['metadata']['webhook_url'])) {
+                $createData['server'] = [
+                    'url' => $data['metadata']['webhook_url']
+                ];
+            }
+
+            // Add serverMessages for end-of-call report
+            $createData['serverMessages'] = [
+                'end-of-call-report'
+            ];
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
@@ -150,6 +162,21 @@ class VapiService
                 'metadata' => array_merge($data['metadata'] ?? [], [
                     'updated_at' => now()->toISOString(),
                 ])
+            ];
+
+            // Add server configuration for webhook URL
+            if (!empty($data['metadata']['webhook_url'])) {
+                $updateData['server'] = [
+                    'url' => $data['metadata']['webhook_url']
+                ];
+            } else {
+                // Remove server configuration if webhook URL is empty
+                $updateData['server'] = null;
+            }
+
+            // Add serverMessages for end-of-call report
+            $updateData['serverMessages'] = [
+                'end-of-call-report'
             ];
 
             $response = Http::withHeaders([

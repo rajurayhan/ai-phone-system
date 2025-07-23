@@ -118,6 +118,7 @@ class AssistantController extends Controller
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
             'metadata.assistant_phone_number' => 'string|max:20',
+            'metadata.webhook_url' => 'nullable|url|max:500',
             'user_id' => 'nullable|integer|exists:users,id', // Allow admin to assign to specific user
             'type' => 'nullable|string|in:demo,production', // New type field
         ]);
@@ -184,6 +185,7 @@ class AssistantController extends Controller
             'created_by' => $user->id,
             'type' => $data['type'] ?? 'demo', // Default to demo
             'phone_number' => $data['metadata']['assistant_phone_number'] ?? null,
+            'webhook_url' => $data['metadata']['webhook_url'] ?? 'https://n8n.cloud.lhgdev.com/webhook/lhg-live-demo-agents',
         ]);
 
         return response()->json([
@@ -230,6 +232,11 @@ class AssistantController extends Controller
         // Get detailed data from Vapi
         $vapiData = $this->vapiService->getAssistant($assistant->vapi_assistant_id);
 
+        // Merge webhook URL from database with Vapi metadata
+        if ($assistant->webhook_url && isset($vapiData['metadata'])) {
+            $vapiData['metadata']['webhook_url'] = $assistant->webhook_url;
+        }
+
         return response()->json([
             'success' => true,
             'data' => array_merge($assistant->toArray(), [
@@ -255,6 +262,7 @@ class AssistantController extends Controller
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
             'metadata.assistant_phone_number' => 'string|max:20',
+            'metadata.webhook_url' => 'nullable|url|max:500',
             'user_id' => 'nullable|integer|exists:users,id', // Allow admin to reassign to different user
             'type' => 'nullable|string|in:demo,production', // New type field
         ]);
@@ -353,6 +361,11 @@ class AssistantController extends Controller
         // Update phone_number if provided
         if ($request->has('metadata.assistant_phone_number')) {
             $updateData['phone_number'] = $request->input('metadata.assistant_phone_number');
+        }
+        
+        // Update webhook_url if provided
+        if ($request->has('metadata.webhook_url')) {
+            $updateData['webhook_url'] = $request->input('metadata.webhook_url');
         }
 
         // Update in database

@@ -22,6 +22,7 @@ class Assistant extends Model
         'created_by',
         'type',
         'phone_number',
+        'webhook_url',
     ];
 
     /**
