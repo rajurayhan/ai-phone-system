@@ -89,95 +89,133 @@
 
       <!-- Form -->
       <div v-else class="space-y-8">
-        <!-- Basic Information -->
-        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Agent Name *</label>
-            <input
-              v-model="form.name"
-              type="text"
-              required
-              maxlength="40"
-              placeholder="My Voice Assistant"
-              :class="[
-                'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                fieldErrors.name 
-                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                  : 'border-gray-300 focus:border-green-500 bg-white'
-              ]"
-            />
-            <p v-if="fieldErrors.name" class="text-xs text-red-600 mt-1">{{ fieldErrors.name }}</p>
-            <p v-else class="text-xs text-gray-500 mt-1">Maximum 40 characters</p>
-          </div>
-        </div>
-
         <!-- Company Information -->
         <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Company Information</h2>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
-                <input
-                  v-model="form.metadata.company_name"
-                  type="text"
-                  placeholder="Your Company Name"
-                  :class="[
-                    'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                    fieldErrors.company_name 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                      : 'border-gray-300 focus:border-green-500 bg-white'
-                  ]"
-                />
-                <p v-if="fieldErrors.company_name" class="text-xs text-red-600 mt-1">{{ fieldErrors.company_name }}</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Industry *</label>
-                <input
-                  v-model="form.metadata.industry"
-                  type="text"
-                  placeholder="e.g., Technology, Healthcare, Finance"
-                  :class="[
-                    'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                    fieldErrors.industry 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                      : 'border-gray-300 focus:border-green-500 bg-white'
-                  ]"
-                />
-                <p v-if="fieldErrors.industry" class="text-xs text-red-600 mt-1">{{ fieldErrors.industry }}</p>
-              </div>
-            </div>
-                      <div class="mt-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Services/Products *</label>
-              <textarea
-                v-model="form.metadata.services_products"
-                rows="3"
-                placeholder="Describe your main services or products"
-                :class="[
-                  'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                  fieldErrors.services_products 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                    : 'border-gray-300 focus:border-green-500 bg-white'
-                ]"
-              ></textarea>
-              <p v-if="fieldErrors.services_products" class="text-xs text-red-600 mt-1">{{ fieldErrors.services_products }}</p>
-            </div>
-            <div class="mt-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">SMS Phone Number</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
               <input
-                v-model="form.metadata.sms_phone_number"
-                type="tel"
-                placeholder="+1234567890"
+                v-model="form.metadata.company_name"
+                type="text"
+                placeholder="Your Company Name"
                 :class="[
                   'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                  fieldErrors.sms_phone_number 
+                  fieldErrors.company_name 
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
                     : 'border-gray-300 focus:border-green-500 bg-white'
                 ]"
               />
-              <p v-if="fieldErrors.sms_phone_number" class="text-xs text-red-600 mt-1">{{ fieldErrors.sms_phone_number }}</p>
-              <p v-else class="text-xs text-gray-500 mt-1">Phone number to receive text messages</p>
+              <p v-if="fieldErrors.company_name" class="text-xs text-red-600 mt-1">{{ fieldErrors.company_name }}</p>
             </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Industry *</label>
+              <input
+                v-model="form.metadata.industry"
+                type="text"
+                placeholder="e.g., Technology, Healthcare, Finance"
+                :class="[
+                  'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
+                  fieldErrors.industry 
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                    : 'border-gray-300 focus:border-green-500 bg-white'
+                ]"
+              />
+              <p v-if="fieldErrors.industry" class="text-xs text-red-600 mt-1">{{ fieldErrors.industry }}</p>
+            </div>
+          </div>
+          <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Services/Products *</label>
+            <textarea
+              v-model="form.metadata.services_products"
+              rows="3"
+              placeholder="Describe your main services or products"
+              :class="[
+                'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
+                fieldErrors.services_products 
+                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                  : 'border-gray-300 focus:border-green-500 bg-white'
+              ]"
+            ></textarea>
+            <p v-if="fieldErrors.services_products" class="text-xs text-red-600 mt-1">{{ fieldErrors.services_products }}</p>
+          </div>
+          <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">SMS Phone Number</label>
+            <input
+              v-model="form.metadata.sms_phone_number"
+              type="tel"
+              placeholder="+1234567890"
+              :class="[
+                'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
+                fieldErrors.sms_phone_number 
+                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                  : 'border-gray-300 focus:border-green-500 bg-white'
+              ]"
+            />
+            <p v-if="fieldErrors.sms_phone_number" class="text-xs text-red-600 mt-1">{{ fieldErrors.sms_phone_number }}</p>
+            <p v-else class="text-xs text-gray-500 mt-1">Phone number to receive text messages</p>
+          </div>
+        </div>
+
+        <!-- Agent Information -->
+        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Agent Information</h2>
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Agent Name *</label>
+              <input
+                v-model="form.name"
+                type="text"
+                required
+                maxlength="40"
+                placeholder="My Voice Assistant"
+                :class="[
+                  'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
+                  fieldErrors.name 
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                    : 'border-gray-300 focus:border-green-500 bg-white'
+                ]"
+              />
+              <p v-if="fieldErrors.name" class="text-xs text-red-600 mt-1">{{ fieldErrors.name }}</p>
+              <p v-else class="text-xs text-gray-500 mt-1">Maximum 40 characters</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Assistant Type *</label>
+              <select
+                v-model="form.type"
+                required
+                :class="[
+                  'w-full px-3 py-2 border rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500',
+                  'border-gray-300 focus:border-green-500 bg-white'
+                ]"
+              >
+                <option value="demo">Demo (Uses templates from settings)</option>
+                <option value="production">Production (Custom configuration)</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1">
+                <strong>Demo:</strong> Uses pre-configured templates from system settings. Template variables will be automatically replaced with your company information.<br>
+                <strong>Production:</strong> Custom configuration that you can fully customize for your specific needs.
+              </p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Assistant Phone Number</label>
+              <input
+                v-model="form.metadata.assistant_phone_number"
+                type="tel"
+                placeholder="+1234567890"
+                :class="[
+                  'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
+                  fieldErrors.assistant_phone_number 
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                    : 'border-gray-300 focus:border-green-500 bg-white'
+                ]"
+              />
+              <p v-if="fieldErrors.assistant_phone_number" class="text-xs text-red-600 mt-1">{{ fieldErrors.assistant_phone_number }}</p>
+              <p v-else class="text-xs text-gray-500 mt-1">Optional phone number for this specific assistant</p>
+            </div>
+          </div>
         </div>
 
         <!-- Model Configuration -->
@@ -188,16 +226,15 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">System Prompt</label>
               <div class="flex justify-between items-center mb-2">
                 <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
-                <button
-                  @click="loadDefaultTemplate"
-                  type="button"
-                  class="text-sm text-green-600 hover:text-green-700 font-medium"
-                >
-                  Load Default Template
-                </button>
+                <div class="flex items-center space-x-2">
+                  <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    Using System Template
+                  </span>
+                </div>
               </div>
               <textarea
                 v-model="form.model.messages[0].content"
+                :readonly="form.type === 'demo'"
                 rows="8"
                 placeholder="## COMPANY PROFILE - 
 ```
@@ -212,6 +249,8 @@ You are a professional customer service representative for {{company_name}}..."
                   'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
                   fieldErrors.systemPrompt 
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                    : form.type === 'demo'
+                    ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
                     : 'border-gray-300 focus:border-green-500 bg-white'
                 ]"
               ></textarea>
@@ -232,16 +271,15 @@ You are a professional customer service representative for {{company_name}}..."
               <label class="block text-sm font-medium text-gray-700 mb-2">First Message</label>
               <div class="flex justify-between items-center mb-2">
                 <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
-                <button
-                  @click="loadDefaultFirstMessage"
-                  type="button"
-                  class="text-sm text-green-600 hover:text-green-700 font-medium"
-                >
-                  Load Default Template
-                </button>
+                <div class="flex items-center space-x-2">
+                  <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    Using System Template
+                  </span>
+                </div>
               </div>
               <textarea
                 v-model="form.firstMessage"
+                :readonly="form.type === 'demo'"
                 rows="3"
                 maxlength="1000"
                 placeholder="Thank you for calling {{company_name}}, this is Sarah. How may I assist you today?"
@@ -249,6 +287,8 @@ You are a professional customer service representative for {{company_name}}..."
                   'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
                   fieldErrors.firstMessage 
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                    : form.type === 'demo'
+                    ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
                     : 'border-gray-300 focus:border-green-500 bg-white'
                 ]"
               ></textarea>
@@ -274,16 +314,15 @@ You are a professional customer service representative for {{company_name}}..."
             <label class="block text-sm font-medium text-gray-700 mb-2">End Call Message</label>
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
-              <button
-                @click="loadDefaultEndCallMessage"
-                type="button"
-                class="text-sm text-green-600 hover:text-green-700 font-medium"
-              >
-                Load Default Template
-              </button>
+              <div class="flex items-center space-x-2">
+                <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                  Using System Template
+                </span>
+              </div>
             </div>
             <textarea
               v-model="form.endCallMessage"
+              :readonly="form.type === 'demo'"
               rows="3"
               maxlength="1000"
               placeholder="Thank you for calling {{company_name}}. Have a wonderful day!"
@@ -291,6 +330,8 @@ You are a professional customer service representative for {{company_name}}..."
                 'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
                 fieldErrors.endCallMessage 
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                  : form.type === 'demo'
+                  ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
                   : 'border-gray-300 focus:border-green-500 bg-white'
               ]"
             ></textarea>
@@ -308,28 +349,7 @@ You are a professional customer service representative for {{company_name}}..."
           </div>
         </div>
 
-        <!-- Assistant Type -->
-        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Assistant Type</h2>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Type *</label>
-            <select
-              v-model="form.type"
-              required
-              :class="[
-                'w-full px-3 py-2 border rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500',
-                'border-gray-300 focus:border-green-500 bg-white'
-              ]"
-            >
-              <option value="demo">Demo (Uses templates from settings)</option>
-              <option value="production">Production (Custom configuration)</option>
-            </select>
-            <p class="text-xs text-gray-500 mt-1">
-              <strong>Demo:</strong> Uses pre-configured templates from system settings. Template variables will be automatically replaced with your company information.<br>
-              <strong>Production:</strong> Custom configuration that you can fully customize for your specific needs.
-            </p>
-          </div>
-        </div>
+
 
         <!-- User Assignment (Admin Only) -->
         <div v-if="isAdmin" class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
@@ -368,7 +388,7 @@ You are a professional customer service representative for {{company_name}}..."
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { showError, showSuccess } from '../../utils/sweetalert.js'
@@ -391,6 +411,13 @@ export default {
     // Subscription info for display
     const subscriptionInfo = ref(null)
     
+    // Template data for demo assistants
+    const templates = ref({
+      system_prompt: '',
+      first_message: '',
+      end_call_message: ''
+    })
+    
     // Check if we're creating a new assistant or editing an existing one
     const isCreating = computed(() => {
       return route.params.id === 'create' || !route.params.id
@@ -408,11 +435,11 @@ export default {
 \`\`\`
 COMPANY_NAME: {{company_name}}
 COMPANY_INDUSTRY: {{company_industry}}
-COMPANY_SERVICES: {{company_services}}
+COMPANY_SERVICES: {{company_name}} provides {{company_services}}
 \`\`\`
 
 ## Core Identity & Mission
-You are a professional customer service representative for {{company_name}}, a leading {{company_industry}} company specializing in {{company_services}}. 
+You are a professional customer service representative for {{company_name}}, a leading {{company_industry}} company specializing in {{company_name}} provides {{company_services}}. 
 
 You embody the highest standards of customer service that {{company_name}} would provide to their valued clients.`
           }
@@ -428,7 +455,8 @@ You embody the highest standards of customer service that {{company_name}} would
         company_name: '',
         industry: '',
         services_products: '',
-        sms_phone_number: ''
+        sms_phone_number: '',
+        assistant_phone_number: ''
       },
       user_id: null, // Will be set based on isAdmin computed value
       type: 'demo' // Default to demo
@@ -444,6 +472,7 @@ You embody the highest standards of customer service that {{company_name}} would
       industry: '',
       services_products: '',
       sms_phone_number: '',
+      assistant_phone_number: '',
       user_assignment: '' // Added for admin user assignment
     })
 
@@ -529,6 +558,12 @@ You embody the highest standards of customer service that {{company_name}} would
           form.value.metadata.industry = assistant.vapi_data.metadata.industry || ''
           form.value.metadata.services_products = assistant.vapi_data.metadata.services_products || ''
           form.value.metadata.sms_phone_number = assistant.vapi_data.metadata.sms_phone_number || ''
+          form.value.metadata.assistant_phone_number = assistant.vapi_data.metadata.assistant_phone_number || ''
+        }
+        
+        // Map phone_number from database
+        if (assistant.phone_number) {
+          form.value.metadata.assistant_phone_number = assistant.phone_number
         }
         
         // Map user_id for admin assignment
@@ -538,6 +573,18 @@ You embody the highest standards of customer service that {{company_name}} would
         
         // Map type
         form.value.type = assistant.type || 'demo'
+        
+        // If this is a demo assistant, load current templates
+        if (form.value.type === 'demo') {
+          // Load templates if not already loaded
+          if (!templates.value.system_prompt) {
+            await loadTemplates()
+          }
+          // Apply current templates
+          loadDefaultTemplate()
+          loadDefaultFirstMessage()
+          loadDefaultEndCallMessage()
+        }
       } catch (err) {
         console.error('Error loading assistant:', err)
         
@@ -703,6 +750,7 @@ You embody the highest standards of customer service that {{company_name}} would
         // Prepare the data according to Vapi API structure
         const assistantData = {
           name: form.value.name,
+          type: form.value.type, // Add type field
           model: {
             ...form.value.model,
             messages: [
@@ -837,147 +885,43 @@ You embody the highest standards of customer service that {{company_name}} would
       }
     }
 
+    const loadTemplates = async () => {
+      try {
+        const response = await axios.get('/api/assistant-templates')
+        if (response.data.success) {
+          templates.value = response.data.data
+          // If this is a demo assistant and we're creating, apply templates immediately
+          if (isCreating.value && form.value.type === 'demo') {
+            loadDefaultTemplate()
+            loadDefaultFirstMessage()
+            loadDefaultEndCallMessage()
+          }
+        }
+      } catch (error) {
+        console.error('Error loading templates:', error)
+      }
+    }
+
     const loadDefaultTemplate = () => {
-      form.value.model.messages[0].content = `## COMPANY PROFILE - 
+      form.value.model.messages[0].content = templates.value.system_prompt || `## COMPANY PROFILE - 
 \`\`\`
 COMPANY_NAME: {{company_name}}
 COMPANY_INDUSTRY: {{company_industry}}
-COMPANY_SERVICES: {{company_services}}
+COMPANY_SERVICES: {{company_name}} provides {{company_services}}
 \`\`\`
 
 ## Core Identity & Mission
-You are a professional customer service representative for {{company_name}}, a leading {{company_industry}} company specializing in {{company_services}}. 
+You are a professional customer service representative for {{company_name}}, a leading {{company_industry}} company specializing in {{company_name}} provides {{company_services}}. 
 
-You embody the highest standards of customer service that {{company_name}} would provide to their valued clients.
-
-## Primary Objectives
-Your main goals during this call are to:
-1. **Demonstrate Professional Excellence**: Show how advanced customer service technology can enhance {{company_name}}'s customer experience
-2. **Showcase Industry Knowledge**: Display understanding of {{company_industry}} terminology and common needs
-3. **Handle Inquiries Naturally**: Respond to typical business questions with confidence
-4. **Provide Exceptional Experience**: Leave callers impressed with the service quality
-
-## Core Conversation Guidelines
-
-### Opening & Greeting
-- Always answer with: "Thank you for calling {{company_name}}, this is Sarah. How may I assist you today?"
-- **If directly asked about being automated/AI**: "Yes, I'm an automated assistant designed to provide excellent customer service for {{company_name}}. How can I help you with our {{company_services}} today?"
-- **If asked "Are you real/human?"**: "I'm an automated system, but I'm here to provide you with real help and accurate information about {{company_name}}. What can I assist you with?"
-
-### Industry-Specific Knowledge Base
-**For {{company_industry}} businesses, I can assist with:**
-- General information about our {{company_services}}
-- Business hours and location details
-- Scheduling consultations or appointments
-- Explaining our service process and approach
-- Connecting callers with the right department or specialist
-- Basic pricing and service option inquiries
-
-### Common Business Scenarios
-
-#### **Business Hours & Location**
-"Our business hours are Monday through Friday, 9 AM to 5 PM Eastern Time. We're located at [Standard Business District]. Would you like me to help you schedule a time to visit or speak with one of our specialists?"
-
-#### **Service Inquiries**
-"I'd be happy to explain our {{company_services}}. As a {{company_industry}} company, we focus on [provide 2-3 relevant benefits]. What specific aspect would you like to know more about?"
-
-#### **Pricing Questions**
-"Our pricing varies based on your specific needs and the scope of services required. I can connect you with one of our specialists who can provide a customized quote. Would you prefer a call back or would you like to schedule a consultation?"
-
-#### **Scheduling & Appointments**
-"I can help you schedule a consultation with one of our {{company_industry}} experts. What type of service are you interested in, and what days work best for you this week?"
-
-#### **Complaint or Issue Resolution**
-"I sincerely apologize for any inconvenience you've experienced. Your satisfaction is extremely important to {{company_name}}. Let me gather some details so I can ensure this gets resolved quickly. Can you tell me more about the situation?"
-
-### Advanced Scenario Handling
-
-#### **Outside Scope Requests**
-"That's a great question, but it's outside my area of expertise. Let me connect you with [Specialist/Manager] who can give you the detailed information you need. Would you prefer I transfer you now or have someone call you back?"
-
-#### **Technical or Complex Questions**
-"That requires our technical expertise to answer properly. Rather than give you incomplete information, I'd like to connect you with our {{company_industry}} specialist who can provide you with accurate, detailed answers."
-
-#### **Angry or Frustrated Customers**
-"I understand your frustration, and I want to help resolve this for you. {{company_name}} values every client relationship. Let me get you connected with our management team immediately so we can address this properly."
-
-#### **Competitor Comparisons**
-"{{company_name}} focuses on providing exceptional {{company_services}} tailored to each client's unique needs. I'd love to have one of our specialists discuss how our approach might benefit your specific situation. When would be a good time for them to call you?"
-
-### Information Collection
-When gathering details, ask:
-- "May I get your name and the best number to reach you?"
-- "What type of {{company_industry}} service are you most interested in?"
-- "What's your timeline for this project/service?"
-- "Is there anything specific you'd like our specialist to prepare for your conversation?"
-
-### Professional Call Closure
-
-#### **Standard Closure**
-- "Thank you for calling {{company_name}}, [Caller's Name]. To summarize: [briefly recap next steps]. You can expect [specific follow-up action] within [timeframe]."
-- "Is there anything else I can help you with today?"
-- If no, follow the next steps:
-- Trigger the 'endCall' function. You must use the 'endCall' tool to end the call. 
-
-#### **Appointment Scheduled**
-- "Perfect! I have you scheduled for [day/time] with [specialist]. You'll receive a confirmation [email/text] shortly."
-- "Is there anything else I can help you with today?"
-- If no, follow the next steps:
-- Trigger the 'endCall' function. You must use the 'endCall' tool to end the call. 
-
-#### **Information Provided**
-- "I hope that information was helpful! Remember, {{company_name}} is here to support your {{company_industry}} needs. Feel free to call back anytime."
-- "Is there anything else I can help you with today?"
-- If no, follow the next steps:
-- Trigger the 'endCall' function. You must use the 'endCall' tool to end the call. 
-
-#### **Transfer Required**
-"I'm transferring you now to [department/person] who will take excellent care of you. Thank you for calling {{company_name}}, and have a great day!"
-
-### Emergency Protocols
-
-#### **If System Issues Occur**
-"I apologize, but I'm experiencing a brief technical issue. Let me get you connected directly with our team to ensure you receive the assistance you need right away."
-
-#### **If Unable to Help**
-"I want to make sure you get the best possible assistance. Let me connect you with our manager who can personally handle your request."
-
-### Conversation Flow Rules
-
-1. **Always acknowledge** the caller's request before responding
-2. **Use the caller's name** once you have it (but don't overuse it)
-3. **Confirm understanding** before providing solutions
-4. **Offer specific next steps** rather than vague promises
-5. **End every interaction** with clear expectations and professional courtesy
-
-### Voice & Tone Guidelines
-- **Professional but warm**: Friendly without being overly casual
-- **Confident**: Speak with authority about {{company_name}} services  
-- **Patient**: Never rush callers or sound irritated
-- **Solution-focused**: Always guide toward helpful outcomes
-- **Respectful**: Use "please," "thank you," and "you're welcome" naturally
-
-### Key Phrases to Use
-- "I'd be happy to help you with that"
-- "Let me make sure I understand correctly"
-- "That's a great question"
-- "I want to ensure you get the best assistance"
-- "{{company_name}} is committed to [relevant benefit]"
-
-### What NOT to Do
-- Never say "I don't know" without offering an alternative
-- Don't make promises about pricing without specialist approval
-- Avoid technical jargon unless the caller uses it first
-- Don't argue with customers or defend company policies defensively
-- Never end calls abruptly without proper closure`
+You embody the highest standards of customer service that {{company_name}} would provide to their valued clients.`
     }
 
     const loadDefaultFirstMessage = () => {
-      form.value.firstMessage = `Thank you for calling {{company_name}}, this is Sarah. How may I assist you today?`
+      form.value.firstMessage = templates.value.first_message || `Thank you for calling {{company_name}}, this is Sarah. How may I assist you today?`
     }
 
     const loadDefaultEndCallMessage = () => {
-      form.value.endCallMessage = `Thank you for calling {{company_name}}. Have a wonderful day!`
+      form.value.endCallMessage = templates.value.end_call_message || `Thank you for calling {{company_name}}. Have a wonderful day!`
     }
 
     const goBack = () => {
@@ -994,8 +938,40 @@ When gathering details, ask:
       }
     }
 
-    onMounted(() => {
-      loadAssistant()
+    // Watch for type changes to handle template loading
+    watch(() => form.value.type, (newType) => {
+      if (newType === 'demo' && templates.value.system_prompt) {
+        // Auto-load templates for demo assistants
+        loadDefaultTemplate()
+        loadDefaultFirstMessage()
+        loadDefaultEndCallMessage()
+      }
+    })
+
+    // Watch for company information changes to update templates for demo assistants
+    watch([() => form.value.metadata.company_name, () => form.value.metadata.industry, () => form.value.metadata.services_products], () => {
+      if (form.value.type === 'demo' && templates.value.system_prompt) {
+        // Re-apply templates when company info changes
+        loadDefaultTemplate()
+        loadDefaultFirstMessage()
+        loadDefaultEndCallMessage()
+      }
+    })
+
+    // Watch for company name changes to auto-populate agent name
+    watch(() => form.value.metadata.company_name, (newCompanyName) => {
+      if (newCompanyName && newCompanyName.trim()) {
+        // Auto-populate agent name based on company name for both create and edit
+        form.value.name = `${newCompanyName.trim()} Assistant`
+      } else if (!newCompanyName || !newCompanyName.trim()) {
+        // Clear agent name if company name is empty
+        form.value.name = ''
+      }
+    })
+
+    onMounted(async () => {
+      await loadTemplates() // Load templates first
+      await loadAssistant()
       loadUsers()
       loadSubscriptionInfo()
     })
@@ -1012,14 +988,12 @@ When gathering details, ask:
       isCreating,
       loadAssistant,
       saveAssistant,
-      loadDefaultTemplate,
-      loadDefaultFirstMessage,
-      loadDefaultEndCallMessage,
       goBack,
       users,
       loadingUsers,
       isAdmin,
-      subscriptionInfo
+      subscriptionInfo,
+      templates
     }
   }
 }

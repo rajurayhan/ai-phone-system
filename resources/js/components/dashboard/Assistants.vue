@@ -98,7 +98,21 @@
               </div>
               <div>
                 <h3 class="text-lg font-semibold text-gray-900">{{ assistant.name }}</h3>
-                <p class="text-sm text-gray-600">{{ assistant.metadata?.user_email || 'Unknown' }}</p>
+                <div class="flex items-center space-x-2 mt-1">
+                  <span 
+                    :class="[
+                      'px-2 py-1 rounded-full text-xs font-medium',
+                      assistant.type === 'demo' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-green-100 text-green-800'
+                    ]"
+                  >
+                    {{ assistant.type === 'demo' ? 'Demo' : 'Production' }}
+                  </span>
+                  <span v-if="assistant.phone_number" class="text-xs text-gray-500">
+                    📞 {{ assistant.phone_number }}
+                  </span>
+                </div>
               </div>
             </div>
             <div class="flex items-center space-x-2">

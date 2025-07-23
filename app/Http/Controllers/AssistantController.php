@@ -117,6 +117,7 @@ class AssistantController extends Controller
             'metadata.industry' => 'string|max:255',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
+            'metadata.assistant_phone_number' => 'string|max:20',
             'user_id' => 'nullable|integer|exists:users,id', // Allow admin to assign to specific user
             'type' => 'nullable|string|in:demo,production', // New type field
         ]);
@@ -182,6 +183,7 @@ class AssistantController extends Controller
             'vapi_assistant_id' => $vapiAssistant['id'],
             'created_by' => $user->id,
             'type' => $data['type'] ?? 'demo', // Default to demo
+            'phone_number' => $data['metadata']['assistant_phone_number'] ?? null,
         ]);
 
         return response()->json([
@@ -248,6 +250,7 @@ class AssistantController extends Controller
             'metadata.industry' => 'string|max:255',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
+            'metadata.assistant_phone_number' => 'string|max:20',
             'user_id' => 'nullable|integer|exists:users,id', // Allow admin to reassign to different user
             'type' => 'nullable|string|in:demo,production', // New type field
         ]);
@@ -341,6 +344,11 @@ class AssistantController extends Controller
         // Update type if provided
         if ($request->has('type')) {
             $updateData['type'] = $request->type;
+        }
+        
+        // Update phone_number if provided
+        if ($request->has('metadata.assistant_phone_number')) {
+            $updateData['phone_number'] = $request->input('metadata.assistant_phone_number');
         }
 
         // Update in database

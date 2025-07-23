@@ -21,6 +21,7 @@ class Assistant extends Model
         'vapi_assistant_id',
         'created_by',
         'type',
+        'phone_number',
     ];
 
     /**

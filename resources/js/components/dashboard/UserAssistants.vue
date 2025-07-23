@@ -162,6 +162,23 @@
                     <span class="text-gray-500">Created By:</span>
                     <span class="font-medium text-gray-900">{{ assistant.creator?.name || 'Unknown' }}</span>
                   </div>
+                  <div class="flex items-center justify-between text-sm mt-1">
+                    <span class="text-gray-500">Type:</span>
+                    <span 
+                      :class="[
+                        'px-2 py-1 rounded-full text-xs font-medium',
+                        assistant.type === 'demo' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-green-100 text-green-800'
+                      ]"
+                    >
+                      {{ assistant.type === 'demo' ? 'Demo' : 'Production' }}
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm mt-1">
+                    <span class="text-gray-500">Phone:</span>
+                    <span class="font-medium text-gray-900">{{ assistant.phone_number || 'Not set' }}</span>
+                  </div>
                 </div>
 
                 <div class="mt-6 flex space-x-3">
