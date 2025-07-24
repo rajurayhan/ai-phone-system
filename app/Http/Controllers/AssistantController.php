@@ -117,10 +117,11 @@ class AssistantController extends Controller
             'metadata.industry' => 'string|max:255',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
-            'metadata.assistant_phone_number' => 'string|max:20',
+            'metadata.assistant_phone_number' => 'nullable|string|max:20|regex:/^\+[1-9]\d{1,14}$/',
             'metadata.webhook_url' => 'nullable|url|max:500',
             'user_id' => 'nullable|integer|exists:users,id', // Allow admin to assign to specific user
             'type' => 'nullable|string|in:demo,production', // New type field
+            'selected_phone_number' => 'nullable|string|max:20|regex:/^\+[1-9]\d{1,14}$/', // Allow selected phone number
         ]);
 
         $user = Auth::user();
@@ -149,14 +150,8 @@ class AssistantController extends Controller
         if ($user->isAdmin() && $request->has('user_id') && $request->user_id) {
             $assistantUserId = $request->user_id;
             
-            // Check if the target user can create more assistants
-            $targetUser = User::find($assistantUserId);
-            if (!$targetUser->canCreateAssistant()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'The selected user has reached their assistant limit for their current subscription plan.'
-                ], 403);
-            }
+            // For admins, we don't check subscription limits of target users
+            // Admins can create assistants for any user regardless of their subscription status
         }
         
         // Add user_id to metadata
@@ -166,6 +161,25 @@ class AssistantController extends Controller
         }
         $data['metadata']['user_id'] = $assistantUserId;
         $data['voice']['voiceId'] = 'Spencer';
+
+        // Handle phone number purchase and assignment
+        $phoneNumber = null;
+        if ($request->has('selected_phone_number') && $request->selected_phone_number) {
+            $twilioService = app(\App\Services\TwilioService::class);
+            
+            // Purchase the selected phone number
+            $purchaseResult = $twilioService->purchaseNumber($request->selected_phone_number);
+            
+            if ($purchaseResult['success']) {
+                $phoneNumber = $request->selected_phone_number;
+                $data['metadata']['assistant_phone_number'] = $phoneNumber;
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to purchase phone number: ' . ($purchaseResult['message'] ?? 'Unknown error')
+                ], 500);
+            }
+        }
 
         // Create assistant in Vapi
         $vapiAssistant = $this->vapiService->createAssistant($data);
@@ -187,6 +201,11 @@ class AssistantController extends Controller
             'phone_number' => $data['metadata']['assistant_phone_number'] ?? null,
             'webhook_url' => $data['metadata']['webhook_url'] ?? 'https://n8n.cloud.lhgdev.com/webhook/lhg-live-demo-agents',
         ]);
+
+        // Assign phone number to Vapi if purchased
+        if ($phoneNumber) {
+            $this->vapiService->assignPhoneNumber($vapiAssistant['id'], $phoneNumber);
+        }
 
         return response()->json([
             'success' => true,
@@ -272,10 +291,11 @@ class AssistantController extends Controller
             'metadata.industry' => 'string|max:255',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
-            'metadata.assistant_phone_number' => 'string|max:20',
+            'metadata.assistant_phone_number' => 'nullable|string|max:20|regex:/^\+[1-9]\d{1,14}$/',
             'metadata.webhook_url' => 'nullable|url|max:500',
             'user_id' => 'nullable|integer|exists:users,id', // Allow admin to reassign to different user
             'type' => 'nullable|string|in:demo,production', // New type field
+            'selected_phone_number' => 'nullable|string|max:20|regex:/^\+[1-9]\d{1,14}$/', // Allow selected phone number
         ]);
 
         $user = Auth::user();

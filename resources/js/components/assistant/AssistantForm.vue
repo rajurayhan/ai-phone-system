@@ -42,22 +42,25 @@
                   Subscribe Now
                 </router-link>
               </div>
+              <!-- Admin Status (only show when creating and admin) -->
+              <div v-else-if="isCreating && isAdmin" class="mt-2 text-sm">
+                <span class="text-green-600 font-medium">Admin User</span>
+                <span class="mx-2 text-gray-300">|</span>
+                <span class="text-gray-500">No subscription limits</span>
+              </div>
             </div>
           </div>
           <div class="flex items-center space-x-3">
             <button
               @click="saveAssistant"
-              :disabled="submitting || (isCreating && subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin)"
+              :disabled="submitting"
               class="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg flex items-center"
             >
               <svg v-if="submitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span v-if="isCreating && subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin">
-                Subscribe to Create Assistant
-              </span>
-              <span v-else>
+              <span>
                 {{ submitting ? (isCreating ? 'Creating...' : 'Updating...') : (isCreating ? 'Create Assistant' : 'Update Assistant') }}
               </span>
             </button>
@@ -201,17 +204,94 @@
             
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Assistant Phone Number</label>
-              <input
-                v-model="form.metadata.assistant_phone_number"
-                type="tel"
-                placeholder="+1234567890"
-                :class="[
-                  'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                  fieldErrors.assistant_phone_number 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                    : 'border-gray-300 focus:border-green-500 bg-white'
-                ]"
-              />
+              
+              <!-- Phone Number Purchase Section -->
+              <div v-if="isCreating" class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="text-sm font-medium text-blue-900">Purchase Twilio Phone Number</h4>
+                  <div class="flex items-center space-x-2">
+                    <input
+                      v-model="areaCode"
+                      type="text"
+                      placeholder="Area Code (e.g., 212)"
+                      maxlength="3"
+                      class="text-xs px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      @click="loadAvailableNumbers"
+                      :disabled="loadingNumbers"
+                      class="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      <span v-if="loadingNumbers">Loading...</span>
+                      <span v-else>Get Available Numbers</span>
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Available Numbers List -->
+                <div v-if="availableNumbers.length > 0" class="space-y-2">
+                  <p class="text-xs text-blue-700 mb-2">Select a phone number to purchase when creating assistant:</p>
+                  <div class="space-y-2 max-h-32 overflow-y-auto">
+                    <div
+                      v-for="number in availableNumbers"
+                      :key="number.phone_number"
+                      class="flex items-center justify-between p-2 bg-white border border-blue-200 rounded"
+                    >
+                      <div class="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          :id="number.phone_number"
+                          :value="number.phone_number"
+                          v-model="selectedPhoneNumber"
+                          name="phoneNumber"
+                          class="text-blue-600 focus:ring-blue-500"
+                        />
+                        <label :for="number.phone_number" class="text-sm font-medium cursor-pointer">
+                          {{ number.phone_number }}
+                          <span v-if="number.locality" class="text-xs text-gray-500 ml-1">
+                            ({{ number.locality }}, {{ number.region }})
+                          </span>
+                        </label>
+                      </div>
+                      <span v-if="selectedPhoneNumber === number.phone_number" class="text-xs text-green-600 font-medium">
+                        Selected
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Manual Phone Number Input -->
+                <div class="mt-3">
+                  <p class="text-xs text-blue-700 mb-2">Or enter a phone number manually:</p>
+                  <input
+                    v-model="form.metadata.assistant_phone_number"
+                    type="tel"
+                    placeholder="+1234567890"
+                    :class="[
+                      'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
+                      fieldErrors.assistant_phone_number 
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                        : 'border-gray-300 focus:border-green-500 bg-white'
+                    ]"
+                  />
+                </div>
+              </div>
+              
+              <!-- Edit Mode - Simple Input -->
+              <div v-else>
+                <input
+                  v-model="form.metadata.assistant_phone_number"
+                  type="tel"
+                  placeholder="+1234567890"
+                  :class="[
+                    'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
+                    fieldErrors.assistant_phone_number 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                      : 'border-gray-300 focus:border-green-500 bg-white'
+                  ]"
+                />
+              </div>
+              
               <p v-if="fieldErrors.assistant_phone_number" class="text-xs text-red-600 mt-1">{{ fieldErrors.assistant_phone_number }}</p>
               <p v-else class="text-xs text-gray-500 mt-1">Optional phone number for this specific assistant</p>
             </div>
@@ -444,6 +524,13 @@ export default {
       first_message: '',
       end_call_message: ''
     })
+    
+    // Phone number purchase data
+    const availableNumbers = ref([])
+    const loadingNumbers = ref(false)
+    const purchasingNumber = ref(false)
+    const areaCode = ref('')
+    const selectedPhoneNumber = ref('')
     
     // Check if we're creating a new assistant or editing an existing one
     const isCreating = computed(() => {
@@ -807,6 +894,11 @@ You embody the highest standards of customer service that {{company_name}} would
           user_id: form.value.user_id || currentUser.value.id // Add user_id to main data
         }
         
+        // Add selected phone number if chosen
+        if (selectedPhoneNumber.value) {
+          assistantData.selected_phone_number = selectedPhoneNumber.value
+        }
+        
         if (isCreating.value) {
           await axios.post('/api/assistants', assistantData)
           await showSuccess('Success', 'Assistant created successfully!')
@@ -973,6 +1065,32 @@ You embody the highest standards of customer service that {{company_name}} would
       }
     }
 
+    const loadAvailableNumbers = async () => {
+      try {
+        loadingNumbers.value = true
+        const params = {}
+        if (areaCode.value.trim()) {
+          params.area_code = areaCode.value.trim()
+        }
+        
+        const response = await axios.get('/api/twilio/available-numbers', { params })
+        
+        if (response.data.success) {
+          availableNumbers.value = response.data.data
+          selectedPhoneNumber.value = '' // Reset selection
+        } else {
+          await showError('Error', 'Failed to load available phone numbers')
+        }
+      } catch (error) {
+        console.error('Error loading available numbers:', error)
+        await showError('Error', 'Failed to load available phone numbers')
+      } finally {
+        loadingNumbers.value = false
+      }
+    }
+
+
+
     // Watch for type changes to handle template loading
     watch(() => form.value.type, (newType) => {
       if (newType === 'demo' && templates.value.system_prompt) {
@@ -1009,6 +1127,11 @@ You embody the highest standards of customer service that {{company_name}} would
       await loadAssistant()
       loadUsers()
       loadSubscriptionInfo()
+      
+      // Set default user for admin when creating
+      if (isCreating.value && isAdmin.value && currentUser.value.id) {
+        form.value.user_id = currentUser.value.id
+      }
     })
 
     return {
@@ -1028,7 +1151,13 @@ You embody the highest standards of customer service that {{company_name}} would
       loadingUsers,
       isAdmin,
       subscriptionInfo,
-      templates
+      templates,
+      availableNumbers,
+      loadingNumbers,
+      purchasingNumber,
+      areaCode,
+      selectedPhoneNumber,
+      loadAvailableNumbers
     }
   }
 }

@@ -60,6 +60,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('admin')->prefix('admin/assistants')->group(function () {
         Route::get('/', [App\Http\Controllers\AssistantController::class, 'adminIndex']);
     });
+    
+    // Twilio phone number routes
+    Route::prefix('twilio')->group(function () {
+        Route::get('/available-numbers', [App\Http\Controllers\TwilioController::class, 'getAvailableNumbers']);
+        Route::post('/purchase-number', [App\Http\Controllers\TwilioController::class, 'purchaseNumber']);
+        Route::get('/purchased-numbers', [App\Http\Controllers\TwilioController::class, 'getPurchasedNumbers']);
+        Route::delete('/release-number', [App\Http\Controllers\TwilioController::class, 'releaseNumber']);
+    });
 });
 
 // Dashboard routes

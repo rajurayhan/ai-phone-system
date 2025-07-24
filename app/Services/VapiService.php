@@ -147,6 +147,48 @@ class VapiService
     }
 
     /**
+     * Assign a phone number to an assistant
+     */
+    public function assignPhoneNumber($assistantId, $phoneNumber)
+    {
+        try {
+            Log::info('Vapi Assign Phone Number Request', [
+                'assistantId' => $assistantId,
+                'phoneNumber' => $phoneNumber
+            ]);
+
+            $data = [
+                'provider' => 'twilio',
+                'number' => $phoneNumber,
+                'twilioAccountSid' => config('services.twilio.account_sid'),
+                'twilioAuthToken' => config('services.twilio.auth_token'),
+                'assistantId' => $assistantId,
+                'name' => 'Twilio Number'
+            ];
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->post($this->baseUrl . '/phone-number', $data);
+
+            if ($response->successful()) {
+                Log::info('Vapi Assign Phone Number Success', [
+                    'assistantId' => $assistantId,
+                    'phoneNumber' => $phoneNumber,
+                    'response' => $response->json()
+                ]);
+                return $response->json();
+            }
+
+            Log::error('Vapi Assign Phone Number Error: ' . $response->body());
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Vapi Assign Phone Number Service Error: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Update an assistant
      */
     public function updateAssistant($assistantId, array $data)

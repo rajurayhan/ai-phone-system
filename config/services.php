@@ -39,4 +39,9 @@ return [
         'api_key' => env('VAPI_API_KEY'),
     ],
 
+    'twilio' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID'),
+        'auth_token' => env('TWILIO_AUTH_TOKEN'),
+    ],
+
 ];
