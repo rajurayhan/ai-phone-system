@@ -258,7 +258,7 @@ class AssistantController extends Controller
         }
 
         // If Vapi has webhook URL but local database doesn't, use Vapi's value
-        if ($vapiWebhookUrl && !$assistant->webhook_url) {
+        if ($vapiWebhookUrl) {
             $assistant->update(['webhook_url' => $vapiWebhookUrl]);
         }
 
@@ -321,48 +321,7 @@ class AssistantController extends Controller
         }
 
         // If this is a demo assistant, use templates from settings
-        if ($assistant->isDemo()) {
-            $templates = \App\Models\Setting::getValue('assistant_system_prompt_template', '');
-            $firstMessageTemplate = \App\Models\Setting::getValue('assistant_first_message_template', '');
-            $endCallMessageTemplate = \App\Models\Setting::getValue('assistant_end_call_message_template', '');
-            
-            // Replace template variables with actual company data
-            $companyName = $request->input('metadata.company_name', '');
-            $companyIndustry = $request->input('metadata.industry', '');
-            $companyServices = $request->input('metadata.services_products', '');
-            
-            $processedSystemPrompt = str_replace(
-                ['{{company_name}}', '{{company_industry}}', '{{company_services}}'],
-                [$companyName, $companyIndustry, $companyServices],
-                $templates
-            );
-            
-            $processedFirstMessage = str_replace(
-                ['{{company_name}}', '{{company_industry}}', '{{company_services}}'],
-                [$companyName, $companyIndustry, $companyServices],
-                $firstMessageTemplate
-            );
-            
-            $processedEndCallMessage = str_replace(
-                ['{{company_name}}', '{{company_industry}}', '{{company_services}}'],
-                [$companyName, $companyIndustry, $companyServices],
-                $endCallMessageTemplate
-            );
-            
-            // Update the request data with processed templates
-            $request->merge([
-                'model' => array_merge($request->input('model', []), [
-                    'messages' => [
-                        [
-                            'role' => 'system',
-                            'content' => $processedSystemPrompt
-                        ]
-                    ]
-                ]),
-                'firstMessage' => $processedFirstMessage,
-                'endCallMessage' => $processedEndCallMessage
-            ]);
-        }
+        
 
         // Update in Vapi
         $vapiData = $this->vapiService->updateAssistant($assistant->vapi_assistant_id, $request->all());
@@ -429,7 +388,7 @@ class AssistantController extends Controller
     {
         $user = Auth::user();
         
-        \Log::info('Delete assistant request', [
+        Log::info('Delete assistant request', [
             'user_id' => $user->id,
             'assistant_id' => $assistantId,
             'user_role' => $user->role
@@ -441,7 +400,7 @@ class AssistantController extends Controller
             ->first();
 
         if (!$assistant) {
-            \Log::warning('Assistant not found for deletion', ['assistant_id' => $assistantId]);
+            Log::warning('Assistant not found for deletion', ['assistant_id' => $assistantId]);
             return response()->json([
                 'success' => false,
                 'message' => 'Assistant not found'
@@ -450,7 +409,7 @@ class AssistantController extends Controller
 
         // Check if user owns this assistant or is admin
         if (!$user->isAdmin() && $assistant->user_id != $user->id) {
-            \Log::warning('Unauthorized delete attempt', [
+            Log::warning('Unauthorized delete attempt', [
                 'user_id' => $user->id,
                 'assistant_user_id' => $assistant->user_id,
                 'assistant_id' => $assistantId
@@ -463,14 +422,14 @@ class AssistantController extends Controller
 
         try {
             // Delete from Vapi first
-            \Log::info('Deleting assistant from Vapi', [
+            Log::info('Deleting assistant from Vapi', [
                 'vapi_assistant_id' => $assistant->vapi_assistant_id
             ]);
             
             $vapiSuccess = $this->vapiService->deleteAssistant($assistant->vapi_assistant_id);
 
             if (!$vapiSuccess) {
-                \Log::error('Failed to delete assistant from Vapi', [
+                Log::error('Failed to delete assistant from Vapi', [
                     'vapi_assistant_id' => $assistant->vapi_assistant_id
                 ]);
                 return response()->json([
@@ -479,7 +438,7 @@ class AssistantController extends Controller
                 ], 500);
             }
 
-            \Log::info('Successfully deleted from Vapi, now deleting from database', [
+            Log::info('Successfully deleted from Vapi, now deleting from database', [
                 'assistant_id' => $assistant->id,
                 'vapi_assistant_id' => $assistant->vapi_assistant_id
             ]);
@@ -487,7 +446,7 @@ class AssistantController extends Controller
             // Delete from database
             $assistant->delete();
 
-            \Log::info('Assistant deleted successfully', [
+            Log::info('Assistant deleted successfully', [
                 'assistant_id' => $assistant->id,
                 'vapi_assistant_id' => $assistant->vapi_assistant_id,
                 'deleted_by_user_id' => $user->id
@@ -499,7 +458,7 @@ class AssistantController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            \Log::error('Exception during assistant deletion', [
+            Log::error('Exception during assistant deletion', [
                 'assistant_id' => $assistant->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()

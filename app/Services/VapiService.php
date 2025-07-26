@@ -114,6 +114,7 @@ class VapiService
                 'endCallMessage' => $data['endCallMessage'] ?? '',
                 'metadata' => array_merge($data['metadata'] ?? [], [
                     'created_at' => now()->toISOString(),
+                    'type' => $data['type'],
                 ])
             ];
 
@@ -203,6 +204,7 @@ class VapiService
                 'endCallMessage' => $data['endCallMessage'] ?? '',
                 'metadata' => array_merge($data['metadata'] ?? [], [
                     'updated_at' => now()->toISOString(),
+                    'type' => $data['type'],
                 ])
             ];
 

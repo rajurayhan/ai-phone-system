@@ -308,19 +308,40 @@
                 <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
                 <div class="flex items-center space-x-2">
                   <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    Using System Template
+                    Demo Mode
                   </span>
+                  <button
+                    v-if="form.type === 'demo'"
+                    @click="replaceWithTemplate('systemPrompt')"
+                    type="button"
+                    class="text-blue-600 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                    title="Replace with templated data"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                  <button
+                    v-if="form.type === 'demo'"
+                    @click="replaceWithActual('systemPrompt')"
+                    type="button"
+                    class="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50"
+                    title="Replace with actual Vapi data"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
                 </div>
               </div>
               <textarea
                 v-model="form.model.messages[0].content"
-                :readonly="form.type === 'demo'"
                 rows="8"
                 placeholder="## COMPANY PROFILE - 
 ```
 COMPANY_NAME: {{company_name}}
 COMPANY_INDUSTRY: {{company_industry}}
-COMPANY_SERVICES: {{company_services}}
+COMPANY_SERVICES: {{company_name}} provides {{company_services}}
 ```
 
 ## Core Identity & Mission
@@ -329,8 +350,6 @@ You are a professional customer service representative for {{company_name}}..."
                   'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
                   fieldErrors.systemPrompt 
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                    : form.type === 'demo'
-                    ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
                     : 'border-gray-300 focus:border-green-500 bg-white'
                 ]"
               ></textarea>
@@ -353,13 +372,34 @@ You are a professional customer service representative for {{company_name}}..."
                 <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
                 <div class="flex items-center space-x-2">
                   <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    Using System Template
+                    Demo Mode
                   </span>
+                  <button
+                    v-if="form.type === 'demo'"
+                    @click="replaceWithTemplate('firstMessage')"
+                    type="button"
+                    class="text-blue-600 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                    title="Replace with templated data"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                  <button
+                    v-if="form.type === 'demo'"
+                    @click="replaceWithActual('firstMessage')"
+                    type="button"
+                    class="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50"
+                    title="Replace with actual Vapi data"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
                 </div>
               </div>
               <textarea
                 v-model="form.firstMessage"
-                :readonly="form.type === 'demo'"
                 rows="3"
                 maxlength="1000"
                 placeholder="Thank you for calling {{company_name}}, this is Sarah. How may I assist you today?"
@@ -367,8 +407,6 @@ You are a professional customer service representative for {{company_name}}..."
                   'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
                   fieldErrors.firstMessage 
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                    : form.type === 'demo'
-                    ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
                     : 'border-gray-300 focus:border-green-500 bg-white'
                 ]"
               ></textarea>
@@ -396,13 +434,34 @@ You are a professional customer service representative for {{company_name}}..."
               <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
               <div class="flex items-center space-x-2">
                 <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                  Using System Template
+                  Demo Mode
                 </span>
+                <button
+                  v-if="form.type === 'demo'"
+                  @click="replaceWithTemplate('endCallMessage')"
+                  type="button"
+                  class="text-blue-600 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                  title="Replace with templated data"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+                <button
+                  v-if="form.type === 'demo'"
+                  @click="replaceWithActual('endCallMessage')"
+                  type="button"
+                  class="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50"
+                  title="Replace with actual Vapi data"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
               </div>
             </div>
             <textarea
               v-model="form.endCallMessage"
-              :readonly="form.type === 'demo'"
               rows="3"
               maxlength="1000"
               placeholder="Thank you for calling {{company_name}}. Have a wonderful day!"
@@ -410,8 +469,6 @@ You are a professional customer service representative for {{company_name}}..."
                 'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
                 fieldErrors.endCallMessage 
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                  : form.type === 'demo'
-                  ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
                   : 'border-gray-300 focus:border-green-500 bg-white'
               ]"
             ></textarea>
@@ -537,6 +594,20 @@ export default {
       return route.params.id === 'create' || !route.params.id
     })
     
+    // Store actual Vapi data separately from form data
+    const actualVapiData = ref({
+      systemPrompt: '',
+      firstMessage: '',
+      endCallMessage: ''
+    })
+    
+    // Store templated data separately
+    const templatedData = ref({
+      systemPrompt: '',
+      firstMessage: '',
+      endCallMessage: ''
+    })
+    
     const form = ref({
       name: '',
       model: {
@@ -628,6 +699,78 @@ You embody the highest standards of customer service that {{company_name}} would
       return message
     })
 
+    // Function to replace with templated data
+    const replaceWithTemplate = (field) => {
+      if (field === 'systemPrompt') {
+        form.value.model.messages[0].content = templatedData.value.systemPrompt
+      } else if (field === 'firstMessage') {
+        form.value.firstMessage = templatedData.value.firstMessage
+      } else if (field === 'endCallMessage') {
+        form.value.endCallMessage = templatedData.value.endCallMessage
+      }
+    }
+
+    // Function to replace with actual Vapi data
+    const replaceWithActual = (field) => {
+      if (field === 'systemPrompt') {
+        form.value.model.messages[0].content = actualVapiData.value.systemPrompt
+      } else if (field === 'firstMessage') {
+        form.value.firstMessage = actualVapiData.value.firstMessage
+      } else if (field === 'endCallMessage') {
+        form.value.endCallMessage = actualVapiData.value.endCallMessage
+      }
+    }
+
+    // Function to update templated data when company info changes
+    const updateTemplatedData = () => {
+      if (templates.value.system_prompt) {
+        templatedData.value.systemPrompt = templates.value.system_prompt
+          .replace(/\{\{company_name\}\}/g, form.value.metadata.company_name || '{{company_name}}')
+          .replace(/\{\{company_industry\}\}/g, form.value.metadata.industry || '{{company_industry}}')
+          .replace(/\{\{company_services\}\}/g, form.value.metadata.services_products || '{{company_services}}')
+      }
+      
+      if (templates.value.first_message) {
+        templatedData.value.firstMessage = templates.value.first_message
+          .replace(/\{\{company_name\}\}/g, form.value.metadata.company_name || '{{company_name}}')
+          .replace(/\{\{company_industry\}\}/g, form.value.metadata.industry || '{{company_industry}}')
+          .replace(/\{\{company_services\}\}/g, form.value.metadata.services_products || '{{company_services}}')
+      }
+      
+      if (templates.value.end_call_message) {
+        templatedData.value.endCallMessage = templates.value.end_call_message
+          .replace(/\{\{company_name\}\}/g, form.value.metadata.company_name || '{{company_name}}')
+          .replace(/\{\{company_industry\}\}/g, form.value.metadata.industry || '{{company_industry}}')
+          .replace(/\{\{company_services\}\}/g, form.value.metadata.services_products || '{{company_services}}')
+      }
+    }
+
+    // Watch for type changes to handle template loading
+    watch(() => form.value.type, (newType) => {
+      if (newType === 'demo' && templates.value.system_prompt) {
+        // Auto-load templates for demo assistants
+        loadDefaultTemplate()
+        loadDefaultFirstMessage()
+        loadDefaultEndCallMessage()
+      }
+    })
+
+    // Watch for company information changes to update templated data
+    watch([() => form.value.metadata.company_name, () => form.value.metadata.industry, () => form.value.metadata.services_products], () => {
+      updateTemplatedData()
+    }, { deep: true })
+
+    // Watch for company name changes to auto-populate agent name
+    watch(() => form.value.metadata.company_name, (newCompanyName) => {
+      if (newCompanyName && newCompanyName.trim()) {
+        // Auto-populate agent name based on company name for both create and edit
+        form.value.name = `${newCompanyName.trim()} Assistant`
+      } else if (!newCompanyName || !newCompanyName.trim()) {
+        // Clear agent name if company name is empty
+        form.value.name = ''
+      }
+    })
+
     const loadAssistant = async () => {
       // Check if user is logged in
       const token = localStorage.getItem('token')
@@ -648,17 +791,22 @@ You embody the highest standards of customer service that {{company_name}} would
         const response = await axios.get(`/api/assistants/${route.params.id}`)
         const assistant = response.data.data
         
-        // Map the assistant data to our form structure
+        // Store actual Vapi data separately
+        actualVapiData.value.systemPrompt = assistant.vapi_data?.model?.messages?.[0]?.content || ''
+        actualVapiData.value.firstMessage = assistant.vapi_data?.firstMessage || ''
+        actualVapiData.value.endCallMessage = assistant.vapi_data?.endCallMessage || ''
+        
+        // Map the assistant data to our form structure - always use actual Vapi data
         form.value.name = assistant.name || ''
-        form.value.firstMessage = assistant.vapi_data?.firstMessage || ''
-        form.value.endCallMessage = assistant.vapi_data?.endCallMessage || ''
+        form.value.firstMessage = actualVapiData.value.firstMessage
+        form.value.endCallMessage = actualVapiData.value.endCallMessage
         
         // Map model configuration
         if (assistant.vapi_data?.model) {
           form.value.model.provider = assistant.vapi_data.model.provider || 'openai'
           form.value.model.model = assistant.vapi_data.model.model || 'gpt-4o'
           if (assistant.vapi_data.model.messages && assistant.vapi_data.model.messages.length > 0) {
-            form.value.model.messages[0].content = assistant.vapi_data.model.messages[0].content || ''
+            form.value.model.messages[0].content = actualVapiData.value.systemPrompt
           }
         }
         
@@ -696,17 +844,10 @@ You embody the highest standards of customer service that {{company_name}} would
         // Map type
         form.value.type = assistant.type || 'demo'
         
-        // If this is a demo assistant, load current templates
-        if (form.value.type === 'demo') {
-          // Load templates if not already loaded
-          if (!templates.value.system_prompt) {
-            await loadTemplates()
-          }
-          // Apply current templates
-          loadDefaultTemplate()
-          loadDefaultFirstMessage()
-          loadDefaultEndCallMessage()
-        }
+        // Load templates and update templated data
+        await loadTemplates()
+        updateTemplatedData()
+        
       } catch (err) {
         console.error('Error loading assistant:', err)
         
@@ -1017,12 +1158,8 @@ You embody the highest standards of customer service that {{company_name}} would
         const response = await axios.get('/api/assistant-templates')
         if (response.data.success) {
           templates.value = response.data.data
-          // If this is a demo assistant and we're creating, apply templates immediately
-          if (isCreating.value && form.value.type === 'demo') {
-            loadDefaultTemplate()
-            loadDefaultFirstMessage()
-            loadDefaultEndCallMessage()
-          }
+          // Update templated data with current company info
+          updateTemplatedData()
         }
       } catch (error) {
         console.error('Error loading templates:', error)
@@ -1030,7 +1167,9 @@ You embody the highest standards of customer service that {{company_name}} would
     }
 
     const loadDefaultTemplate = () => {
-      form.value.model.messages[0].content = templates.value.system_prompt || `## COMPANY PROFILE - 
+      // This function is now only used for creating new assistants
+      if (isCreating.value && form.value.type === 'demo') {
+        form.value.model.messages[0].content = templates.value.system_prompt || `## COMPANY PROFILE - 
 \`\`\`
 COMPANY_NAME: {{company_name}}
 COMPANY_INDUSTRY: {{company_industry}}
@@ -1041,14 +1180,21 @@ COMPANY_SERVICES: {{company_name}} provides {{company_services}}
 You are a professional customer service representative for {{company_name}}, a leading {{company_industry}} company specializing in {{company_name}} provides {{company_services}}. 
 
 You embody the highest standards of customer service that {{company_name}} would provide to their valued clients.`
+      }
     }
 
     const loadDefaultFirstMessage = () => {
-      form.value.firstMessage = templates.value.first_message || `Thank you for calling {{company_name}}, this is Sarah. How may I assist you today?`
+      // This function is now only used for creating new assistants
+      if (isCreating.value && form.value.type === 'demo') {
+        form.value.firstMessage = templates.value.first_message || 'Thank you for calling {{company_name}}, this is Sarah. How may I assist you today?'
+      }
     }
 
     const loadDefaultEndCallMessage = () => {
-      form.value.endCallMessage = templates.value.end_call_message || `Thank you for calling {{company_name}}. Have a wonderful day!`
+      // This function is now only used for creating new assistants
+      if (isCreating.value && form.value.type === 'demo') {
+        form.value.endCallMessage = templates.value.end_call_message || 'Thank you for calling {{company_name}}. Have a wonderful day!'
+      }
     }
 
     const goBack = () => {
@@ -1101,15 +1247,10 @@ You embody the highest standards of customer service that {{company_name}} would
       }
     })
 
-    // Watch for company information changes to update templates for demo assistants
+    // Watch for company information changes to update templated data
     watch([() => form.value.metadata.company_name, () => form.value.metadata.industry, () => form.value.metadata.services_products], () => {
-      if (form.value.type === 'demo' && templates.value.system_prompt) {
-        // Re-apply templates when company info changes
-        loadDefaultTemplate()
-        loadDefaultFirstMessage()
-        loadDefaultEndCallMessage()
-      }
-    })
+      updateTemplatedData()
+    }, { deep: true })
 
     // Watch for company name changes to auto-populate agent name
     watch(() => form.value.metadata.company_name, (newCompanyName) => {
@@ -1157,7 +1298,11 @@ You embody the highest standards of customer service that {{company_name}} would
       purchasingNumber,
       areaCode,
       selectedPhoneNumber,
-      loadAvailableNumbers
+      loadAvailableNumbers,
+      replaceWithTemplate,
+      replaceWithActual,
+      actualVapiData,
+      templatedData
     }
   }
 }
