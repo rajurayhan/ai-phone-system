@@ -234,7 +234,12 @@ export default {
       
       const currentPackage = currentSubscription.value?.package;
       if (!currentPackage) return false; // No current subscription, so all packages are available
-      return pkg.price <= currentPackage.price;
+      
+      // Convert prices to numbers for proper comparison
+      const pkgPrice = parseFloat(pkg.price);
+      const currentPrice = parseFloat(currentPackage.price);
+      
+      return pkgPrice <= currentPrice;
     }
 
     onMounted(() => {

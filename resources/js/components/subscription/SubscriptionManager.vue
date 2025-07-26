@@ -358,8 +358,21 @@ export default {
 
     const isPackageDisabled = (pkg) => {
       const currentPackage = currentSubscription.value?.package;
-      if (!currentPackage) return false; // No current subscription, so all packages are available
-      return pkg.price <= currentPackage.price; // Disable packages with lower or equal prices
+      console.log('isPackageDisabled called for:', pkg.name, 'price:', pkg.price);
+      console.log('currentPackage:', currentPackage?.name, 'price:', currentPackage?.price);
+      
+      if (!currentPackage) {
+        console.log('No current package, returning false');
+        return false; // No current subscription, so all packages are available
+      }
+      
+      // Convert prices to numbers for proper comparison
+      const pkgPrice = parseFloat(pkg.price);
+      const currentPrice = parseFloat(currentPackage.price);
+      
+      const isDisabled = pkgPrice <= currentPrice;
+      console.log('Package disabled:', isDisabled, 'because', pkgPrice, '<=', currentPrice);
+      return isDisabled; // Disable packages with lower or equal prices (same or lower tier)
     };
 
     onMounted(() => {

@@ -129,6 +129,12 @@
               </div>
               
               <div>
+                <label class="block text-sm font-medium text-gray-700">Features (comma-separated)</label>
+                <textarea v-model="form.features" rows="4" placeholder="Enter features separated by commas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"></textarea>
+                <p class="mt-1 text-xs text-gray-500">Example: 1 Voice Agent, 1,000 minutes/month, Basic Analytics, Email Support</p>
+              </div>
+              
+              <div>
                 <label class="block text-sm font-medium text-gray-700">Support Level</label>
                 <select v-model="form.support_level" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm">
                   <option value="email">Email</option>
@@ -196,7 +202,7 @@ export default {
         price: 0,
         voice_agents_limit: 1,
         monthly_minutes_limit: 1000,
-        features: [],
+        features: '',
         support_level: 'email',
         analytics_level: 'basic',
         is_popular: false,
@@ -233,7 +239,10 @@ export default {
 
     editPackage(pkg) {
       this.editingPackage = pkg
-      this.form = { ...pkg }
+      this.form = { 
+        ...pkg,
+        features: Array.isArray(pkg.features) ? pkg.features.join(', ') : pkg.features
+      }
       this.showEditModal = true
     },
 
@@ -331,7 +340,7 @@ export default {
         price: 0,
         voice_agents_limit: 1,
         monthly_minutes_limit: 1000,
-        features: [],
+        features: '',
         support_level: 'email',
         analytics_level: 'basic',
         is_popular: false,
