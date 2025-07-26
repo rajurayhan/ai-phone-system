@@ -302,59 +302,55 @@
         <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Model Configuration</h2>
           <div class="space-y-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">System Prompt</label>
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
-                <div class="flex items-center space-x-2">
-                  <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    Demo Mode
-                  </span>
+            <!-- System Prompt -->
+            <div class="mt-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                System Prompt
+                <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <textarea
+                  v-model="form.model.messages[0].content"
+                  rows="8"
+                  :class="[
+                    'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none',
+                    fieldErrors.systemPrompt 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                      : 'border-gray-300 focus:border-green-500 bg-white'
+                  ]"
+                  placeholder="Enter the system prompt that defines the assistant's behavior..."
+                ></textarea>
+                
+                <!-- Template/Actual Data Toggle for Demo Assistants -->
+                <div v-if="form.type === 'demo'" class="absolute top-2 right-2 flex space-x-1">
                   <button
-                    v-if="form.type === 'demo'"
-                    @click="replaceWithTemplate('systemPrompt')"
                     type="button"
-                    class="text-blue-600 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                    @click="replaceWithTemplate('systemPrompt')"
+                    class="p-1 text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 rounded"
                     title="Replace with templated data"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
                   </button>
                   <button
-                    v-if="form.type === 'demo'"
-                    @click="replaceWithActual('systemPrompt')"
                     type="button"
-                    class="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50"
+                    @click="replaceWithActual('systemPrompt')"
+                    class="p-1 text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 rounded"
                     title="Replace with actual Vapi data"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                   </button>
                 </div>
               </div>
-              <textarea
-                v-model="form.model.messages[0].content"
-                rows="8"
-                placeholder="## COMPANY PROFILE - 
-```
-COMPANY_NAME: {{company_name}}
-COMPANY_INDUSTRY: {{company_industry}}
-COMPANY_SERVICES: {{company_name}} provides {{company_services}}
-```
-
-## Core Identity & Mission
-You are a professional customer service representative for {{company_name}}..."
-                :class="[
-                  'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                  fieldErrors.systemPrompt 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                    : 'border-gray-300 focus:border-green-500 bg-white'
-                ]"
-              ></textarea>
-              <p v-if="fieldErrors.systemPrompt" class="text-xs text-red-600 mt-1">{{ fieldErrors.systemPrompt }}</p>
-              <p v-else class="text-xs text-gray-500 mt-1">Define the assistant's behavior and capabilities. The template variables will be automatically replaced with your company information.</p>
+              <p v-if="fieldErrors.systemPrompt" class="text-xs text-red-600 mt-1">
+                {{ fieldErrors.systemPrompt }}
+              </p>
+              <p v-else class="text-xs text-gray-500 mt-1">
+                Define the assistant's behavior and personality. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{company_name}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_industry}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_services}}</code>
+              </p>
             </div>
             
             <!-- Prompt Preview -->
@@ -366,124 +362,122 @@ You are a professional customer service representative for {{company_name}}..."
               <p class="text-xs text-gray-500 mt-1">This is how your system prompt will appear with the company information filled in.</p>
             </div>
             
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">First Message</label>
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
-                <div class="flex items-center space-x-2">
-                  <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    Demo Mode
-                  </span>
+            <!-- First Message -->
+            <div class="mt-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                First Message
+                <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <textarea
+                  v-model="form.firstMessage"
+                  rows="4"
+                  :class="[
+                    'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none',
+                    fieldErrors.firstMessage 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                      : 'border-gray-300 focus:border-green-500 bg-white'
+                  ]"
+                  placeholder="Enter the first message the assistant will say when a call starts..."
+                ></textarea>
+                
+                <!-- Template/Actual Data Toggle for Demo Assistants -->
+                <div v-if="form.type === 'demo'" class="absolute top-2 right-2 flex space-x-1">
                   <button
-                    v-if="form.type === 'demo'"
-                    @click="replaceWithTemplate('firstMessage')"
                     type="button"
-                    class="text-blue-600 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
+                    @click="replaceWithTemplate('firstMessage')"
+                    class="p-1 text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 rounded"
                     title="Replace with templated data"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
                   </button>
                   <button
-                    v-if="form.type === 'demo'"
-                    @click="replaceWithActual('firstMessage')"
                     type="button"
-                    class="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50"
+                    @click="replaceWithActual('firstMessage')"
+                    class="p-1 text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 rounded"
                     title="Replace with actual Vapi data"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                   </button>
                 </div>
               </div>
-              <textarea
-                v-model="form.firstMessage"
-                rows="3"
-                maxlength="1000"
-                placeholder="Thank you for calling {{company_name}}, this is Sarah. How may I assist you today?"
-                :class="[
-                  'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                  fieldErrors.firstMessage 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                    : 'border-gray-300 focus:border-green-500 bg-white'
-                ]"
-              ></textarea>
-              <p v-if="fieldErrors.firstMessage" class="text-xs text-red-600 mt-1">{{ fieldErrors.firstMessage }}</p>
-              <p v-else class="text-xs text-gray-500 mt-1">Maximum 1000 characters. This is the first message the assistant will say.</p>
-              
-              <!-- First Message Preview -->
-              <div v-if="form.metadata.company_name || form.metadata.industry || form.metadata.services_products" class="mt-3">
-                <label class="block text-sm font-medium text-gray-700 mb-2">First Message Preview</label>
-                <div class="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-gray-700">
+              <p v-if="fieldErrors.firstMessage" class="text-xs text-red-600 mt-1">
+                {{ fieldErrors.firstMessage }}
+              </p>
+              <p v-else class="text-xs text-gray-500 mt-1">
+                The first message the assistant will say when a call starts. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{company_name}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_industry}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_services}}</code>
+              </p>
+            </div>
+
+            <!-- End Call Message -->
+            <div class="mt-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                End Call Message
+                <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <textarea
+                  v-model="form.endCallMessage"
+                  rows="4"
+                  :class="[
+                    'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none',
+                    fieldErrors.endCallMessage 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                      : 'border-gray-300 focus:border-green-500 bg-white'
+                  ]"
+                  placeholder="Enter the message the assistant will say when ending a call..."
+                ></textarea>
+                
+                <!-- Template/Actual Data Toggle for Demo Assistants -->
+                <div v-if="form.type === 'demo'" class="absolute top-2 right-2 flex space-x-1">
+                  <button
+                    type="button"
+                    @click="replaceWithTemplate('endCallMessage')"
+                    class="p-1 text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 rounded"
+                    title="Replace with templated data"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    @click="replaceWithActual('endCallMessage')"
+                    class="p-1 text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 rounded"
+                    title="Replace with actual Vapi data"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p v-if="fieldErrors.endCallMessage" class="text-xs text-red-600 mt-1">
+                {{ fieldErrors.endCallMessage }}
+              </p>
+              <p v-else class="text-xs text-gray-500 mt-1">
+                The message the assistant will say when ending a call. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{company_name}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_industry}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_services}}</code>
+              </p>
+            </div>
+            
+            <!-- First Message Preview -->
+            <div v-if="form.metadata.company_name || form.metadata.industry || form.metadata.services_products" class="mt-3">
+              <label class="block text-sm font-medium text-gray-700 mb-2">First Message Preview</label>
+              <div class="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-gray-700">
                   <pre class="whitespace-pre-wrap">{{ processedFirstMessage }}</pre>
                 </div>
                 <p class="text-xs text-gray-500 mt-1">This is how your first message will appear with the company information filled in.</p>
               </div>
             </div>
           </div>
-        </div>
 
         <!-- Messaging Configuration -->
         <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Messaging Configuration</h2>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">End Call Message</label>
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-sm text-gray-600">Use {{company_name}}, {{company_industry}}, and {{company_services}} as template variables</span>
-              <div class="flex items-center space-x-2">
-                <span v-if="form.type === 'demo'" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                  Demo Mode
-                </span>
-                <button
-                  v-if="form.type === 'demo'"
-                  @click="replaceWithTemplate('endCallMessage')"
-                  type="button"
-                  class="text-blue-600 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50"
-                  title="Replace with templated data"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                </button>
-                <button
-                  v-if="form.type === 'demo'"
-                  @click="replaceWithActual('endCallMessage')"
-                  type="button"
-                  class="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50"
-                  title="Replace with actual Vapi data"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <textarea
-              v-model="form.endCallMessage"
-              rows="3"
-              maxlength="1000"
-              placeholder="Thank you for calling {{company_name}}. Have a wonderful day!"
-              :class="[
-                'w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500',
-                fieldErrors.endCallMessage 
-                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
-                  : 'border-gray-300 focus:border-green-500 bg-white'
-              ]"
-            ></textarea>
-            <p v-if="fieldErrors.endCallMessage" class="text-xs text-red-600 mt-1">{{ fieldErrors.endCallMessage }}</p>
-            <p v-else class="text-xs text-gray-500 mt-1">Message said when the call ends (max 1000 characters)</p>
-            
-            <!-- End Call Message Preview -->
-            <div v-if="form.metadata.company_name || form.metadata.industry || form.metadata.services_products" class="mt-3">
-              <label class="block text-sm font-medium text-gray-700 mb-2">End Call Message Preview</label>
-              <div class="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-gray-700">
-                <pre class="whitespace-pre-wrap">{{ processedEndCallMessage }}</pre>
-              </div>
-              <p class="text-xs text-gray-500 mt-1">This is how your end call message will appear with the company information filled in.</p>
-            </div>
-          </div>
           
           <!-- Webhook Configuration -->
           <div class="mt-6">

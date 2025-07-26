@@ -61,16 +61,13 @@ class VapiService
     public function getAssistant($assistantId)
     {
         try {
-            // Log::info('Vapi Get Assistant Request: ' . $assistantId);
             
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
             ])->get($this->baseUrl . '/assistant/' . $assistantId);
 
-            // Log::info('Vapi Get Assistant Response Status: ' . $response->status());
-            // Log::info('Vapi Get Assistant Response Body: ' . $response->body());
-
+            
             if ($response->successful()) {
                 return $response->json();
             }
@@ -202,8 +199,8 @@ class VapiService
             // (same fields as create method)
             $updateData = [
                 'name' => $data['name'] ?? $currentAssistant['name'],
-                'model' => $data['model'] ?? $currentAssistant['model'],
-                'voice' => $data['voice'] ?? $currentAssistant['voice'],
+                'model' => $this->mergeModelData($currentAssistant['model'] ?? [], $data['model'] ?? []),
+                'voice' => $this->mergeVoiceData($currentAssistant['voice'] ?? [], $data['voice'] ?? []),
                 'firstMessage' => $data['firstMessage'] ?? $currentAssistant['firstMessage'] ?? '',
                 'endCallMessage' => $data['endCallMessage'] ?? $currentAssistant['endCallMessage'] ?? '',
                 'metadata' => array_merge($currentAssistant['metadata'] ?? [], $data['metadata'] ?? []),
@@ -230,14 +227,6 @@ class VapiService
                 $updateData['server'] = $currentAssistant['server'];
             }
 
-            // Debug logging
-            Log::info('Sending update to Vapi:', [
-                'assistant_id' => $assistantId,
-                'update_data' => $updateData,
-                'original_data' => $currentAssistant,
-                'request_data' => $data
-            ]);
-
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
@@ -248,13 +237,72 @@ class VapiService
             }
 
             Log::error('Vapi Update Assistant Error: ' . $response->body());
-            Log::error('Vapi Update Assistant Status: ' . $response->status());
-            Log::error('Vapi Update Assistant Headers: ' . json_encode($response->headers()));
             return null;
         } catch (\Exception $e) {
             Log::error('Vapi Update Assistant Service Error: ' . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Merge model data preserving existing configuration
+     */
+    private function mergeModelData($currentModel, $newModel)
+    {
+        // Start with current model data
+        $mergedModel = $currentModel;
+        
+        // Update with new model data, preserving existing fields not in the request
+        if (isset($newModel['provider'])) {
+            $mergedModel['provider'] = $newModel['provider'];
+        }
+        
+        if (isset($newModel['model'])) {
+            $mergedModel['model'] = $newModel['model'];
+        }
+        
+        // Handle messages array - preserve existing messages structure
+        if (isset($newModel['messages'])) {
+            $mergedModel['messages'] = $newModel['messages'];
+        }
+        
+        // Preserve all other model configuration (maxTokens, temperature, etc.)
+        // that might be set in Vapi but not in our UI
+        foreach ($currentModel as $key => $value) {
+            if (!isset($newModel[$key]) && $key !== 'messages') {
+                $mergedModel[$key] = $value;
+            }
+        }
+        
+        return $mergedModel;
+    }
+
+    /**
+     * Merge voice data preserving existing configuration
+     */
+    private function mergeVoiceData($currentVoice, $newVoice)
+    {
+        // Start with current voice data
+        $mergedVoice = $currentVoice;
+        
+        // Update with new voice data, preserving existing fields not in the request
+        if (isset($newVoice['provider'])) {
+            $mergedVoice['provider'] = $newVoice['provider'];
+        }
+        
+        if (isset($newVoice['model'])) {
+            $mergedVoice['model'] = $newVoice['model'];
+        }
+        
+        // Preserve all other voice configuration (maxTokens, temperature, etc.)
+        // that might be set in Vapi but not in our UI
+        foreach ($currentVoice as $key => $value) {
+            if (!isset($newVoice[$key])) {
+                $mergedVoice[$key] = $value;
+            }
+        }
+        
+        return $mergedVoice;
     }
 
     /**

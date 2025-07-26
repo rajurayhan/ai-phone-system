@@ -320,12 +320,6 @@ class AssistantController extends Controller
             ], 403);
         }
 
-        // Debug logging
-        Log::info('Update request data:', [
-            'assistant_id' => $assistantId,
-            'request_data' => $request->all()
-        ]);
-
         // Update in Vapi - VapiService will handle preserving all existing data
         $vapiData = $this->vapiService->updateAssistant($assistant->vapi_assistant_id, $request->all());
 
