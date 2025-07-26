@@ -95,6 +95,7 @@
         <!-- Company Information -->
         <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Company Information</h2>
+          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
@@ -301,6 +302,20 @@
         <!-- Model Configuration -->
         <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Model Configuration</h2>
+          
+          <!-- Template Variables Reminder -->
+          <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <h3 class="text-sm font-medium text-green-900 mb-2">💡 Template Variables Available</h3>
+            <p class="text-xs text-green-700 mb-3">
+              You can use these variables in your prompts and messages. They will be automatically replaced with your company information:
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <code class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">{{ '{' }}{{ '{' }}company_name{{ '}' }}{{ '}' }}</code>
+              <code class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">{{ '{' }}{{ '{' }}company_industry{{ '}' }}{{ '}' }}</code>
+              <code class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">{{ '{' }}{{ '{' }}company_services{{ '}' }}{{ '}' }}</code>
+            </div>
+          </div>
+          
           <div class="space-y-6">
             <!-- System Prompt -->
             <div class="mt-6">
@@ -349,7 +364,7 @@
                 {{ fieldErrors.systemPrompt }}
               </p>
               <p v-else class="text-xs text-gray-500 mt-1">
-                Define the assistant's behavior and personality. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{company_name}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_industry}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_services}}</code>
+                Define the assistant's behavior and personality. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_name{{ '}' }}{{ '}' }}</code>, <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_industry{{ '}' }}{{ '}' }}</code>, <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_services{{ '}' }}{{ '}' }}</code>
               </p>
             </div>
             
@@ -409,7 +424,7 @@
                 {{ fieldErrors.firstMessage }}
               </p>
               <p v-else class="text-xs text-gray-500 mt-1">
-                The first message the assistant will say when a call starts. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{company_name}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_industry}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_services}}</code>
+                The first message the assistant will say when a call starts. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_name{{ '}' }}{{ '}' }}</code>, <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_industry{{ '}' }}{{ '}' }}</code>, <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_services{{ '}' }}{{ '}' }}</code>
               </p>
             </div>
 
@@ -460,7 +475,7 @@
                 {{ fieldErrors.endCallMessage }}
               </p>
               <p v-else class="text-xs text-gray-500 mt-1">
-                The message the assistant will say when ending a call. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{company_name}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_industry}}</code>, <code class="bg-gray-100 px-1 rounded">{{company_services}}</code>
+                The message the assistant will say when ending a call. You can use template variables: <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_name{{ '}' }}{{ '}' }}</code>, <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_industry{{ '}' }}{{ '}' }}</code>, <code class="bg-gray-100 px-1 rounded">{{ '{' }}{{ '{' }}company_services{{ '}' }}{{ '}' }}</code>
               </p>
             </div>
             
