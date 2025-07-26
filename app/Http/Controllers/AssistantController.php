@@ -262,6 +262,17 @@ class AssistantController extends Controller
             $assistant->update(['webhook_url' => $vapiWebhookUrl]);
         }
 
+        // Synchronize type from Vapi metadata to local database
+        $vapiType = null;
+        if (isset($vapiData['metadata']['type'])) {
+            $vapiType = $vapiData['metadata']['type'];
+        }
+
+        // If Vapi has type but local database doesn't, or if they differ, sync from Vapi
+        if ($vapiType && $assistant->type !== $vapiType) {
+            $assistant->update(['type' => $vapiType]);
+        }
+
         // Merge webhook URL from database with Vapi metadata for frontend
         if ($assistant->webhook_url && isset($vapiData['metadata'])) {
             $vapiData['metadata']['webhook_url'] = $assistant->webhook_url;

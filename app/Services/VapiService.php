@@ -212,6 +212,17 @@ class VapiService
             // Update the updated_at timestamp
             $updateData['metadata']['updated_at'] = now()->toISOString();
             
+            // Handle type field - ensure it's properly synced with metadata
+            if (isset($data['type'])) {
+                $updateData['metadata']['type'] = $data['type'];
+            } elseif (isset($currentAssistant['metadata']['type'])) {
+                // Preserve existing type if not provided in update
+                $updateData['metadata']['type'] = $currentAssistant['metadata']['type'];
+            } else {
+                // Default to demo if no type is set
+                $updateData['metadata']['type'] = 'demo';
+            }
+
             // Handle webhook URL specifically - only add server if webhook URL is provided
             if (isset($data['metadata']['webhook_url'])) {
                 if (!empty($data['metadata']['webhook_url'])) {

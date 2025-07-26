@@ -835,8 +835,8 @@ You embody the highest standards of customer service that {{company_name}} would
           form.value.user_id = assistant.user_id || null
         }
         
-        // Map type
-        form.value.type = assistant.type || 'demo'
+        // Map type - check both database and Vapi metadata
+        form.value.type = assistant.type || assistant.vapi_data?.metadata?.type || 'demo'
         
         // Load templates and update templated data
         await loadTemplates()
