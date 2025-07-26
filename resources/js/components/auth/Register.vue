@@ -139,7 +139,7 @@
 </template>
 
 <script>
-import { showError } from '../../utils/sweetalert.js'
+import { showError, showSuccess } from '../../utils/sweetalert.js'
 
 export default {
   name: 'Register',
@@ -169,6 +169,9 @@ export default {
         // Store token and user data
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Show success message about email verification
+        await showSuccess('Registration Successful!', response.data.message || 'Please check your email to verify your account.');
         
         // Redirect to dashboard
         this.$router.push('/dashboard');

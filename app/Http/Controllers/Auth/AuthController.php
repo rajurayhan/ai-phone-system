@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\WelcomeEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -30,11 +31,15 @@ class AuthController extends Controller
             'status' => 'active',
         ]);
 
+        // Send welcome email with verification link
+        $user->notify(new WelcomeEmail());
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'user' => $user,
             'token' => $token,
+            'message' => 'Registration successful! Please check your email to verify your account.'
         ], 201);
     }
 

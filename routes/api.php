@@ -21,6 +21,11 @@ use App\Http\Controllers\SubscriptionController;
 Route::get('/features', [App\Http\Controllers\FeatureController::class, 'index']);
 Route::get('/subscriptions/packages', [SubscriptionController::class, 'getPackages']);
 
+// Email verification route
+Route::get('/verify-email/{hash}', [App\Http\Controllers\Auth\VerifyEmailController::class, '__invoke'])
+    ->middleware(['throttle:6,1'])
+    ->name('verification.verify');
+
 // Auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
