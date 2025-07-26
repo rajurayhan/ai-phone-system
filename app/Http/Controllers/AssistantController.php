@@ -320,10 +320,13 @@ class AssistantController extends Controller
             ], 403);
         }
 
-        // If this is a demo assistant, use templates from settings
-        
+        // Debug logging
+        Log::info('Update request data:', [
+            'assistant_id' => $assistantId,
+            'request_data' => $request->all()
+        ]);
 
-        // Update in Vapi
+        // Update in Vapi - VapiService will handle preserving all existing data
         $vapiData = $this->vapiService->updateAssistant($assistant->vapi_assistant_id, $request->all());
 
         if (!$vapiData) {
@@ -333,7 +336,7 @@ class AssistantController extends Controller
             ], 500);
         }
 
-        // Prepare update data
+        // Prepare update data for local database
         $updateData = [
             'name' => $request->name,
         ];

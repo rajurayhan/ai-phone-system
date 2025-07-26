@@ -1019,13 +1019,13 @@ You embody the highest standards of customer service that {{company_name}} would
             messages: [
               {
                 role: 'system',
-                content: processedPrompt
+                content: isCreating.value ? processedSystemPrompt.value : form.value.model.messages[0].content
               }
             ]
           },
           voice: form.value.voice,
-          firstMessage: processedFirstMessage.value, // Use processed first message
-          endCallMessage: processedEndCallMessage.value, // Use processed end call message
+          firstMessage: isCreating.value ? processedFirstMessage.value : form.value.firstMessage, // Use processed for create, actual for update
+          endCallMessage: isCreating.value ? processedEndCallMessage.value : form.value.endCallMessage, // Use processed for create, actual for update
           metadata: {
             ...form.value.metadata,
             user_id: form.value.user_id || currentUser.value.id,

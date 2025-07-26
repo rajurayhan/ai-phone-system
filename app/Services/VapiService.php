@@ -195,33 +195,48 @@ class VapiService
     public function updateAssistant($assistantId, array $data)
     {
         try {
-            // Prepare the update data according to Vapi API structure
+            // First, get the current assistant data from Vapi to preserve existing values
+            $currentAssistant = $this->getAssistant($assistantId);
+            
+            // Build update data with only the fields that Vapi accepts for updates
+            // (same fields as create method)
             $updateData = [
-                'name' => $data['name'],
-                'model' => $data['model'],
-                'voice' => $data['voice'],
-                'firstMessage' => $data['firstMessage'] ?? '',
-                'endCallMessage' => $data['endCallMessage'] ?? '',
-                'metadata' => array_merge($data['metadata'] ?? [], [
-                    'updated_at' => now()->toISOString(),
-                    'type' => $data['type'],
-                ])
+                'name' => $data['name'] ?? $currentAssistant['name'],
+                'model' => $data['model'] ?? $currentAssistant['model'],
+                'voice' => $data['voice'] ?? $currentAssistant['voice'],
+                'firstMessage' => $data['firstMessage'] ?? $currentAssistant['firstMessage'] ?? '',
+                'endCallMessage' => $data['endCallMessage'] ?? $currentAssistant['endCallMessage'] ?? '',
+                'metadata' => array_merge($currentAssistant['metadata'] ?? [], $data['metadata'] ?? []),
+                'serverMessages' => $currentAssistant['serverMessages'] ?? [
+                    'end-of-call-report'
+                ]
             ];
-
-            // Add server configuration for webhook URL
-            if (!empty($data['metadata']['webhook_url'])) {
-                $updateData['server'] = [
-                    'url' => $data['metadata']['webhook_url']
-                ];
-            } else {
-                // Remove server configuration if webhook URL is empty
-                $updateData['server'] = null;
+            
+            // Update the updated_at timestamp
+            $updateData['metadata']['updated_at'] = now()->toISOString();
+            
+            // Handle webhook URL specifically - only add server if webhook URL is provided
+            if (isset($data['metadata']['webhook_url'])) {
+                if (!empty($data['metadata']['webhook_url'])) {
+                    $updateData['server'] = [
+                        'url' => $data['metadata']['webhook_url']
+                    ];
+                } else {
+                    // Remove server configuration if webhook URL is empty
+                    $updateData['server'] = null;
+                }
+            } elseif (isset($currentAssistant['server'])) {
+                // Preserve existing server configuration if not provided in update
+                $updateData['server'] = $currentAssistant['server'];
             }
 
-            // Add serverMessages for end-of-call report
-            $updateData['serverMessages'] = [
-                'end-of-call-report'
-            ];
+            // Debug logging
+            Log::info('Sending update to Vapi:', [
+                'assistant_id' => $assistantId,
+                'update_data' => $updateData,
+                'original_data' => $currentAssistant,
+                'request_data' => $data
+            ]);
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
@@ -233,6 +248,8 @@ class VapiService
             }
 
             Log::error('Vapi Update Assistant Error: ' . $response->body());
+            Log::error('Vapi Update Assistant Status: ' . $response->status());
+            Log::error('Vapi Update Assistant Headers: ' . json_encode($response->headers()));
             return null;
         } catch (\Exception $e) {
             Log::error('Vapi Update Assistant Service Error: ' . $e->getMessage());
