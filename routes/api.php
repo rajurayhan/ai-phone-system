@@ -21,6 +21,9 @@ use App\Http\Controllers\SubscriptionController;
 Route::get('/features', [App\Http\Controllers\FeatureController::class, 'index']);
 Route::get('/subscriptions/packages', [SubscriptionController::class, 'getPackages']);
 
+// Stripe webhook route (no auth required)
+Route::post('/stripe/webhook', [App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
+
 // Email verification route
 Route::get('/verify-email/{hash}', [App\Http\Controllers\Auth\VerifyEmailController::class, '__invoke'])
     ->middleware(['throttle:6,1'])
@@ -140,6 +143,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel']);
     Route::post('/subscriptions/upgrade', [SubscriptionController::class, 'upgrade']);
     Route::get('/subscriptions/usage', [SubscriptionController::class, 'getUsage']);
+    
+    // Stripe routes
+    Route::prefix('stripe')->group(function () {
+        Route::post('/payment-intent', [App\Http\Controllers\StripeController::class, 'createPaymentIntent']);
+        Route::post('/subscription', [App\Http\Controllers\StripeController::class, 'createSubscription']);
+        Route::post('/subscription/cancel', [App\Http\Controllers\StripeController::class, 'cancelSubscription']);
+        Route::post('/subscription/update', [App\Http\Controllers\StripeController::class, 'updateSubscription']);
+        Route::get('/subscription/details', [App\Http\Controllers\StripeController::class, 'getSubscriptionDetails']);
+    });
     
     // Transaction routes
     Route::prefix('transactions')->group(function () {

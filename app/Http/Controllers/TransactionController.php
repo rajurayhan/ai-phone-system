@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Models\UserSubscription;
 use App\Models\SubscriptionPackage;
+use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -13,8 +14,15 @@ use Carbon\Carbon;
 
 class TransactionController extends Controller
 {
+    protected $stripeService;
+
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
+
     /**
-     * Get user's transaction history
+     * Get user's transactions
      */
     public function index(Request $request): JsonResponse
     {
@@ -24,66 +32,35 @@ class TransactionController extends Controller
             ->with(['package', 'subscription'])
             ->orderBy('created_at', 'desc');
 
-        // Apply filters
-        if ($request->filled('status')) {
+        // Filter by status
+        if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
-        if ($request->filled('payment_method')) {
+        // Filter by payment method
+        if ($request->has('payment_method')) {
             $query->where('payment_method', $request->payment_method);
         }
 
-        if ($request->filled('date_range')) {
-            $dateRange = $request->date_range;
-            $now = \Carbon\Carbon::now();
-            
-            switch ($dateRange) {
-                case 'today':
-                    $query->whereDate('created_at', $now->toDateString());
-                    break;
-                case 'week':
-                    $query->whereBetween('created_at', [$now->startOfWeek()->toDateTimeString(), $now->endOfWeek()->toDateTimeString()]);
-                    break;
-                case 'month':
-                    $query->whereBetween('created_at', [$now->startOfMonth()->toDateTimeString(), $now->endOfMonth()->toDateTimeString()]);
-                    break;
-                case 'quarter':
-                    $query->whereBetween('created_at', [$now->startOfQuarter()->toDateTimeString(), $now->endOfQuarter()->toDateTimeString()]);
-                    break;
-                case 'year':
-                    $query->whereBetween('created_at', [$now->startOfYear()->toDateTimeString(), $now->endOfYear()->toDateTimeString()]);
-                    break;
-            }
+        // Filter by date range
+        if ($request->has('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
         }
 
-        // Pagination
-        $perPage = $request->get('per_page', 15);
-        $transactions = $query->paginate($perPage);
+        if ($request->has('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
 
-        // Create a clone of the query for summary calculations
-        $summaryQuery = clone $query;
-        $summaryQuery->getQuery()->orders = null; // Remove ordering for summary
-        $summaryQuery->getQuery()->limit = null; // Remove limit for summary
-        $summaryQuery->getQuery()->offset = null; // Remove offset for summary
+        $transactions = $query->paginate(20);
 
         return response()->json([
             'success' => true,
-            'data' => $transactions,
-            'summary' => [
-                'total_transactions' => $summaryQuery->count(),
-                'total_amount' => $summaryQuery->where('status', 'completed')->sum('amount'),
-                'pending_transactions' => $summaryQuery->where('status', 'pending')->count(),
-                'failed_transactions' => $summaryQuery->where('status', 'failed')->count(),
-            ]
+            'data' => $transactions
         ]);
     }
 
     /**
-     * Get a specific transaction
+     * Get specific transaction
      */
     public function show(Request $request, $transactionId): JsonResponse
     {
@@ -91,7 +68,7 @@ class TransactionController extends Controller
         
         $transaction = Transaction::where('user_id', $user->id)
             ->where('transaction_id', $transactionId)
-            ->with(['package', 'subscription', 'user'])
+            ->with(['package', 'subscription'])
             ->first();
 
         if (!$transaction) {
@@ -186,20 +163,9 @@ class TransactionController extends Controller
     {
         $user = Auth::user();
         
-        $validator = Validator::make($request->all(), [
-            'status' => 'required|in:pending,completed,failed,refunded,cancelled',
-            'external_transaction_id' => 'nullable|string|max:255',
-            'payment_details' => 'nullable|array',
-            'metadata' => 'nullable|array',
+        $request->validate([
+            'status' => 'required|in:pending,completed,failed,refunded,cancelled'
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
 
         $transaction = Transaction::where('user_id', $user->id)
             ->where('transaction_id', $transactionId)
@@ -212,30 +178,11 @@ class TransactionController extends Controller
             ], 404);
         }
 
-        $updateData = [
+        $transaction->update([
             'status' => $request->status,
-        ];
-
-        // Set timestamps based on status
-        if ($request->status === Transaction::STATUS_COMPLETED) {
-            $updateData['processed_at'] = Carbon::now();
-        } elseif ($request->status === Transaction::STATUS_FAILED) {
-            $updateData['failed_at'] = Carbon::now();
-        }
-
-        if ($request->has('external_transaction_id')) {
-            $updateData['external_transaction_id'] = $request->external_transaction_id;
-        }
-
-        if ($request->has('payment_details')) {
-            $updateData['payment_details'] = $request->payment_details;
-        }
-
-        if ($request->has('metadata')) {
-            $updateData['metadata'] = $request->metadata;
-        }
-
-        $transaction->update($updateData);
+            'processed_at' => $request->status === Transaction::STATUS_COMPLETED ? Carbon::now() : null,
+            'failed_at' => $request->status === Transaction::STATUS_FAILED ? Carbon::now() : null,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -245,7 +192,7 @@ class TransactionController extends Controller
     }
 
     /**
-     * Process payment (simulate payment processing)
+     * Process payment with Stripe integration
      */
     public function processPayment(Request $request, $transactionId): JsonResponse
     {
@@ -269,12 +216,75 @@ class TransactionController extends Controller
             ], 400);
         }
 
+        try {
+            if ($transaction->payment_method === Transaction::PAYMENT_STRIPE) {
+                // Process with Stripe
+                return $this->processStripePayment($transaction, $user);
+            } else {
+                // For other payment methods, simulate processing
+                return $this->processMockPayment($transaction, $user);
+            }
+        } catch (\Exception $e) {
+            $transaction->update([
+                'status' => Transaction::STATUS_FAILED,
+                'failed_at' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment processing failed: ' . $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Process payment with Stripe
+     */
+    private function processStripePayment(Transaction $transaction, $user): JsonResponse
+    {
+        $package = $transaction->package;
+
+        // Create Stripe subscription
+        $stripeResult = $this->stripeService->createSubscription($user, $package);
+
+        if (!$stripeResult) {
+            $transaction->update([
+                'status' => Transaction::STATUS_FAILED,
+                'failed_at' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create Stripe subscription'
+            ], 400);
+        }
+
+        // Update transaction with Stripe data
+        $transaction->update([
+            'status' => Transaction::STATUS_COMPLETED,
+            'external_transaction_id' => $stripeResult['subscription_id'],
+            'processed_at' => Carbon::now(),
+        ]);
+
+        // Update or create local subscription
+        $this->createOrUpdateSubscriptionWithStripe($user, $transaction, $stripeResult);
+
+        return response()->json([
+            'success' => true,
+            'data' => $transaction->load(['package', 'subscription']),
+            'message' => 'Payment processed successfully and subscription activated!'
+        ]);
+    }
+
+    /**
+     * Process mock payment for non-Stripe methods
+     */
+    private function processMockPayment(Transaction $transaction, $user): JsonResponse
+    {
         // Simulate payment processing
-        // In a real application, this would integrate with Stripe, PayPal, etc.
         $success = rand(1, 10) > 2; // 80% success rate for demo
 
         if ($success) {
-            // Update transaction status
             $transaction->update([
                 'status' => Transaction::STATUS_COMPLETED,
                 'processed_at' => Carbon::now(),
@@ -302,6 +312,42 @@ class TransactionController extends Controller
                 'message' => 'Payment processing failed'
             ], 400);
         }
+    }
+
+    /**
+     * Create or update subscription with Stripe data
+     */
+    private function createOrUpdateSubscriptionWithStripe($user, $transaction, $stripeResult): void
+    {
+        // Cancel any existing active subscription
+        $existingSubscription = $user->activeSubscription;
+        if ($existingSubscription) {
+            $existingSubscription->update([
+                'status' => 'cancelled',
+                'cancelled_at' => Carbon::now(),
+                'ends_at' => $existingSubscription->current_period_end,
+            ]);
+        }
+
+        // Create new subscription with Stripe data
+        $package = $transaction->package;
+        
+        $subscription = UserSubscription::create([
+            'user_id' => $user->id,
+            'subscription_package_id' => $package->id,
+            'status' => $stripeResult['status'],
+            'current_period_start' => $stripeResult['current_period_start'],
+            'current_period_end' => $stripeResult['current_period_end'],
+            'trial_ends_at' => $stripeResult['trial_end'],
+            'stripe_subscription_id' => $stripeResult['subscription_id'],
+            'stripe_customer_id' => $stripeResult['customer_id'],
+            'created_by' => $user->id,
+        ]);
+
+        // Update transaction with subscription reference
+        $transaction->update([
+            'user_subscription_id' => $subscription->id,
+        ]);
     }
 
     /**
@@ -384,76 +430,38 @@ class TransactionController extends Controller
      */
     public function adminIndex(Request $request): JsonResponse
     {
-        if (!Auth::user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized'
-            ], 403);
-        }
-
         $query = Transaction::with(['user', 'package', 'subscription'])
             ->orderBy('created_at', 'desc');
 
-        // Apply filters
-        if ($request->filled('status')) {
+        // Filter by status
+        if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
-        if ($request->filled('payment_method')) {
+        // Filter by payment method
+        if ($request->has('payment_method')) {
             $query->where('payment_method', $request->payment_method);
         }
 
-        if ($request->filled('user_id')) {
-            $userIds = explode(',', $request->user_id);
-            $query->whereIn('user_id', $userIds);
+        // Filter by user
+        if ($request->has('user_id')) {
+            $query->where('user_id', $request->user_id);
         }
 
-        if ($request->filled('date_range')) {
-            $dateRange = $request->date_range;
-            $now = \Carbon\Carbon::now();
-            
-            switch ($dateRange) {
-                case 'today':
-                    $query->whereDate('created_at', $now->toDateString());
-                    break;
-                case 'week':
-                    $query->whereBetween('created_at', [$now->startOfWeek()->toDateTimeString(), $now->endOfWeek()->toDateTimeString()]);
-                    break;
-                case 'month':
-                    $query->whereBetween('created_at', [$now->startOfMonth()->toDateTimeString(), $now->endOfMonth()->toDateTimeString()]);
-                    break;
-                case 'quarter':
-                    $query->whereBetween('created_at', [$now->startOfQuarter()->toDateTimeString(), $now->endOfQuarter()->toDateTimeString()]);
-                    break;
-                case 'year':
-                    $query->whereBetween('created_at', [$now->startOfYear()->toDateTimeString(), $now->endOfYear()->toDateTimeString()]);
-                    break;
-            }
+        // Filter by date range
+        if ($request->has('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
         }
 
-        // Pagination
-        $perPage = $request->get('per_page', 15);
-        $transactions = $query->paginate($perPage);
+        if ($request->has('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
 
-        // Create a clone of the query for summary calculations
-        $summaryQuery = clone $query;
-        $summaryQuery->getQuery()->orders = null; // Remove ordering for summary
-        $summaryQuery->getQuery()->limit = null; // Remove limit for summary
-        $summaryQuery->getQuery()->offset = null; // Remove offset for summary
+        $transactions = $query->paginate(50);
 
         return response()->json([
             'success' => true,
-            'data' => $transactions,
-            'summary' => [
-                'total_transactions' => $summaryQuery->count(),
-                'total_amount' => $summaryQuery->where('status', 'completed')->sum('amount'),
-                'pending_transactions' => $summaryQuery->where('status', 'pending')->count(),
-                'failed_transactions' => $summaryQuery->where('status', 'failed')->count(),
-            ]
+            'data' => $transactions
         ]);
     }
 
@@ -462,37 +470,35 @@ class TransactionController extends Controller
      */
     public function adminStats(Request $request): JsonResponse
     {
-        if (!Auth::user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized'
-            ], 403);
-        }
+        $startDate = $request->get('start_date', Carbon::now()->subDays(30));
+        $endDate = $request->get('end_date', Carbon::now());
 
         $stats = [
-            'total_transactions' => Transaction::count(),
-            'total_amount' => Transaction::completed()->sum('amount'),
-            'pending_transactions' => Transaction::pending()->count(),
-            'completed_transactions' => Transaction::completed()->count(),
-            'failed_transactions' => Transaction::failed()->count(),
-            'refunded_transactions' => Transaction::refunded()->count(),
-            'cancelled_transactions' => Transaction::cancelled()->count(),
-            'transactions_by_type' => [
+            'total_transactions' => Transaction::whereBetween('created_at', [$startDate, $endDate])->count(),
+            'total_amount' => Transaction::whereBetween('created_at', [$startDate, $endDate])
+                ->where('status', Transaction::STATUS_COMPLETED)
+                ->sum('amount'),
+            'completed_transactions' => Transaction::whereBetween('created_at', [$startDate, $endDate])
+                ->where('status', Transaction::STATUS_COMPLETED)
+                ->count(),
+            'failed_transactions' => Transaction::whereBetween('created_at', [$startDate, $endDate])
+                ->where('status', Transaction::STATUS_FAILED)
+                ->count(),
+            'pending_transactions' => Transaction::whereBetween('created_at', [$startDate, $endDate])
+                ->where('status', Transaction::STATUS_PENDING)
+                ->count(),
+            'payment_methods' => [
+                'stripe' => Transaction::byPaymentMethod(Transaction::PAYMENT_STRIPE)->count(),
+                'paypal' => Transaction::byPaymentMethod(Transaction::PAYMENT_PAYPAL)->count(),
+                'manual' => Transaction::byPaymentMethod(Transaction::PAYMENT_MANUAL)->count(),
+            ],
+            'transaction_types' => [
                 'subscription' => Transaction::byType(Transaction::TYPE_SUBSCRIPTION)->count(),
                 'upgrade' => Transaction::byType(Transaction::TYPE_UPGRADE)->count(),
                 'renewal' => Transaction::byType(Transaction::TYPE_RENEWAL)->count(),
                 'refund' => Transaction::byType(Transaction::TYPE_REFUND)->count(),
                 'trial' => Transaction::byType(Transaction::TYPE_TRIAL)->count(),
             ],
-            'transactions_by_payment_method' => [
-                'stripe' => Transaction::byPaymentMethod(Transaction::PAYMENT_STRIPE)->count(),
-                'paypal' => Transaction::byPaymentMethod(Transaction::PAYMENT_PAYPAL)->count(),
-                'manual' => Transaction::byPaymentMethod(Transaction::PAYMENT_MANUAL)->count(),
-            ],
-            'recent_transactions' => Transaction::with(['user', 'package'])
-                ->orderBy('created_at', 'desc')
-                ->limit(10)
-                ->get(),
         ];
 
         return response()->json([
