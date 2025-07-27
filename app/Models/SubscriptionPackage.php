@@ -29,6 +29,12 @@ class SubscriptionPackage extends Model
         'price' => 'decimal:2',
     ];
 
+    protected $appends = [
+        'formatted_price',
+        'formatted_voice_agents_limit',
+        'formatted_minutes_limit'
+    ];
+
     /**
      * Get features as array (split from comma-separated string)
      */
@@ -60,7 +66,21 @@ class SubscriptionPackage extends Model
         if (empty($value)) {
             return [];
         }
-        return array_map('trim', explode(',', $value));
+        
+        // Use a more robust approach to split features
+        // First, replace commas in numbers with a placeholder
+        $value = preg_replace('/(\d+),(\d+)/', '$1###$2', $value);
+        
+        // Split by comma
+        $features = array_map('trim', explode(',', $value));
+        
+        // Restore commas in numbers
+        $features = array_map(function($feature) {
+            return str_replace('###', ',', $feature);
+        }, $features);
+        
+        // Filter out empty features
+        return array_filter($features);
     }
 
     /**
@@ -69,7 +89,8 @@ class SubscriptionPackage extends Model
     public function setFeaturesAttribute($value)
     {
         if (is_array($value)) {
-            $this->attributes['features'] = implode(',', $value);
+            // Join with comma and space, but ensure numbers with commas are preserved
+            $this->attributes['features'] = implode(', ', $value);
         } else {
             $this->attributes['features'] = $value;
         }
