@@ -31,7 +31,7 @@ import CallLogsPage from './components/call-logs/CallLogsPage.vue'
 import AdminCallLogs from './components/admin/CallLogs.vue'
 
 // Set initial document title
-updateDocumentTitle('XpartFone - Revolutionary Voice AI Platform')
+updateDocumentTitle('Hive AI Phone - Revolutionary Voice AI Platform')
 
 // Create router
 const router = createRouter({

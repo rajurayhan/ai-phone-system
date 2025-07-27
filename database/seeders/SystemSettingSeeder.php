@@ -16,7 +16,7 @@ class SystemSettingSeeder extends Seeder
         $settings = [
             [
                 'key' => 'site_title',
-                'value' => 'XpartFone',
+                'value' => 'Hive AI Phone',
                 'type' => 'text',
                 'group' => 'general',
                 'label' => 'Site Title',

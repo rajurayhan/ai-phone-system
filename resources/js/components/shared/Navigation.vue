@@ -14,7 +14,7 @@
                 </svg>
               </div>
               <div class="ml-2">
-                <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
+                <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'Hive AI Phone' }}</h1>
               </div>
             </router-link>
           </div>
@@ -226,7 +226,7 @@ export default {
       configMenuOpen: false,
       user: JSON.parse(localStorage.getItem('user') || '{}'),
       settings: {
-        site_title: 'XpartFone',
+        site_title: 'Hive AI Phone',
         logo_url: '/logo.png'
       }
     }

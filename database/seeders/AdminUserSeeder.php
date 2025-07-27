@@ -20,7 +20,7 @@ class AdminUserSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'admin',
             'email_verified_at' => now(),
-            'company' => 'XpartFone',
+            'company' => 'Hive AI Phone',
             'bio' => 'System Administrator',
         ]);
     }

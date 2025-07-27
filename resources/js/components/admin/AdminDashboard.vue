@@ -12,7 +12,7 @@
               Admin Dashboard
             </h2>
             <p class="mt-1 text-sm text-gray-500">
-              Manage your XpartFone platform
+              Manage your Hive AI Phone platform
             </p>
           </div>
         </div>

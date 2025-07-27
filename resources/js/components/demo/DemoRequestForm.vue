@@ -16,7 +16,7 @@
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'Hive AI Phone' }}</h1>
                 </div>
               </router-link>
             </div>
@@ -46,7 +46,7 @@
         <div class="text-center mb-8">
           <h1 class="text-3xl font-bold text-gray-900 mb-4">Request a Demo</h1>
           <p class="text-lg text-gray-600">
-            Experience the power of our XpartFone platform firsthand.
+            Experience the power of our Hive AI Phone platform firsthand.
             Our team will schedule a personalized demo tailored to your business needs.
           </p>
         </div>
@@ -299,7 +299,7 @@
                       placeholder="Describe your services or products"
                     ></textarea>
                     <p class="text-xs text-gray-500 mt-1">
-                      Tell us about your business and how you think XpartFone could help
+                      Tell us about your business and how you think Hive AI Phone could help
                     </p>
                   </div>
                 </div>
@@ -366,7 +366,7 @@
               </div>
               <div class="ml-4">
                 <h4 class="text-sm font-medium text-gray-900">Live Demo</h4>
-                <p class="text-sm text-gray-600 mt-1">See our XpartFone platform in action with real examples</p>
+                <p class="text-sm text-gray-600 mt-1">See our Hive AI Phone platform in action with real examples</p>
               </div>
             </div>
             <div class="flex items-start">
@@ -405,7 +405,7 @@ export default {
     const hasRequestedDemo = ref(false)
     const existingRequest = ref(null)
     const settings = ref({
-                site_title: 'XpartFone',
+                site_title: 'Hive AI Phone',
       logo_url: null
     })
     
@@ -421,7 +421,7 @@ export default {
       } catch (error) {
         // Set default values if API fails
         settings.value = {
-          site_title: 'XpartFone',
+          site_title: 'Hive AI Phone',
           logo_url: '/logo.png'
         }
       }
