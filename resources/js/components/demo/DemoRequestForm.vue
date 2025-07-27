@@ -19,12 +19,19 @@
             </div>
           </div>
           <div class="flex items-center space-x-4">
-            <router-link to="/login" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-              Login
-            </router-link>
-            <router-link to="/register" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-              Sign Up
-            </router-link>
+            <template v-if="!isAuthenticated">
+              <router-link to="/login" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                Login
+              </router-link>
+              <router-link to="/register" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                Sign Up
+              </router-link>
+            </template>
+            <template v-else>
+              <router-link to="/dashboard" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                Dashboard
+              </router-link>
+            </template>
           </div>
         </div>
       </div>
@@ -41,8 +48,82 @@
           </p>
         </div>
 
+        <!-- Loading State -->
+        <div v-if="checking" class="bg-white shadow-lg rounded-lg p-8 text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p class="mt-4 text-gray-600">Checking your demo request status...</p>
+        </div>
+
+        <!-- Not Authenticated -->
+        <div v-else-if="!isAuthenticated" class="bg-white shadow-lg rounded-lg p-8 text-center">
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
+            <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Login Required</h2>
+          <p class="text-gray-600 mb-6">
+            You need to be logged in to request a demo. Please sign in or create an account to continue.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <router-link to="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+              Sign In
+            </router-link>
+            <router-link to="/register" class="inline-flex items-center px-4 py-2 border border-green-600 text-sm font-medium rounded-md text-green-600 bg-white hover:bg-green-50">
+              Create Account
+            </router-link>
+          </div>
+        </div>
+
+        <!-- Already Requested Demo -->
+        <div v-else-if="hasRequestedDemo" class="bg-white shadow-lg rounded-lg p-8">
+          <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Demo Request Already Submitted</h2>
+            <p class="text-gray-600 mb-6">
+              Thank you for your interest! We have already received your demo request and our team will contact you within 24 hours.
+            </p>
+            <div class="bg-gray-50 rounded-lg p-6 text-left">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Your Request Details:</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span class="font-medium text-gray-700">Name:</span>
+                  <span class="ml-2 text-gray-600">{{ existingRequest.name }}</span>
+                </div>
+                <div>
+                  <span class="font-medium text-gray-700">Email:</span>
+                  <span class="ml-2 text-gray-600">{{ existingRequest.email }}</span>
+                </div>
+                <div>
+                  <span class="font-medium text-gray-700">Company:</span>
+                  <span class="ml-2 text-gray-600">{{ existingRequest.company_name }}</span>
+                </div>
+                <div>
+                  <span class="font-medium text-gray-700">Status:</span>
+                  <span class="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full" :class="existingRequest.status_badge_class">
+                    {{ existingRequest.status_display_name }}
+                  </span>
+                </div>
+                <div class="md:col-span-2">
+                  <span class="font-medium text-gray-700">Submitted:</span>
+                  <span class="ml-2 text-gray-600">{{ formatDate(existingRequest.created_at) }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6">
+              <router-link to="/" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                Return to Home
+              </router-link>
+            </div>
+          </div>
+        </div>
+
         <!-- Demo Request Form -->
-        <div class="bg-white shadow-lg rounded-lg p-8">
+        <div v-else class="bg-white shadow-lg rounded-lg p-8">
           <form @submit.prevent="submitDemoRequest">
             <div class="space-y-6">
               <!-- Personal Information -->
@@ -71,7 +152,8 @@
                       v-model="form.email"
                       type="email"
                       required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      readonly
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed"
                       placeholder="Enter your email address"
                     />
                   </div>
@@ -305,7 +387,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showSuccess, showError } from '../../utils/sweetalert.js'
 
@@ -314,6 +396,14 @@ export default {
   setup() {
     const router = useRouter()
     const loading = ref(false)
+    const checking = ref(true)
+    const hasRequestedDemo = ref(false)
+    const existingRequest = ref(null)
+    
+    // Check if user is authenticated
+    const isAuthenticated = computed(() => {
+      return localStorage.getItem('token') !== null
+    })
     
     const form = ref({
       name: '',
@@ -324,6 +414,56 @@ export default {
       country: '',
       services: ''
     })
+
+    // Check if user has already requested a demo
+    const checkExistingDemoRequest = async () => {
+      try {
+        checking.value = true
+        
+        // Get user email from localStorage if authenticated
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        const email = user.email || ''
+        
+        // Pre-fill form with user data if authenticated
+        if (user.email) {
+          form.value.email = user.email
+          form.value.name = user.name || ''
+        } else {
+          // If no user email, redirect to login or show message
+          checking.value = false
+          return
+        }
+
+        if (!email) {
+          // If no email available, show message
+          checking.value = false
+          return
+        }
+
+        const response = await fetch('/api/demo-request/check', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        })
+
+        const data = await response.json()
+
+        if (data.success) {
+          if (data.data.has_requested) {
+            hasRequestedDemo.value = true
+            existingRequest.value = data.data.request
+          }
+        }
+      } catch (error) {
+        console.error('Error checking demo request:', error)
+        // If there's an error, show the form anyway
+      } finally {
+        checking.value = false
+      }
+    }
 
     const submitDemoRequest = async () => {
       try {
@@ -342,16 +482,8 @@ export default {
 
         if (data.success) {
           await showSuccess('Demo Request Submitted!', data.message)
-          // Reset form
-          form.value = {
-            name: '',
-            email: '',
-            phone: '',
-            company_name: '',
-            industry: '',
-            country: '',
-            services: ''
-          }
+          // Check again to show the updated status
+          await checkExistingDemoRequest()
         } else {
           await showError('Error', data.message || 'Failed to submit demo request')
         }
@@ -363,10 +495,29 @@ export default {
       }
     }
 
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+
+    onMounted(() => {
+      checkExistingDemoRequest()
+    })
+
     return {
       form,
       loading,
-      submitDemoRequest
+      checking,
+      hasRequestedDemo,
+      existingRequest,
+      isAuthenticated,
+      submitDemoRequest,
+      formatDate
     }
   }
 }

@@ -23,8 +23,14 @@
               <a href="#features" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">Features</a>
               <a href="#pricing" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">Pricing</a>
               <a href="#contact" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">Contact</a>
-              <router-link to="/login" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">Login</router-link>
-              <router-link to="/register" class="btn-primary">Get Started</router-link>
+              <!-- Show different buttons based on authentication status -->
+              <template v-if="!isAuthenticated">
+                <router-link to="/login" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">Login</router-link>
+                <router-link to="/register" class="btn-primary">Get Started</router-link>
+              </template>
+              <template v-else>
+                <router-link to="/dashboard" class="btn-primary">Dashboard</router-link>
+              </template>
             </div>
           </div>
         </div>
@@ -47,8 +53,11 @@
               </p>
               <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                 <div class="rounded-md shadow">
-                  <router-link to="/register" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:py-4 md:text-lg md:px-10">
+                  <router-link v-if="!isAuthenticated" to="/register" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:py-4 md:text-lg md:px-10">
                     Get Started
+                  </router-link>
+                  <router-link v-else to="/dashboard" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:py-4 md:text-lg md:px-10">
+                    Dashboard
                   </router-link>
                 </div>
                 <div class="mt-3 sm:mt-0 sm:ml-3">
@@ -167,8 +176,11 @@
           Join thousands of businesses already using our voice AI platform.
         </p>
         <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-          <router-link to="/register" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50">
+          <router-link v-if="!isAuthenticated" to="/register" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50">
             Sign up now
+          </router-link>
+          <router-link v-else to="/dashboard" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50">
+            Dashboard
           </router-link>
           <router-link to="/demo-request" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-primary-600">
             Request Demo
@@ -228,7 +240,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 
 export default {
@@ -236,6 +248,11 @@ export default {
   setup() {
     const packages = ref([])
     const features = ref([])
+
+    // Check if user is authenticated
+    const isAuthenticated = computed(() => {
+      return localStorage.getItem('token') !== null
+    })
 
     const loadPackages = async () => {
       try {
@@ -262,7 +279,8 @@ export default {
 
     return {
       packages,
-      features
+      features,
+      isAuthenticated
     }
   }
 }

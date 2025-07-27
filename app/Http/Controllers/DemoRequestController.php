@@ -63,6 +63,26 @@ class DemoRequestController extends Controller
     }
 
     /**
+     * Check if user has already requested a demo
+     */
+    public function checkExistingRequest(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $existingRequest = DemoRequest::where('email', $request->email)->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'has_requested' => $existingRequest !== null,
+                'request' => $existingRequest
+            ]
+        ]);
+    }
+
+    /**
      * Admin: Get all demo requests with filtering
      */
     public function adminIndex(Request $request): JsonResponse

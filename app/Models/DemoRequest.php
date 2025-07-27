@@ -28,6 +28,11 @@ class DemoRequest extends Model
         'completed_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'status_badge_class',
+        'status_display_name',
+    ];
+
     /**
      * Get status badge class
      */

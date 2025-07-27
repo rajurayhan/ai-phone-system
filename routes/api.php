@@ -239,6 +239,7 @@ Route::get('/twilio/diagnostics', function () {
 
 // Demo request routes
 Route::post('/demo-request', [App\Http\Controllers\DemoRequestController::class, 'store']);
+Route::post('/demo-request/check', [App\Http\Controllers\DemoRequestController::class, 'checkExistingRequest']);
 
 // Admin demo request routes
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
