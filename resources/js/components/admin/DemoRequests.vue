@@ -378,11 +378,22 @@ export default {
           ...filters.value
         }
         
+        console.log('Loading demo requests with params:', params)
         const response = await axios.get('/api/admin/demo-requests', { params })
-        demoRequests.value = response.data.data.data
-        pagination.value = response.data.data
+        console.log('Demo requests response:', response.data)
+        
+        // Check if response has the expected structure
+        if (response.data.success && response.data.data) {
+          demoRequests.value = response.data.data.data || []
+          pagination.value = response.data.data
+        } else {
+          console.error('Unexpected response structure:', response.data)
+          demoRequests.value = []
+          pagination.value = null
+        }
       } catch (error) {
         console.error('Error loading demo requests:', error)
+        console.error('Error response:', error.response?.data)
         showError('Failed to load demo requests')
       } finally {
         loading.value = false
@@ -391,10 +402,26 @@ export default {
 
     const loadStats = async () => {
       try {
+        console.log('Loading demo request stats...')
         const response = await axios.get('/api/admin/demo-requests/stats')
-        stats.value = response.data.data
+        console.log('Stats response:', response.data)
+        
+        // Check if response has the expected structure
+        if (response.data.success && response.data.data) {
+          stats.value = response.data.data
+        } else {
+          console.error('Unexpected stats response structure:', response.data)
+          stats.value = {
+            total: 0,
+            pending: 0,
+            contacted: 0,
+            completed: 0,
+            cancelled: 0
+          }
+        }
       } catch (error) {
         console.error('Error loading stats:', error)
+        console.error('Stats error response:', error.response?.data)
       }
     }
 
@@ -446,6 +473,9 @@ export default {
     }
 
     onMounted(() => {
+      console.log('DemoRequests component mounted')
+      console.log('User from localStorage:', JSON.parse(localStorage.getItem('user') || '{}'))
+      console.log('Token exists:', !!localStorage.getItem('token'))
       loadDemoRequests()
       loadStats()
     })

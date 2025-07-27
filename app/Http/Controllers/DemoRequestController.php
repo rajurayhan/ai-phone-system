@@ -67,24 +67,36 @@ class DemoRequestController extends Controller
      */
     public function adminIndex(Request $request): JsonResponse
     {
+        \Log::info('DemoRequestController::adminIndex called', [
+            'user_id' => auth()->id(),
+            'user_role' => auth()->user()->role ?? 'unknown',
+            'request_params' => $request->all()
+        ]);
+
         $query = DemoRequest::query();
 
+        // Log the initial query
+        \Log::info('Initial query count: ' . $query->count());
+
         // Filter by status
-        if ($request->has('status') && $request->status !== '') {
+        if ($request->has('status') && $request->status !== '' && $request->status !== null && $request->status !== 'null') {
             $query->where('status', $request->status);
+            \Log::info('Applied status filter: ' . $request->status);
         }
 
         // Filter by date range
-        if ($request->has('date_from') && $request->date_from) {
+        if ($request->has('date_from') && $request->date_from && $request->date_from !== '' && $request->date_from !== 'null') {
             $query->whereDate('created_at', '>=', $request->date_from);
+            \Log::info('Applied date_from filter: ' . $request->date_from);
         }
 
-        if ($request->has('date_to') && $request->date_to) {
+        if ($request->has('date_to') && $request->date_to && $request->date_to !== '' && $request->date_to !== 'null') {
             $query->whereDate('created_at', '<=', $request->date_to);
+            \Log::info('Applied date_to filter: ' . $request->date_to);
         }
 
         // Search by name, email, or company
-        if ($request->has('search') && $request->search) {
+        if ($request->has('search') && $request->search && $request->search !== '' && $request->search !== 'null') {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -92,6 +104,7 @@ class DemoRequestController extends Controller
                   ->orWhere('company_name', 'like', "%{$search}%")
                   ->orWhere('country', 'like', "%{$search}%");
             });
+            \Log::info('Applied search filter: ' . $search);
         }
 
         // Sort
@@ -99,9 +112,18 @@ class DemoRequestController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
 
+        // Log the final query count
+        \Log::info('Final query count: ' . $query->count());
+
         // Paginate
         $perPage = $request->get('per_page', 15);
         $demoRequests = $query->paginate($perPage);
+
+        \Log::info('Paginated result', [
+            'total' => $demoRequests->total(),
+            'count' => $demoRequests->count(),
+            'current_page' => $demoRequests->currentPage()
+        ]);
 
         return response()->json([
             'success' => true,
