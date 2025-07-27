@@ -7,6 +7,8 @@ import App from './App.vue';
 // Import components
 import Login from './components/auth/Login.vue';
 import Register from './components/auth/Register.vue';
+import ForgotPassword from './components/auth/ForgotPassword.vue';
+import ResetPassword from './components/auth/ResetPassword.vue';
 import Dashboard from './components/dashboard/Dashboard.vue';
 import Profile from './components/profile/Profile.vue';
 import AdminDashboard from './components/admin/AdminDashboard.vue';
@@ -52,6 +54,18 @@ const router = createRouter({
             path: '/register',
             name: 'register',
             component: Register,
+            meta: { requiresGuest: true }
+        },
+        {
+            path: '/forgot-password',
+            name: 'forgot-password',
+            component: ForgotPassword,
+            meta: { requiresGuest: true }
+        },
+        {
+            path: '/password-reset/:token',
+            name: 'reset-password',
+            component: ResetPassword,
             meta: { requiresGuest: true }
         },
         {

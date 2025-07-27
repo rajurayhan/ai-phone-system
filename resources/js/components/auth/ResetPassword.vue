@@ -22,16 +22,14 @@
           </router-link>
         </div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
+          Reset your password
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
-          Or
-          <router-link to="/register" class="font-medium text-primary-600 hover:text-primary-500">
-            create a new account
-          </router-link>
+          Enter your new password below
         </p>
       </div>
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
+      
+      <form class="mt-8 space-y-6" @submit.prevent="handleResetPassword" v-if="!passwordReset">
         <div class="space-y-4">
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email address</label>
@@ -42,47 +40,44 @@
               type="email"
               autocomplete="email"
               required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
+              readonly
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200 bg-gray-50"
               placeholder="Enter your email"
               :class="{ 'border-red-500 focus:ring-red-500': errors.email }"
             />
             <p v-if="errors.email" class="mt-2 text-sm text-red-600">{{ errors.email }}</p>
           </div>
+          
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
             <input
               id="password"
               v-model="form.password"
               name="password"
               type="password"
-              autocomplete="current-password"
+              autocomplete="new-password"
               required
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-              placeholder="Enter your password"
+              placeholder="Enter your new password"
               :class="{ 'border-red-500 focus:ring-red-500': errors.password }"
             />
             <p v-if="errors.password" class="mt-2 text-sm text-red-600">{{ errors.password }}</p>
           </div>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
+          
+          <div>
+            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
             <input
-              id="remember-me"
-              v-model="form.remember"
-              name="remember-me"
-              type="checkbox"
-              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              id="password_confirmation"
+              v-model="form.password_confirmation"
+              name="password_confirmation"
+              type="password"
+              autocomplete="new-password"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
+              placeholder="Confirm your new password"
+              :class="{ 'border-red-500 focus:ring-red-500': errors.password_confirmation }"
             />
-            <label for="remember-me" class="ml-2 block text-sm text-gray-700">
-              Remember me
-            </label>
-          </div>
-
-          <div class="text-sm">
-            <router-link to="/forgot-password" class="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200">
-              Forgot your password?
-            </router-link>
+            <p v-if="errors.password_confirmation" class="mt-2 text-sm text-red-600">{{ errors.password_confirmation }}</p>
           </div>
         </div>
 
@@ -98,7 +93,7 @@
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </span>
-            {{ loading ? 'Signing in...' : 'Sign in' }}
+            {{ loading ? 'Resetting...' : 'Reset password' }}
           </button>
         </div>
 
@@ -114,7 +109,37 @@
             </div>
           </div>
         </div>
+
+        <div class="text-center">
+          <router-link to="/login" class="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200">
+            Back to login
+          </router-link>
+        </div>
       </form>
+
+      <div v-if="passwordReset" class="mt-8 space-y-6">
+        <div class="bg-green-50 border border-green-200 rounded-md p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-green-800">Password reset successful!</h3>
+              <div class="mt-2 text-sm text-green-700">
+                <p>Your password has been successfully reset. You can now log in with your new password.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <router-link to="/login" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+            Go to login
+          </router-link>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -125,16 +150,19 @@ import { showSuccess, showError } from '../../utils/sweetalert.js'
 import { updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
-  name: 'Login',
+  name: 'ResetPassword',
   data() {
     return {
       form: {
         email: '',
-        password: ''
+        password: '',
+        password_confirmation: '',
+        token: ''
       },
       errors: {},
       loading: false,
       error: '',
+      passwordReset: false,
       settings: {
         site_title: 'XpartFone',
         logo_url: '/logo.png'
@@ -145,7 +173,7 @@ export default {
     try {
       const response = await axios.get('/api/public-settings')
       this.settings = response.data.data
-      await updateDocumentTitle('Login')
+      await updateDocumentTitle('Reset Password')
     } catch (error) {
       // Set default values if API fails
       this.settings = {
@@ -153,36 +181,45 @@ export default {
         logo_url: '/logo.png'
       }
     }
+    
+    // Get token and email from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    this.form.token = this.$route.params.token || urlParams.get('token') || '';
+    this.form.email = urlParams.get('email') || '';
+    
+    if (!this.form.token || !this.form.email) {
+      this.error = 'Invalid or missing reset token. Please request a new password reset link.';
+      await showError('Invalid Token', 'Invalid or missing reset token. Please request a new password reset link.');
+    }
   },
   methods: {
-    async handleLogin() {
+    async handleResetPassword() {
       this.loading = true;
       this.errors = {};
       this.error = '';
 
+      // Validate passwords match
+      if (this.form.password !== this.form.password_confirmation) {
+        this.errors.password_confirmation = 'Passwords do not match';
+        this.loading = false;
+        return;
+      }
+
       try {
-        const response = await axios.post('/api/login', this.form);
+        const response = await axios.post('/api/reset-password', this.form);
         
-        // Store token and user data
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        
-        // Redirect based on user role
-        if (response.data.user.role === 'admin') {
-          this.$router.push('/admin');
-        } else {
-          this.$router.push('/dashboard');
-        }
+        this.passwordReset = true;
+        await showSuccess('Password Reset', 'Your password has been successfully reset!');
       } catch (error) {
         if (error.response && error.response.data.errors) {
           this.errors = error.response.data.errors;
           await showError('Validation Error', 'Please check your input and try again.');
         } else if (error.response && error.response.data.message) {
           this.error = error.response.data.message;
-          await showError('Login Failed', error.response.data.message);
+          await showError('Reset Failed', error.response.data.message);
         } else {
-          this.error = 'An error occurred during login. Please try again.';
-          await showError('Error', 'An error occurred during login. Please try again.');
+          this.error = 'An error occurred. Please try again.';
+          await showError('Error', 'An error occurred. Please try again.');
         }
       } finally {
         this.loading = false;
