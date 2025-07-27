@@ -16,21 +16,36 @@ class VapiWebhookController extends Controller
     {
         try {
             $payload = $request->all();
-            Log::info('Vapi webhook received', $payload);
+            Log::info('Vapi webhook received', [
+                'type' => $payload['type'] ?? 'unknown',
+                'callId' => $payload['callId'] ?? 'unknown',
+                'assistantId' => $payload['assistantId'] ?? 'unknown',
+                'timestamp' => now()->toISOString()
+            ]);
 
             $eventType = $payload['type'] ?? null;
             $callId = $payload['callId'] ?? null;
             $assistantId = $payload['assistantId'] ?? null;
 
             if (!$eventType || !$callId || !$assistantId) {
-                Log::warning('Missing required fields in webhook payload', $payload);
+                Log::warning('Missing required fields in webhook payload', [
+                    'payload' => $payload,
+                    'missing_fields' => [
+                        'type' => !$eventType,
+                        'callId' => !$callId,
+                        'assistantId' => !$assistantId
+                    ]
+                ]);
                 return response()->json(['success' => false, 'message' => 'Missing required fields'], 400);
             }
 
             // Find the assistant
             $assistant = Assistant::where('vapi_assistant_id', $assistantId)->first();
             if (!$assistant) {
-                Log::warning('Assistant not found for vapi_assistant_id', ['assistant_id' => $assistantId]);
+                Log::warning('Assistant not found for vapi_assistant_id', [
+                    'assistant_id' => $assistantId,
+                    'available_assistants' => Assistant::pluck('vapi_assistant_id')->toArray()
+                ]);
                 return response()->json(['success' => false, 'message' => 'Assistant not found'], 404);
             }
 
@@ -46,10 +61,22 @@ class VapiWebhookController extends Controller
                     $this->handleCallUpdate($payload, $assistant);
                     break;
                 default:
-                    Log::warning('Unknown event type', ['type' => $eventType]);
+                    Log::warning('Unknown event type', [
+                        'type' => $eventType,
+                        'callId' => $callId,
+                        'assistantId' => $assistantId,
+                        'supported_types' => ['call-start', 'call-end', 'call-update']
+                    ]);
                     return response()->json(['success' => false, 'message' => 'Unknown event type'], 400);
             }
 
+            Log::info('Vapi webhook processed successfully', [
+                'type' => $eventType,
+                'callId' => $callId,
+                'assistantId' => $assistantId,
+                'assistant_name' => $assistant->name
+            ]);
+            
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
