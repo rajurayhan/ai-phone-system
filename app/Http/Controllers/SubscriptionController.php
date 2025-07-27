@@ -182,7 +182,6 @@ class SubscriptionController extends Controller
                 'status' => $subscription->status,
                 'current_period_end' => $subscription->current_period_end,
                 'days_remaining' => $subscription->daysUntilExpiration(),
-                'is_on_trial' => $subscription->isOnTrial(),
             ],
             'package' => [
                 'name' => $package->name,
