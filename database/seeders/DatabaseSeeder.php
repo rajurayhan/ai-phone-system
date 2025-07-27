@@ -34,8 +34,8 @@ class DatabaseSeeder extends Seeder
 
         // Create admin user
         $adminUser = User::create([
-            'name' => 'Admin User',
-            'email' => 'raju@lhgraphics.com',
+            'name' => 'Raju',
+            'email' => 'raju@xpartfone.com',
             'password' => Hash::make('raju@2025'),
             'role' => 'admin',
             'status' => 'active',
@@ -44,8 +44,8 @@ class DatabaseSeeder extends Seeder
 
         // Create test user
         $testUser = User::create([
-            'name' => 'Kim',
-            'email' => 'kim@lhgraphics.com',
+            'name' => 'Akib',
+            'email' => 'akib@xpartfone.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'status' => 'active',
@@ -54,19 +54,10 @@ class DatabaseSeeder extends Seeder
 
         // Create additional test users
         User::create([
-            'name' => 'Josh',
-            'email' => 'josh@lhgraphics.com',
+            'name' => 'Riyad',
+            'email' => 'riyad@xpartfone.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
-            'status' => 'active',
-            'email_verified_at' => now(),
-        ]);
-
-        User::create([
-            'name' => 'Sean',
-            'email' => 'sean@lhgraphics.com',
-            'password' => Hash::make('password'),
-            'role' => 'user',
             'status' => 'active',
             'email_verified_at' => now(),
         ]);
