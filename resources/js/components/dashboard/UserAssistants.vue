@@ -30,23 +30,47 @@
           </div>
         </div>
 
-        <!-- Subscription Status Banner -->
-        <div v-if="subscriptionInfo && !subscriptionInfo.hasSubscription" class="mt-6 bg-yellow-50 border border-yellow-200 rounded-md p-4">
+        <!-- Pending Subscription Banner -->
+        <div v-if="subscriptionInfo && subscriptionInfo.subscriptionStatus === 'pending'" class="mt-6 bg-yellow-50 border border-yellow-200 rounded-md p-4">
           <div class="flex">
             <div class="flex-shrink-0">
               <svg class="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div class="ml-3">
               <h3 class="text-sm font-medium text-yellow-800">
-                No Active Subscription
+                Payment Processing
               </h3>
               <div class="mt-2 text-sm text-yellow-700">
-                <p>You need an active subscription to create and manage voice assistants.</p>
+                <p>Your subscription is being processed. You'll be able to create assistants once payment is confirmed.</p>
               </div>
               <div class="mt-4">
                 <router-link to="/subscription" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-800 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                  Check Payment Status
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Subscription Banner -->
+        <div v-else-if="subscriptionInfo && !subscriptionInfo.hasSubscription" class="mt-6 bg-red-50 border border-red-200 rounded-md p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">
+                No Active Subscription
+              </h3>
+              <div class="mt-2 text-sm text-red-700">
+                <p>You need an active subscription to create and manage voice assistants.</p>
+              </div>
+              <div class="mt-4">
+                <router-link to="/subscription" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-800 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                   Subscribe Now
                 </router-link>
               </div>
@@ -125,7 +149,8 @@
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span v-if="subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin">Subscribe to Create</span>
+                <span v-if="subscriptionInfo && subscriptionInfo.subscriptionStatus === 'pending' && !isAdmin">Payment Processing</span>
+                <span v-else-if="subscriptionInfo && !subscriptionInfo.hasSubscription && !isAdmin">Subscribe to Create</span>
                 <span v-else>Create Assistant</span>
               </button>
             </div>
@@ -546,19 +571,24 @@ export default {
         const response = await axios.get('/api/subscriptions/usage');
         const usage = response.data.data;
         
-        if (usage && usage.package) {
+        if (usage && usage.package && usage.subscription) {
+          // Check if subscription is actually active (not pending)
+          const isActiveSubscription = usage.subscription.status === 'active'
+          
           this.subscriptionInfo = {
-            hasSubscription: true,
+            hasSubscription: isActiveSubscription,
             plan: usage.package.name || 'No Plan',
             used: usage.assistants.used || 0,
-            limit: usage.assistants.limit || 0
+            limit: usage.assistants.limit || 0,
+            subscriptionStatus: usage.subscription.status
           };
         } else {
           this.subscriptionInfo = {
             hasSubscription: false,
             plan: 'No Plan',
             used: 0,
-            limit: 0
+            limit: 0,
+            subscriptionStatus: 'none'
           };
         }
       } catch (error) {
@@ -568,14 +598,16 @@ export default {
             hasSubscription: false,
             plan: 'No Plan',
             used: 0,
-            limit: 0
+            limit: 0,
+            subscriptionStatus: 'none'
           };
         } else {
           this.subscriptionInfo = {
             hasSubscription: false,
             plan: 'Unknown',
             used: 0,
-            limit: 0
+            limit: 0,
+            subscriptionStatus: 'unknown'
           };
         }
       }

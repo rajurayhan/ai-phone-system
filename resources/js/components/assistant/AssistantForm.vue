@@ -18,9 +18,11 @@
             <div>
               <h1 class="text-2xl font-bold text-gray-900">{{ isCreating ? 'Create Assistant' : 'Edit Assistant' }}</h1>
               <p class="text-gray-600">{{ isCreating ? 'Create a new voice assistant' : 'Update your voice assistant configuration' }}</p>
-              <!-- Subscription Status (only show when creating and not admin) -->
-              <div v-if="isCreating && subscriptionInfo && !isAdmin" class="mt-2 text-sm">
-                <span class="text-gray-500">Current Plan: {{ subscriptionInfo.plan }}</span>
+              <!-- Active Subscription Status (only show when creating and not admin) -->
+              <div v-if="isCreating && subscriptionInfo?.hasSubscription && !isAdmin" class="mt-2 text-sm">
+                <span class="text-green-600 font-medium">Active Subscription</span>
+                <span class="mx-2 text-gray-300">|</span>
+                <span class="text-gray-500">Plan: {{ subscriptionInfo.plan }}</span>
                 <span class="mx-2 text-gray-300">|</span>
                 <span class="text-gray-500">Assistants: {{ subscriptionInfo.used }}/{{ subscriptionInfo.limit }}</span>
                 <span v-if="subscriptionInfo.remaining > 0" class="ml-2 text-green-600">
@@ -31,6 +33,15 @@
                 </span>
                 <router-link v-if="subscriptionInfo.remaining <= 0" to="/subscription" class="ml-2 text-blue-600 hover:text-blue-700 underline">
                   Upgrade Plan
+                </router-link>
+              </div>
+              <!-- Pending Subscription Warning (only show when creating and not admin) -->
+              <div v-else-if="isCreating && subscriptionInfo?.subscriptionStatus === 'pending' && !isAdmin" class="mt-2 text-sm">
+                <span class="text-yellow-600 font-medium">Payment Processing</span>
+                <span class="mx-2 text-gray-300">|</span>
+                <span class="text-gray-500">Your subscription is being processed. You'll be able to create assistants once payment is confirmed.</span>
+                <router-link to="/subscription" class="ml-2 text-blue-600 hover:text-blue-700 underline">
+                  Check Payment Status
                 </router-link>
               </div>
               <!-- No Subscription Warning (only show when creating and not admin) -->
@@ -53,7 +64,7 @@
           <div class="flex items-center space-x-3">
             <button
               @click="saveAssistant"
-              :disabled="submitting"
+              :disabled="submitting || (isCreating && !isAdmin && !subscriptionInfo?.hasSubscription)"
               class="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg flex items-center"
             >
               <svg v-if="submitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
@@ -61,7 +72,11 @@
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               <span>
-                {{ submitting ? (isCreating ? 'Creating...' : 'Updating...') : (isCreating ? 'Create Assistant' : 'Update Assistant') }}
+                {{ 
+                  submitting ? (isCreating ? 'Creating...' : 'Updating...') : 
+                  (isCreating && !isAdmin && !subscriptionInfo?.hasSubscription) ? 'Active Subscription Required' :
+                  (isCreating ? 'Create Assistant' : 'Update Assistant') 
+                }}
               </span>
             </button>
           </div>
@@ -995,13 +1010,17 @@ You embody the highest standards of customer service that {{company_name}} would
         const response = await axios.get('/api/subscriptions/usage')
         const usage = response.data.data
         
-        if (usage && usage.package) {
+        if (usage && usage.package && usage.subscription) {
+          // Check if subscription is actually active (not pending)
+          const isActiveSubscription = usage.subscription.status === 'active'
+          
           subscriptionInfo.value = {
             plan: usage.package.name || 'No Plan',
             used: usage.assistants.used || 0,
             limit: usage.assistants.limit || 0,
             remaining: usage.assistants.remaining || 0,
-            hasSubscription: true
+            hasSubscription: isActiveSubscription,
+            subscriptionStatus: usage.subscription.status
           }
         } else {
           // No active subscription
@@ -1010,7 +1029,8 @@ You embody the highest standards of customer service that {{company_name}} would
             used: 0,
             limit: 0,
             remaining: 0,
-            hasSubscription: false
+            hasSubscription: false,
+            subscriptionStatus: 'none'
           }
         }
       } catch (error) {
@@ -1021,7 +1041,8 @@ You embody the highest standards of customer service that {{company_name}} would
             used: 0,
             limit: 0,
             remaining: 0,
-            hasSubscription: false
+            hasSubscription: false,
+            subscriptionStatus: 'none'
           }
         } else {
           // Set default values if API fails - assume no subscription
@@ -1030,7 +1051,8 @@ You embody the highest standards of customer service that {{company_name}} would
             used: 0,
             limit: 0,
             remaining: 0,
-            hasSubscription: false
+            hasSubscription: false,
+            subscriptionStatus: 'unknown'
           }
         }
       }

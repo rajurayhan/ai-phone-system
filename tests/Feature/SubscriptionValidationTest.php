@@ -82,6 +82,61 @@ class SubscriptionValidationTest extends TestCase
         ]);
     }
 
+    public function test_user_with_pending_subscription_cannot_create_assistant()
+    {
+        $user = User::factory()->create(['role' => 'user']);
+
+        // Create a pending subscription for the user
+        UserSubscription::create([
+            'user_id' => $user->id,
+            'subscription_package_id' => $this->package->id,
+            'status' => 'pending',
+            'current_period_start' => Carbon::now(),
+            'current_period_end' => Carbon::now()->addMonth(),
+        ]);
+
+        // Mock VapiService
+        $this->mock(VapiService::class, function ($mock) {
+            $mock->shouldReceive('createAssistant')->andReturn([
+                'id' => 'assistant_test_123',
+                'name' => 'Test Assistant'
+            ]);
+        });
+
+        $response = $this->actingAs($user)->postJson('/api/assistants', [
+            'name' => 'Test Assistant',
+            'type' => 'demo',
+            'model' => [
+                'provider' => 'openai',
+                'model' => 'gpt-4o',
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'You are a helpful assistant.'
+                    ]
+                ]
+            ],
+            'voice' => [
+                'provider' => 'vapi',
+                'voiceId' => 'elliot'
+            ],
+            'firstMessage' => 'Hello, how can I help you?',
+            'endCallMessage' => 'Thank you for calling.',
+            'metadata' => [
+                'company_name' => 'Test Company',
+                'industry' => 'Technology',
+                'services_products' => 'Software Development',
+                'country' => 'United States'
+            ]
+        ]);
+
+        $response->assertStatus(403);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'You need an active subscription to create assistants. Please subscribe to a plan to get started.'
+        ]);
+    }
+
     public function test_user_with_active_subscription_can_create_assistant()
     {
         $user = User::factory()->create(['role' => 'user']);
