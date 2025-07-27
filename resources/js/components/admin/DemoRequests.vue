@@ -126,7 +126,10 @@
               <input v-model="filters.search" type="text" placeholder="Name, email, company, country" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
             </div>
           </div>
-          <div class="mt-4 flex justify-end">
+          <div class="mt-4 flex justify-end space-x-3">
+            <button @click="clearFilters" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+              Clear Filters
+            </button>
             <button @click="loadDemoRequests" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
               Apply Filters
             </button>
@@ -462,6 +465,16 @@ export default {
       }
     }
 
+    const clearFilters = () => {
+      filters.value = {
+        status: '',
+        date_from: '',
+        date_to: '',
+        search: ''
+      }
+      loadDemoRequests()
+    }
+
     const formatDate = (dateString) => {
       return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -496,7 +509,8 @@ export default {
       viewRequest,
       updateStatus,
       submitStatusUpdate,
-      formatDate
+      formatDate,
+      clearFilters
     }
   }
 }

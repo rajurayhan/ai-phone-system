@@ -67,32 +67,20 @@ class DemoRequestController extends Controller
      */
     public function adminIndex(Request $request): JsonResponse
     {
-        \Log::info('DemoRequestController::adminIndex called', [
-            'user_id' => auth()->id(),
-            'user_role' => auth()->user()->role ?? 'unknown',
-            'request_params' => $request->all()
-        ]);
-
         $query = DemoRequest::query();
-
-        // Log the initial query
-        \Log::info('Initial query count: ' . $query->count());
 
         // Filter by status
         if ($request->has('status') && $request->status !== '' && $request->status !== null && $request->status !== 'null') {
             $query->where('status', $request->status);
-            \Log::info('Applied status filter: ' . $request->status);
         }
 
         // Filter by date range
         if ($request->has('date_from') && $request->date_from && $request->date_from !== '' && $request->date_from !== 'null') {
             $query->whereDate('created_at', '>=', $request->date_from);
-            \Log::info('Applied date_from filter: ' . $request->date_from);
         }
 
         if ($request->has('date_to') && $request->date_to && $request->date_to !== '' && $request->date_to !== 'null') {
             $query->whereDate('created_at', '<=', $request->date_to);
-            \Log::info('Applied date_to filter: ' . $request->date_to);
         }
 
         // Search by name, email, or company
@@ -104,7 +92,6 @@ class DemoRequestController extends Controller
                   ->orWhere('company_name', 'like', "%{$search}%")
                   ->orWhere('country', 'like', "%{$search}%");
             });
-            \Log::info('Applied search filter: ' . $search);
         }
 
         // Sort
@@ -112,18 +99,9 @@ class DemoRequestController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
 
-        // Log the final query count
-        \Log::info('Final query count: ' . $query->count());
-
         // Paginate
         $perPage = $request->get('per_page', 15);
         $demoRequests = $query->paginate($perPage);
-
-        \Log::info('Paginated result', [
-            'total' => $demoRequests->total(),
-            'count' => $demoRequests->count(),
-            'current_page' => $demoRequests->currentPage()
-        ]);
 
         return response()->json([
             'success' => true,
@@ -136,15 +114,28 @@ class DemoRequestController extends Controller
      */
     public function adminStats(Request $request): JsonResponse
     {
-        $dateFrom = $request->get('date_from', now()->subDays(30)->toDateString());
-        $dateTo = $request->get('date_to', now()->toDateString());
+        $query = DemoRequest::query();
+
+        // Apply date filters only if they are not empty/null
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+
+        if ($dateFrom && $dateFrom !== '' && $dateFrom !== 'null') {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo && $dateTo !== '' && $dateTo !== 'null') {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        // No default date range - show all records if no date filters are applied
 
         $stats = [
-            'total' => DemoRequest::whereBetween('created_at', [$dateFrom, $dateTo])->count(),
-            'pending' => DemoRequest::whereBetween('created_at', [$dateFrom, $dateTo])->pending()->count(),
-            'contacted' => DemoRequest::whereBetween('created_at', [$dateFrom, $dateTo])->contacted()->count(),
-            'completed' => DemoRequest::whereBetween('created_at', [$dateFrom, $dateTo])->completed()->count(),
-            'cancelled' => DemoRequest::whereBetween('created_at', [$dateFrom, $dateTo])->cancelled()->count(),
+            'total' => $query->count(),
+            'pending' => (clone $query)->pending()->count(),
+            'contacted' => (clone $query)->contacted()->count(),
+            'completed' => (clone $query)->completed()->count(),
+            'cancelled' => (clone $query)->cancelled()->count(),
         ];
 
         return response()->json([
