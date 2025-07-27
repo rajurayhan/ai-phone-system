@@ -18,53 +18,11 @@
               </router-link>
             </div>
           </div>
-          
-          <!-- Desktop Navigation -->
-          <div class="hidden sm:flex items-center space-x-4">
+          <div class="flex items-center space-x-4">
             <router-link to="/login" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
               Login
             </router-link>
             <router-link to="/register" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-              Sign Up
-            </router-link>
-          </div>
-
-          <!-- Mobile menu button -->
-          <div class="sm:hidden">
-            <button 
-              @click="mobileMenuOpen = !mobileMenuOpen"
-              class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
-            >
-              <span class="sr-only">Open main menu</span>
-              <svg 
-                :class="mobileMenuOpen ? 'hidden' : 'block'"
-                class="h-6 w-6" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg 
-                :class="mobileMenuOpen ? 'block' : 'hidden'"
-                class="h-6 w-6" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Mobile menu -->
-        <div v-if="mobileMenuOpen" class="sm:hidden">
-          <div class="px-2 pt-2 pb-3 space-y-1">
-            <router-link to="/login" class="text-gray-500 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-              Login
-            </router-link>
-            <router-link to="/register" class="bg-green-600 hover:bg-green-700 text-white block px-3 py-2 rounded-md text-base font-medium text-center">
               Sign Up
             </router-link>
           </div>
@@ -253,7 +211,6 @@ export default {
     const packages = ref([])
     const isAuthenticated = ref(false)
     const settings = ref({})
-    const mobileMenuOpen = ref(false)
 
     const checkAuthStatus = () => {
       const token = localStorage.getItem('token')
@@ -325,8 +282,7 @@ export default {
       packages,
       isAuthenticated,
       isPackageDisabled,
-      settings,
-      mobileMenuOpen
+      settings
     }
   }
 }

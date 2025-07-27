@@ -27,8 +27,6 @@ import TransactionManagement from './components/admin/TransactionManagement.vue'
 import DemoRequestForm from './components/demo/DemoRequestForm.vue'
 import DemoRequests from './components/admin/DemoRequests.vue'
 import SystemSettings from './components/admin/SystemSettings.vue'
-import NotFound from './components/errors/NotFound.vue'
-import ErrorPage from './components/errors/ErrorPage.vue'
 
 // Set initial document title
 updateDocumentTitle('XpartFone - Revolutionary Voice AI Platform')
@@ -172,22 +170,6 @@ const router = createRouter({
             name: 'demo-request',
             component: DemoRequestForm,
             meta: { requiresAuth: true }
-        },
-        {
-            path: '/:pathMatch(.*)*',
-            name: 'not-found',
-            component: NotFound
-        },
-        {
-            path: '/test-error',
-            name: 'test-error',
-            component: ErrorPage,
-            props: {
-                errorCode: '500',
-                errorTitle: 'Test Error',
-                errorMessage: 'This is a test error page.',
-                errorDescription: 'This page is for testing error handling.'
-            }
         }
     ]
 });
@@ -209,28 +191,7 @@ router.beforeEach((to, from, next) => {
     }
 });
 
-// Error handling for navigation
-router.onError((error) => {
-    console.error('Navigation error:', error);
-    // Redirect to 404 page for navigation errors
-    router.push('/404');
-});
-
 // Create Vue app
 const app = createApp(App);
 app.use(router);
-
-// Global error handler
-app.config.errorHandler = (err, vm, info) => {
-    console.error('Vue error:', err);
-    console.error('Error info:', info);
-    // You could redirect to an error page here if needed
-};
-
-// Global unhandled promise rejection handler
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled promise rejection:', event.reason);
-    event.preventDefault();
-});
-
 app.mount('#app'); 

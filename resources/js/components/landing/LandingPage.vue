@@ -21,8 +21,6 @@
               </div>
             </div>
           </div>
-          
-          <!-- Desktop Navigation -->
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
               <a href="#features" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">Features</a>
@@ -37,51 +35,6 @@
                 <router-link to="/dashboard" class="btn-primary">Dashboard</router-link>
               </template>
             </div>
-          </div>
-
-          <!-- Mobile menu button -->
-          <div class="md:hidden">
-            <button 
-              @click="mobileMenuOpen = !mobileMenuOpen"
-              class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
-            >
-              <span class="sr-only">Open main menu</span>
-              <svg 
-                :class="mobileMenuOpen ? 'hidden' : 'block'"
-                class="h-6 w-6" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg 
-                :class="mobileMenuOpen ? 'block' : 'hidden'"
-                class="h-6 w-6" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Mobile menu -->
-        <div v-if="mobileMenuOpen" class="md:hidden">
-          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="#features" class="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">Features</a>
-            <a href="#pricing" class="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">Pricing</a>
-            <a href="#contact" class="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">Contact</a>
-            <!-- Show different buttons based on authentication status -->
-            <template v-if="!isAuthenticated">
-              <router-link to="/login" class="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">Login</router-link>
-              <router-link to="/register" class="btn-primary block text-center">Get Started</router-link>
-            </template>
-            <template v-else>
-              <router-link to="/dashboard" class="btn-primary block text-center">Dashboard</router-link>
-            </template>
           </div>
         </div>
       </div>
@@ -305,7 +258,6 @@ export default {
     const packages = ref([])
     const features = ref([])
     const settings = ref({})
-    const mobileMenuOpen = ref(false)
 
     // Check if user is authenticated
     const isAuthenticated = computed(() => {
@@ -360,8 +312,7 @@ export default {
       packages,
       features,
       isAuthenticated,
-      settings,
-      mobileMenuOpen
+      settings
     }
   }
 }

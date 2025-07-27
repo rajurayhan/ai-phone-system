@@ -194,6 +194,7 @@ export default {
 
     const viewStats = (assistantId) => {
       // TODO: Implement stats view
+      console.log('View stats for assistant:', assistantId)
       activeMenu.value = null
     }
 

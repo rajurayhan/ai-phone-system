@@ -157,6 +157,7 @@ export default {
         if (response.ok) {
           const data = await response.json();
           this.stats = data.data;
+          console.log('Stats loaded successfully');
         } else {
           console.error('Failed to load stats');
         }
@@ -177,6 +178,7 @@ export default {
         if (response.ok) {
           const data = await response.json();
           this.recentActivity = data.data;
+          console.log('Activity loaded successfully');
         } else {
           console.error('Failed to load activity');
         }

@@ -25,6 +25,12 @@ window.axios.interceptors.request.use(function (config) {
         if (config.url && config.url.startsWith('/api/')) {
             delete config.headers['X-CSRF-TOKEN'];
         }
+        
+        // Debug: Log the token being sent (remove this in production)
+        console.log('Sending token:', token.substring(0, 20) + '...');
+        console.log('Request headers:', config.headers);
+    } else {
+        console.log('No token found in localStorage');
     }
     return config;
 }, function (error) {

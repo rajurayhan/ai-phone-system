@@ -467,10 +467,14 @@ export default {
       
       try {
         this.deletingAssistant = assistantId; // Set loading state
+        console.log('Deleting assistant:', assistantId);
         const response = await axios.delete(`/api/assistants/${assistantId}`);
+        
+        console.log('Delete response status:', response.status);
         
         if (response.status === 200) {
             const result = response.data;
+            console.log('Delete successful:', result);
             await this.loadAssistants();
         } else {
           const errorData = response.data;
