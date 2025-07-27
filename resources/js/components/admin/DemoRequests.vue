@@ -376,13 +376,22 @@ export default {
     const loadDemoRequests = async (page = 1) => {
       try {
         loading.value = true
+        const token = localStorage.getItem('token')
+        console.log('Token exists:', !!token)
+        
         const params = {
           page,
           ...filters.value
         }
         
         console.log('Loading demo requests with params:', params)
-        const response = await axios.get('/api/admin/demo-requests', { params })
+        const response = await axios.get('/api/admin/demo-requests', { 
+          params,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        })
         console.log('Demo requests response:', response.data)
         
         // Check if response has the expected structure
@@ -405,15 +414,23 @@ export default {
 
     const loadStats = async () => {
       try {
-        console.log('Loading demo request stats...')
-        const response = await axios.get('/api/admin/demo-requests/stats')
-        console.log('Stats response:', response.data)
+        console.log('Loading stats...')
+        const token = localStorage.getItem('token')
+        console.log('Token exists:', !!token)
         
-        // Check if response has the expected structure
+        const response = await axios.get('/api/admin/demo-requests/stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        })
+        
+        console.log('Stats API response:', response.data)
+        
         if (response.data.success && response.data.data) {
           stats.value = response.data.data
         } else {
-          console.error('Unexpected stats response structure:', response.data)
+          console.log('Stats response structure unexpected:', response.data)
           stats.value = {
             total: 0,
             pending: 0,
@@ -424,7 +441,13 @@ export default {
         }
       } catch (error) {
         console.error('Error loading stats:', error)
-        console.error('Stats error response:', error.response?.data)
+        stats.value = {
+          total: 0,
+          pending: 0,
+          contacted: 0,
+          completed: 0,
+          cancelled: 0
+        }
       }
     }
 
