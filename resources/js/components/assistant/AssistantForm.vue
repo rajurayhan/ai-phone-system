@@ -129,6 +129,28 @@
             </div>
           </div>
           <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Country *</label>
+            <select
+              v-model="form.metadata.country"
+              required
+              :class="[
+                'w-full px-3 py-2 border rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500',
+                fieldErrors.country 
+                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50' 
+                  : 'border-gray-300 focus:border-green-500 bg-white'
+              ]"
+            >
+              <option value="United States">United States</option>
+              <option value="United Kingdom">United Kingdom (England, Scotland, Wales, Northern Ireland)</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="Ireland">Ireland</option>
+            </select>
+            <p v-if="fieldErrors.country" class="text-xs text-red-600 mt-1">{{ fieldErrors.country }}</p>
+            <p v-else class="text-xs text-gray-500 mt-1">Country for Twilio phone number search</p>
+          </div>
+          <div class="mt-6">
             <label class="block text-sm font-medium text-gray-700 mb-2">Services/Products *</label>
             <textarea
               v-model="form.metadata.services_products"
@@ -220,13 +242,26 @@
                     />
                     <button
                       @click="loadAvailableNumbers"
-                      :disabled="loadingNumbers"
+                      :disabled="loadingNumbers || !form.metadata.country"
                       class="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
                     >
                       <span v-if="loadingNumbers">Loading...</span>
                       <span v-else>Get Available Numbers</span>
                     </button>
                   </div>
+                </div>
+                
+                <!-- Country Info -->
+                <div v-if="form.metadata.country" class="mb-3 p-2 bg-blue-100 rounded text-xs">
+                  <span class="font-medium">Searching in:</span> {{ form.metadata.country }}
+                  <span v-if="areaCode" class="ml-2">
+                    <span class="font-medium">Area Code:</span> {{ areaCode }}
+                  </span>
+                </div>
+                
+                <!-- Country Warning -->
+                <div v-else class="mb-3 p-2 bg-yellow-100 rounded text-xs text-yellow-800">
+                  <span class="font-medium">⚠️ Please select a country above to search for available phone numbers.</span>
                 </div>
                 
                 <!-- Available Numbers List -->
@@ -648,6 +683,7 @@ You embody the highest standards of customer service that {{company_name}} would
       metadata: {
         company_name: '',
         industry: '',
+        country: 'United States', // Default to United States
         services_products: '',
         sms_phone_number: '',
         assistant_phone_number: '',
@@ -669,7 +705,8 @@ You embody the highest standards of customer service that {{company_name}} would
       sms_phone_number: '',
       assistant_phone_number: '',
       webhook_url: '',
-      user_assignment: '' // Added for admin user assignment
+      user_assignment: '', // Added for admin user assignment
+      country: '' // Added for country field
     })
 
     // Computed property to process system prompt with company information
@@ -829,6 +866,7 @@ You embody the highest standards of customer service that {{company_name}} would
         if (assistant.vapi_data?.metadata) {
           form.value.metadata.company_name = assistant.vapi_data.metadata.company_name || ''
           form.value.metadata.industry = assistant.vapi_data.metadata.industry || ''
+          form.value.metadata.country = assistant.vapi_data.metadata.country || 'United States'
           form.value.metadata.services_products = assistant.vapi_data.metadata.services_products || ''
           form.value.metadata.sms_phone_number = assistant.vapi_data.metadata.sms_phone_number || ''
           form.value.metadata.assistant_phone_number = assistant.vapi_data.metadata.assistant_phone_number || ''
@@ -998,6 +1036,11 @@ You embody the highest standards of customer service that {{company_name}} would
         
         if (!form.value.metadata.industry.trim()) {
           fieldErrors.value.industry = 'Industry is required'
+          hasErrors = true
+        }
+        
+        if (!form.value.metadata.country) {
+          fieldErrors.value.country = 'Country is required'
           hasErrors = true
         }
         
@@ -1226,6 +1269,11 @@ You embody the highest standards of customer service that {{company_name}} would
         const params = {}
         if (areaCode.value.trim()) {
           params.area_code = areaCode.value.trim()
+        }
+        
+        // Add country parameter if available
+        if (form.value.metadata.country) {
+          params.country = form.value.metadata.country
         }
         
         const response = await axios.get('/api/twilio/available-numbers', { params })

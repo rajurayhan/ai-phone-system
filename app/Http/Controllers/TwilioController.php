@@ -23,13 +23,30 @@ class TwilioController extends Controller
     {
         $request->validate([
             'country_code' => 'string|max:2',
+            'country' => 'string|in:United States,United Kingdom,Canada,Australia,New Zealand,Ireland',
             'limit' => 'integer|min:1|max:50',
             'area_code' => 'nullable|string|max:3'
         ]);
 
         $countryCode = $request->input('country_code', 'US');
+        $country = $request->input('country');
         $limit = $request->input('limit', 10);
         $areaCode = $request->input('area_code');
+
+        // Map country names to Twilio country codes
+        $countryCodeMap = [
+            'United States' => 'US',
+            'United Kingdom' => 'GB',
+            'Canada' => 'CA',
+            'Australia' => 'AU',
+            'New Zealand' => 'NZ',
+            'Ireland' => 'IE'
+        ];
+
+        // Use country parameter if provided, otherwise use country_code
+        if ($country && isset($countryCodeMap[$country])) {
+            $countryCode = $countryCodeMap[$country];
+        }
 
         $result = $this->twilioService->getAvailableNumbers($countryCode, $limit, $areaCode);
 
