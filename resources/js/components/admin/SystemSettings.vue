@@ -165,6 +165,8 @@ export default {
       logo_url: '',
       homepage_banner: ''
     })
+    const selectedLogoFile = ref(null)
+    const selectedBannerFile = ref(null)
 
     const loadSettings = async () => {
       try {
@@ -189,13 +191,30 @@ export default {
       try {
         saving.value = true
         
+        // Create FormData for file uploads
+        const formData = new FormData()
+        
+        // Add all settings as JSON
         const settingsArray = Object.entries(settings.value).map(([key, value]) => ({
           key,
           value
         }))
+        formData.append('settings', JSON.stringify(settingsArray))
+        
+        // Add logo file if selected
+        if (selectedLogoFile.value) {
+          formData.append('logo_file', selectedLogoFile.value)
+        }
+        
+        // Add banner file if selected
+        if (selectedBannerFile.value) {
+          formData.append('banner_file', selectedBannerFile.value)
+        }
 
-        const response = await axios.post('/api/system-settings', {
-          settings: settingsArray
+        const response = await axios.post('/api/system-settings', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         })
 
         if (response.data.success) {
@@ -204,6 +223,13 @@ export default {
           // Update document title
           await updateDocumentTitle()
           showSuccess('Settings Saved', 'System settings updated successfully')
+          
+          // Clear selected files
+          selectedLogoFile.value = null
+          selectedBannerFile.value = null
+          
+          // Reload settings to get updated URLs
+          await loadSettings()
         }
       } catch (error) {
         console.error('Error saving settings:', error)
@@ -216,8 +242,9 @@ export default {
     const handleLogoUpload = (event) => {
       const file = event.target.files[0]
       if (file) {
-        // For now, we'll just store the file name
-        // In a real implementation, you'd upload to server
+        // Store the file for upload
+        selectedLogoFile.value = file
+        // Show preview
         settings.value.logo_url = URL.createObjectURL(file)
       }
     }
@@ -225,8 +252,9 @@ export default {
     const handleBannerUpload = (event) => {
       const file = event.target.files[0]
       if (file) {
-        // For now, we'll just store the file name
-        // In a real implementation, you'd upload to server
+        // Store the file for upload
+        selectedBannerFile.value = file
+        // Show preview
         settings.value.homepage_banner = URL.createObjectURL(file)
       }
     }
@@ -240,7 +268,9 @@ export default {
       saving,
       saveSettings,
       handleLogoUpload,
-      handleBannerUpload
+      handleBannerUpload,
+      selectedLogoFile,
+      selectedBannerFile
     }
   }
 }

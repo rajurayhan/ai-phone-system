@@ -43,24 +43,36 @@ class SystemSettingController extends Controller
         }
 
         $request->validate([
-            'settings' => 'required|array',
-            'settings.*.key' => 'required|string',
-            'settings.*.value' => 'nullable',
+            'settings' => 'required|string', // JSON string
+            'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'banner_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB for banner
         ]);
 
         try {
-            foreach ($request->settings as $setting) {
+            // Parse settings JSON
+            $settings = json_decode($request->settings, true);
+            
+            foreach ($settings as $setting) {
                 $key = $setting['key'];
                 $value = $setting['value'] ?? null;
                 
-                // Handle file uploads
-                if (isset($setting['file']) && $setting['file']) {
-                    $file = $setting['file'];
-                    $path = $file->store('system', 'public');
-                    $value = Storage::url($path);
-                }
-                
                 SystemSetting::setValue($key, $value);
+            }
+            
+            // Handle logo file upload
+            if ($request->hasFile('logo_file')) {
+                $file = $request->file('logo_file');
+                $path = $file->store('system/logos', 'public');
+                $url = Storage::disk('public')->url($path);
+                SystemSetting::setValue('logo_url', $url);
+            }
+            
+            // Handle banner file upload
+            if ($request->hasFile('banner_file')) {
+                $file = $request->file('banner_file');
+                $path = $file->store('system/banners', 'public');
+                $url = Storage::disk('public')->url($path);
+                SystemSetting::setValue('homepage_banner', $url);
             }
 
             return response()->json([

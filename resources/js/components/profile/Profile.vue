@@ -279,28 +279,23 @@ export default {
       try {
         this.loading = true;
         
-        // Debug: Log the form data
-        console.log('Form data before submission:', this.form);
-        console.log('Name value:', this.form.name);
-        console.log('Name type:', typeof this.form.name);
-        console.log('Name length:', this.form.name ? this.form.name.length : 0);
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('name', this.form.name || '');
+        formData.append('phone', this.form.phone || '');
+        formData.append('company', this.form.company || '');
+        formData.append('bio', this.form.bio || '');
         
-        // Prepare the data to send
-        const updateData = {
-          name: this.form.name || '',
-          phone: this.form.phone || '',
-          company: this.form.company || '',
-          bio: this.form.bio || ''
-        };
+        // Add profile picture if selected
+        if (this.selectedFile) {
+          formData.append('profile_picture', this.selectedFile);
+        }
         
-        // Debug: Log what's being sent
-        console.log('Data being sent:', updateData);
-        
-        const response = await axios.put('/api/user', updateData, {
+        const response = await axios.put('/api/user', formData, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'multipart/form-data'
           }
         });
         
