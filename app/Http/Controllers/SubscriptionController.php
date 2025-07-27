@@ -158,7 +158,7 @@ class SubscriptionController extends Controller
     public function getUsage(): JsonResponse
     {
         $user = Auth::user();
-        $subscription = $user->activeSubscription;
+        return $subscription = $user->activeSubscription;
 
         if (!$subscription) {
             return response()->json([

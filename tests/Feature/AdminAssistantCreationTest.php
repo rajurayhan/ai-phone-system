@@ -60,7 +60,8 @@ class AdminAssistantCreationTest extends TestCase
             'metadata' => [
                 'company_name' => 'Test Company',
                 'industry' => 'Technology',
-                'services_products' => 'Software Development'
+                'services_products' => 'Software Development',
+                'country' => 'United States'
             ]
         ]);
 
@@ -82,7 +83,7 @@ class AdminAssistantCreationTest extends TestCase
         // Mock VapiService
         $this->mock(VapiService::class, function ($mock) {
             $mock->shouldReceive('createAssistant')->andReturn([
-                'id' => 'assistant_test_456',
+                'id' => 'assistant_test_123',
                 'name' => 'Test Assistant',
                 'model' => [
                     'provider' => 'openai',
@@ -117,7 +118,8 @@ class AdminAssistantCreationTest extends TestCase
             'metadata' => [
                 'company_name' => 'Test Company',
                 'industry' => 'Technology',
-                'services_products' => 'Software Development'
+                'services_products' => 'Software Development',
+                'country' => 'United States'
             ],
             'user_id' => $regularUser->id
         ]);
@@ -158,7 +160,8 @@ class AdminAssistantCreationTest extends TestCase
             'metadata' => [
                 'company_name' => 'Test Company',
                 'industry' => 'Technology',
-                'services_products' => 'Software Development'
+                'services_products' => 'Software Development',
+                'country' => 'United States'
             ]
         ]);
 
