@@ -281,7 +281,7 @@ export default {
           // Handle error silently or show toast notification
         }
       } catch (error) {
-        console.error('Error loading stats:', error);
+        // Handle error silently
       }
     },
     
@@ -301,7 +301,7 @@ export default {
           // Handle error silently or show toast notification
         }
       } catch (error) {
-        console.error('Error loading activity:', error);
+        // Handle error silently
       }
     },
     

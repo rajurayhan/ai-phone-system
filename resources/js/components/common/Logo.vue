@@ -33,9 +33,9 @@ export default {
     try {
       const settings = await getSystemSettings()
       this.settings = settings
-    } catch (error) {
-      console.error('Error loading system settings:', error)
-    }
+          } catch (error) {
+        // Handle error silently
+      }
   }
 }
 </script> 

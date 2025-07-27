@@ -260,7 +260,6 @@ export default {
           throw new Error('Failed to load user data');
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
         await showError('Error', 'Failed to load user data. Please log in again.');
         this.$router.push('/login');
       }
@@ -330,8 +329,6 @@ export default {
           throw new Error(response.data.message || 'Failed to update profile');
         }
       } catch (error) {
-        console.error('Profile update error:', error);
-        console.error('Error response:', error.response);
         let errorMessage = 'Failed to update profile.';
         if (error.response && error.response.data && error.response.data.message) {
           errorMessage = error.response.data.message;

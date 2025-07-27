@@ -223,7 +223,7 @@ export default {
         // Cache settings in localStorage for faster loading
         localStorage.setItem('settings', JSON.stringify(settings))
       } catch (error) {
-        console.error('Error loading system settings:', error)
+        // Handle error silently
       }
     },
     async logout() {
@@ -245,7 +245,6 @@ export default {
         // Redirect to login
         this.$router.push('/login');
       } catch (error) {
-        console.error('Logout error:', error);
         // Even if API call fails, clear local storage and redirect
         localStorage.removeItem('token');
         localStorage.removeItem('user');

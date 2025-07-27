@@ -167,7 +167,6 @@ export default {
       // Update document title
       document.title = '404 - Page Not Found | ' + (this.settings.site_title || 'XpartFone')
     } catch (error) {
-      console.error('Error loading system settings:', error)
       // Set default values if API fails
       this.settings = {
         site_title: 'XpartFone',

@@ -176,7 +176,6 @@ export default {
       this.settings = response.data.data
       await updateDocumentTitle('Register')
     } catch (error) {
-      console.error('Error fetching site settings:', error)
       // Set default values if API fails
       this.settings = {
         site_title: 'XpartFone',

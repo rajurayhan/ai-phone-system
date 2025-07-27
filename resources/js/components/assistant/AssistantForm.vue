@@ -933,7 +933,6 @@ You embody the highest standards of customer service that {{company_name}} would
         updateTemplatedData()
         
       } catch (err) {
-        console.error('Error loading assistant:', err)
         
         if (err.response) {
           const { status, data } = err.response
@@ -982,7 +981,7 @@ You embody the highest standards of customer service that {{company_name}} would
         const response = await axios.get('/api/admin/users/for-assignment')
         users.value = response.data.data || []
       } catch (error) {
-        console.error('Error loading users:', error)
+        // Handle error silently
       } finally {
         loadingUsers.value = false
       }
@@ -1015,7 +1014,6 @@ You embody the highest standards of customer service that {{company_name}} would
           }
         }
       } catch (error) {
-        console.error('Error loading subscription info:', error)
         // If 404, it means no active subscription
         if (error.response && error.response.status === 404) {
           subscriptionInfo.value = {
@@ -1149,7 +1147,6 @@ You embody the highest standards of customer service that {{company_name}} would
           }
         }
       } catch (err) {
-        console.error('Error saving assistant:', err)
         
         if (err.response) {
           const { status, data } = err.response
@@ -1251,7 +1248,7 @@ You embody the highest standards of customer service that {{company_name}} would
           updateTemplatedData()
         }
       } catch (error) {
-        console.error('Error loading templates:', error)
+        // Handle error silently
       }
     }
 
@@ -1323,7 +1320,6 @@ You embody the highest standards of customer service that {{company_name}} would
           await showError('Error', 'Failed to load available phone numbers')
         }
       } catch (error) {
-        console.error('Error loading available numbers:', error)
         await showError('Error', 'Failed to load available phone numbers')
       } finally {
         loadingNumbers.value = false

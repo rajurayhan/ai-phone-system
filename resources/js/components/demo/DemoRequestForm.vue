@@ -419,7 +419,6 @@ export default {
         const response = await axios.get('/api/public-settings')
         settings.value = response.data.data
       } catch (error) {
-        console.error('Error loading settings:', error)
         // Set default values if API fails
         settings.value = {
           site_title: 'XpartFone',
@@ -481,7 +480,6 @@ export default {
           }
         }
       } catch (error) {
-        console.error('Error checking demo request:', error)
         // If there's an error, show the form anyway
       } finally {
         checking.value = false
@@ -511,7 +509,6 @@ export default {
           await showError('Error', data.message || 'Failed to submit demo request')
         }
       } catch (error) {
-        console.error('Error submitting demo request:', error)
         await showError('Error', 'Failed to submit demo request. Please try again.')
       } finally {
         loading.value = false

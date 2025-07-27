@@ -163,7 +163,6 @@ export default {
       // Update document title
       document.title = `${this.errorCode} - ${this.errorTitle} | ${this.settings.site_title || 'XpartFone'}`
     } catch (error) {
-      console.error('Error loading system settings:', error)
       // Set default values if API fails
       this.settings = {
         site_title: 'XpartFone',

@@ -237,7 +237,6 @@ export default {
         const response = await axios.get('/api/subscriptions/packages')
         this.packages = response.data.data || []
       } catch (error) {
-        console.error('Error loading packages:', error)
         showError('Error', 'Failed to load subscription packages')
       }
     },
@@ -272,7 +271,6 @@ export default {
           showError('Payment Failed', processResponse.data.message || 'Payment processing failed')
         }
       } catch (error) {
-        console.error('Error processing payment:', error)
         showError('Payment Error', error.response?.data?.message || 'Failed to process payment')
       } finally {
         this.loading = false

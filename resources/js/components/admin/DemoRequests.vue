@@ -395,13 +395,10 @@ export default {
           demoRequests.value = response.data.data.data || []
           pagination.value = response.data.data
         } else {
-          console.error('Unexpected response structure:', response.data)
           demoRequests.value = []
           pagination.value = null
         }
       } catch (error) {
-        console.error('Error loading demo requests:', error)
-        console.error('Error response:', error.response?.data)
         showError('Failed to load demo requests')
       } finally {
         loading.value = false
@@ -431,7 +428,6 @@ export default {
           }
         }
       } catch (error) {
-        console.error('Error loading stats:', error)
         stats.value = {
           total: 0,
           pending: 0,
@@ -472,7 +468,6 @@ export default {
         showUpdateModal.value = false
         loadStats() // Refresh stats
       } catch (error) {
-        console.error('Error updating status:', error)
         showError('Failed to update status')
       } finally {
         updating.value = false

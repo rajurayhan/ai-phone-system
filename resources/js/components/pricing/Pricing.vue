@@ -237,7 +237,7 @@ export default {
         const response = await axios.get('/api/subscriptions/packages')
         packages.value = response.data.data
       } catch (error) {
-        console.error('Error loading packages:', error)
+        // Handle error silently
       }
     }
 
@@ -246,7 +246,6 @@ export default {
         const response = await axios.get('/api/public-settings')
         settings.value = response.data.data
       } catch (error) {
-        console.error('Error loading settings:', error)
         // Set default values if API fails
         settings.value = {
           site_title: 'XpartFone',

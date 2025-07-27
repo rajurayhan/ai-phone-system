@@ -164,7 +164,6 @@ export default {
         assistants.value = response.data.data || []
       } catch (err) {
         error.value = 'Failed to load assistants. Please try again.'
-        console.error('Error loading assistants:', err)
       } finally {
         loading.value = false
       }
@@ -181,7 +180,6 @@ export default {
         activeMenu.value = null
       } catch (err) {
         error.value = 'Failed to delete assistant. Please try again.'
-        console.error('Error deleting assistant:', err)
       }
     }
 

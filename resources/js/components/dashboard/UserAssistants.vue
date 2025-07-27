@@ -439,7 +439,6 @@ export default {
         const response = await axios.get('/api/assistants', { params });
         this.assistants = response.data.data || [];
       } catch (error) {
-        console.error('Error loading assistants:', error);
         if (error.response && error.response.status === 401) {
           this.$router.push('/login');
         }
@@ -464,7 +463,6 @@ export default {
         const response = await axios.get(`/api/assistants/${assistant.vapi_assistant_id}`);
         this.stats = response.data.data.vapi_data?.stats || null;
       } catch (error) {
-        console.error('Error loading stats:', error);
         this.stats = null;
       }
     },
@@ -564,7 +562,6 @@ export default {
           };
         }
       } catch (error) {
-        console.error('Error loading subscription info:', error);
         // If 404, it means no active subscription
         if (error.response && error.response.status === 404) {
           this.subscriptionInfo = {

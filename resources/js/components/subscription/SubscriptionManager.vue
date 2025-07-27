@@ -272,7 +272,6 @@ export default {
         const response = await axios.get('/api/subscriptions/packages')
         packages.value = response.data.data
       } catch (error) {
-        console.error('Error loading packages:', error)
         showError('Failed to load subscription packages')
       }
     }
@@ -282,7 +281,7 @@ export default {
         const response = await axios.get('/api/subscriptions/usage')
         usage.value = response.data.data
       } catch (error) {
-        console.error('Error loading usage:', error)
+        // Handle error silently
       }
     }
 
@@ -296,7 +295,6 @@ export default {
         showSuccess('Subscription created successfully!')
         await loadCurrentSubscription()
       } catch (error) {
-        console.error('Error subscribing:', error)
         showError(error.response?.data?.message || 'Failed to subscribe to package')
       } finally {
         loading.value = false
@@ -314,7 +312,6 @@ export default {
         showUpgradeModal.value = false
         await loadCurrentSubscription()
       } catch (error) {
-        console.error('Error upgrading:', error)
         showError(error.response?.data?.message || 'Failed to upgrade subscription')
       } finally {
         loading.value = false
@@ -333,7 +330,6 @@ export default {
         showSuccess('Subscription cancelled successfully')
         await loadCurrentSubscription()
       } catch (error) {
-        console.error('Error cancelling subscription:', error)
         showError(error.response?.data?.message || 'Failed to cancel subscription')
       } finally {
         loading.value = false
