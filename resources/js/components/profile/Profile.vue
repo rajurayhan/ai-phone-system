@@ -245,16 +245,22 @@ export default {
             'Authorization': `Bearer ${token}`
           }
         });
-        this.user = response.data.data;
-        this.form = {
-          name: this.user.name || '',
-          email: this.user.email || '',
-          phone: this.user.phone || '',
-          company: this.user.company || '',
-          bio: this.user.bio || ''
-        };
-        localStorage.setItem('user', JSON.stringify(this.user));
+        
+        if (response.data.success) {
+          this.user = response.data.data;
+          this.form = {
+            name: this.user.name || '',
+            email: this.user.email || '',
+            phone: this.user.phone || '',
+            company: this.user.company || '',
+            bio: this.user.bio || ''
+          };
+          localStorage.setItem('user', JSON.stringify(this.user));
+        } else {
+          throw new Error('Failed to load user data');
+        }
       } catch (error) {
+        console.error('Error fetching user data:', error);
         await showError('Error', 'Failed to load user data. Please log in again.');
         this.$router.push('/login');
       }
@@ -291,7 +297,15 @@ export default {
           formData.append('profile_picture', this.selectedFile);
         }
         
-        const response = await axios.put('/api/user', formData, {
+        console.log('Sending profile update with data:', {
+          name: this.form.name,
+          phone: this.form.phone,
+          company: this.form.company,
+          bio: this.form.bio,
+          hasFile: !!this.selectedFile
+        });
+        
+        const response = await axios.post('/api/user', formData, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
@@ -299,13 +313,28 @@ export default {
           }
         });
         
-        this.user = response.data.data;
-        localStorage.setItem('user', JSON.stringify(this.user));
-        this.selectedFile = null;
-        if (this.$refs.profilePictureInput) {
-          this.$refs.profilePictureInput.value = '';
+        if (response.data.success) {
+          // Update user data with response
+          this.user = response.data.data;
+          
+          // Update form data to match the response
+          this.form = {
+            name: this.user.name || '',
+            email: this.user.email || '',
+            phone: this.user.phone || '',
+            company: this.user.company || '',
+            bio: this.user.bio || ''
+          };
+          
+          localStorage.setItem('user', JSON.stringify(this.user));
+          this.selectedFile = null;
+          if (this.$refs.profilePictureInput) {
+            this.$refs.profilePictureInput.value = '';
+          }
+          showSuccess('Profile Updated', 'Your profile has been updated successfully.');
+        } else {
+          throw new Error(response.data.message || 'Failed to update profile');
         }
-        showSuccess('Profile Updated', 'Your profile has been updated successfully.');
       } catch (error) {
         console.error('Profile update error:', error);
         console.error('Error response:', error.response);

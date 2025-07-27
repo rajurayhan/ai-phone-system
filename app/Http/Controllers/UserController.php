@@ -34,7 +34,8 @@ class UserController extends Controller
             'has_file' => $request->hasFile('profile_picture'),
             'name_field' => $request->input('name'),
             'name_field_exists' => $request->has('name'),
-            'all_inputs' => $request->all()
+            'all_inputs' => $request->all(),
+            'files' => $request->allFiles()
         ]);
         
         $request->validate([
@@ -45,35 +46,59 @@ class UserController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        // Update user data
-        $user->name = $request->input('name');
-        $user->phone = $request->input('phone');
-        $user->company = $request->input('company');
-        $user->bio = $request->input('bio');
+        try {
+            // Update user data
+            $user->name = $request->input('name');
+            $user->phone = $request->input('phone');
+            $user->company = $request->input('company');
+            $user->bio = $request->input('bio');
 
-        // Handle profile picture upload
-        if ($request->hasFile('profile_picture')) {
-            // Delete old profile picture if exists
-            if ($user->profile_picture) {
-                Storage::disk('public')->delete($user->profile_picture);
+            // Handle profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                $file = $request->file('profile_picture');
+                
+                // Validate file type
+                if (!$file->isValid()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid file upload'
+                    ], 400);
+                }
+                
+                // Delete old profile picture if exists
+                if ($user->profile_picture) {
+                    $oldPath = str_replace('/storage/', '', $user->profile_picture);
+                    Storage::disk('public')->delete($oldPath);
+                }
+
+                // Store new profile picture
+                $path = $file->store('profile-pictures', 'public');
+                $user->profile_picture = $path;
+                
+                \Log::info('Profile picture uploaded', ['path' => $path]);
             }
 
-            // Store new profile picture
-            $path = $request->file('profile_picture')->store('profile-pictures', 'public');
-            $user->profile_picture = $path;
+            $user->save();
+
+            \Log::info('Profile updated successfully', ['user_id' => $user->id]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $user,
+                'message' => 'Profile updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Profile update failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
-            \Log::info('Profile picture uploaded', ['path' => $path]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update profile: ' . $e->getMessage()
+            ], 500);
         }
-
-        $user->save();
-
-        \Log::info('Profile updated successfully', ['user_id' => $user->id]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $user,
-            'message' => 'Profile updated successfully'
-        ]);
     }
 
     public function changePassword(Request $request): JsonResponse

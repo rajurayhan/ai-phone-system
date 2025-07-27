@@ -38,6 +38,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [App\Http\Controllers\UserController::class, 'show']);
     Route::put('/user', [App\Http\Controllers\UserController::class, 'update']);
+    Route::post('/user', [App\Http\Controllers\UserController::class, 'update']); // Alternative for file uploads
     Route::put('/user/password', [App\Http\Controllers\UserController::class, 'changePassword']);
 });
 
