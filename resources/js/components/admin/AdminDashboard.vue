@@ -277,9 +277,8 @@ export default {
         if (response.ok) {
           const data = await response.json();
           this.stats = data.data;
-          console.log('Admin stats loaded successfully');
         } else {
-          console.error('Failed to load admin stats');
+          // Handle error silently or show toast notification
         }
       } catch (error) {
         console.error('Error loading stats:', error);
@@ -298,9 +297,8 @@ export default {
         if (response.ok) {
           const data = await response.json();
           this.recentActivity = data.data;
-          console.log('Admin activity loaded successfully');
         } else {
-          console.error('Failed to load admin activity');
+          // Handle error silently or show toast notification
         }
       } catch (error) {
         console.error('Error loading activity:', error);

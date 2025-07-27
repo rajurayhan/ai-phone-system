@@ -850,7 +850,7 @@ You embody the highest standards of customer service that {{company_name}} would
         selectedPhoneNumber.value = ''
         areaCode.value = ''
         searchReset.value = true // Set flag to true
-        console.log('Country changed from', oldCountry, 'to', newCountry, '- resetting number search results')
+
       }
     })
 

@@ -380,7 +380,6 @@ export default {
           }
         })
         this.stats = response.data.data || {}
-        console.log('Stats loaded:', this.stats)
       } catch (error) {
         console.error('Error loading stats:', error)
         if (error.response && error.response.status === 401) {
@@ -398,7 +397,6 @@ export default {
           }
         })
         this.users = response.data.data || []
-        console.log('Users loaded:', this.users)
       } catch (error) {
         console.error('Error loading users:', error)
         if (error.response && error.response.status === 401) {
@@ -427,7 +425,7 @@ export default {
             'Content-Type': 'application/json'
           }
         })
-        console.log('Transactions response:', response.data)
+
         this.transactions = response.data.data.data || []
         this.pagination = response.data.data
       } catch (error) {

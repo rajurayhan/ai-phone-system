@@ -157,12 +157,11 @@ export default {
         if (response.ok) {
           const data = await response.json();
           this.stats = data.data;
-          console.log('Stats loaded successfully');
         } else {
-          console.error('Failed to load stats');
+          // Handle error silently or show toast notification
         }
       } catch (error) {
-        console.error('Error loading stats:', error);
+        // Handle error silently or show toast notification
       }
     },
     
@@ -178,12 +177,11 @@ export default {
         if (response.ok) {
           const data = await response.json();
           this.recentActivity = data.data;
-          console.log('Activity loaded successfully');
         } else {
-          console.error('Failed to load activity');
+          // Handle error silently or show toast notification
         }
       } catch (error) {
-        console.error('Error loading activity:', error);
+        // Handle error silently or show toast notification
       }
     },
     

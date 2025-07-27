@@ -153,6 +153,10 @@
           </div>
         </div>
         <div class="flex items-center">
+          <!-- Mobile menu button -->
+          <MobileNavigation />
+          
+          <!-- Desktop user menu -->
           <div class="ml-3 relative">
             <div>
               <button @click="userMenuOpen = !userMenuOpen" class="max-w-xs bg-gray-100 flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
@@ -185,9 +189,13 @@
 
 <script>
 import { getSystemSettings } from '../../utils/systemSettings.js'
+import MobileNavigation from './MobileNavigation.vue'
 
 export default {
   name: 'Navigation',
+  components: {
+    MobileNavigation
+  },
   data() {
     return {
       userMenuOpen: false,

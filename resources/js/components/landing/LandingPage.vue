@@ -36,9 +36,103 @@
               </template>
             </div>
           </div>
+          
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button
+              @click="mobileMenuOpen = !mobileMenuOpen"
+              class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Open main menu</span>
+              <!-- Icon when menu is closed -->
+              <svg
+                v-if="!mobileMenuOpen"
+                class="block h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              <!-- Icon when menu is open -->
+              <svg
+                v-else
+                class="block h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
+
+    <!-- Mobile menu for landing page -->
+    <div
+      v-if="mobileMenuOpen"
+      class="md:hidden absolute top-16 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50"
+    >
+      <div class="px-2 pt-2 pb-3 space-y-1">
+        <a
+          href="#features"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+          @click="mobileMenuOpen = false"
+        >
+          Features
+        </a>
+        
+        <a
+          href="#pricing"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+          @click="mobileMenuOpen = false"
+        >
+          Pricing
+        </a>
+        
+        <a
+          href="#contact"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+          @click="mobileMenuOpen = false"
+        >
+          Contact
+        </a>
+        
+        <div class="border-t border-gray-200 pt-4 mt-4">
+          <template v-if="!isAuthenticated">
+            <router-link
+              to="/login"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+              @click="mobileMenuOpen = false"
+            >
+              Login
+            </router-link>
+            
+            <router-link
+              to="/register"
+              class="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md"
+              @click="mobileMenuOpen = false"
+            >
+              Get Started
+            </router-link>
+          </template>
+          <template v-else>
+            <router-link
+              to="/dashboard"
+              class="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md"
+              @click="mobileMenuOpen = false"
+            >
+              Dashboard
+            </router-link>
+          </template>
+        </div>
+      </div>
+    </div>
 
     <!-- Hero Section -->
     <div class="relative overflow-hidden">
@@ -258,6 +352,7 @@ export default {
     const packages = ref([])
     const features = ref([])
     const settings = ref({})
+    const mobileMenuOpen = ref(false)
 
     // Check if user is authenticated
     const isAuthenticated = computed(() => {
@@ -306,13 +401,22 @@ export default {
       const title = settings.value.site_title || 'XpartFone'
       const tagline = settings.value.site_tagline || 'Revolutionary Voice AI Platform'
       updateDocumentTitle(`${title} - ${tagline}`)
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        const mobileMenuButton = document.querySelector('[aria-expanded="false"]')
+        if (mobileMenuButton && !mobileMenuButton.contains(e.target) && !e.target.closest('.mobile-menu')) {
+          mobileMenuOpen.value = false
+        }
+      })
     })
 
     return {
       packages,
       features,
       isAuthenticated,
-      settings
+      settings,
+      mobileMenuOpen
     }
   }
 }

@@ -297,13 +297,7 @@ export default {
           formData.append('profile_picture', this.selectedFile);
         }
         
-        console.log('Sending profile update with data:', {
-          name: this.form.name,
-          phone: this.form.phone,
-          company: this.form.company,
-          bio: this.form.bio,
-          hasFile: !!this.selectedFile
-        });
+
         
         const response = await axios.post('/api/user', formData, {
           headers: {

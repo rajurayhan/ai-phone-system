@@ -481,22 +481,16 @@ export default {
       
       try {
         this.deletingAssistant = assistantId; // Set loading state
-        console.log('Deleting assistant:', assistantId);
         const response = await axios.delete(`/api/assistants/${assistantId}`);
-        
-        console.log('Delete response status:', response.status);
         
         if (response.status === 200) {
             const result = response.data;
-            console.log('Delete successful:', result);
             await this.loadAssistants();
         } else {
           const errorData = response.data;
-          console.error('Failed to delete assistant:', errorData);
           await showError('Delete Failed', errorData.message || 'Failed to delete assistant. Please try again.');
         }
       } catch (error) {
-        console.error('Error deleting assistant:', error);
         await showError('Error', 'Failed to delete assistant: ' + error.message);
       } finally {
         this.deletingAssistant = null; // Reset loading state
