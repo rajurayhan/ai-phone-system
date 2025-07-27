@@ -124,6 +124,14 @@
               </router-link>
               
               <router-link
+                to="/admin/call-logs"
+                class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                @click="mobileMenuOpen = false"
+              >
+                Call Logs
+              </router-link>
+              
+              <router-link
                 to="/admin/system-settings"
                 class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                 @click="mobileMenuOpen = false"

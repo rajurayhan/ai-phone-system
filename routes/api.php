@@ -115,6 +115,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/stats', [App\Http\Controllers\CallLogController::class, 'stats']);
         Route::get('/{callId}', [App\Http\Controllers\CallLogController::class, 'show']);
     });
+    
+
 });
 
 // Admin dashboard routes
@@ -196,6 +198,13 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::post('/', [App\Http\Controllers\FeatureController::class, 'store']);
         Route::put('/{id}', [App\Http\Controllers\FeatureController::class, 'update']);
         Route::delete('/{id}', [App\Http\Controllers\FeatureController::class, 'destroy']);
+    });
+    
+    // Admin call logs routes
+    Route::prefix('admin/call-logs')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\CallLogController::class, 'index']);
+        Route::get('/stats', [App\Http\Controllers\Admin\CallLogController::class, 'stats']);
+        Route::get('/{callId}', [App\Http\Controllers\Admin\CallLogController::class, 'show']);
     });
     
     // Admin users routes
