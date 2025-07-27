@@ -238,7 +238,11 @@
                       type="text"
                       placeholder="Area Code (e.g., 212)"
                       maxlength="3"
-                      class="text-xs px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      :disabled="!isAreaCodeSupported"
+                      :class="[
+                        'text-xs px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500',
+                        isAreaCodeSupported ? 'border-gray-300' : 'border-gray-200 bg-gray-100'
+                      ]"
                     />
                     <button
                       @click="loadAvailableNumbers"
@@ -254,14 +258,22 @@
                 <!-- Country Info -->
                 <div v-if="form.metadata.country" class="mb-3 p-2 bg-blue-100 rounded text-xs">
                   <span class="font-medium">Searching in:</span> {{ form.metadata.country }}
-                  <span v-if="areaCode" class="ml-2">
+                  <span v-if="areaCode && isAreaCodeSupported" class="ml-2">
                     <span class="font-medium">Area Code:</span> {{ areaCode }}
+                  </span>
+                  <span v-else-if="areaCode && !isAreaCodeSupported" class="ml-2 text-yellow-700">
+                    <span class="font-medium">⚠️ Area codes not supported for {{ form.metadata.country }}</span>
                   </span>
                 </div>
                 
                 <!-- Country Warning -->
                 <div v-else class="mb-3 p-2 bg-yellow-100 rounded text-xs text-yellow-800">
                   <span class="font-medium">⚠️ Please select a country above to search for available phone numbers.</span>
+                </div>
+                
+                <!-- Area Code Support Info -->
+                <div v-if="form.metadata.country && !isAreaCodeSupported" class="mb-3 p-2 bg-yellow-100 rounded text-xs text-yellow-800">
+                  <span class="font-medium">ℹ️ Note:</span> Area codes are only supported for United States and Canada. For other countries, all available numbers in the country will be shown.
                 </div>
                 
                 <!-- Available Numbers List -->
@@ -791,6 +803,11 @@ You embody the highest standards of customer service that {{company_name}} would
       }
     }
 
+    // Computed property to check if area code is supported for the selected country
+    const isAreaCodeSupported = computed(() => {
+      return form.value.metadata.country === 'United States' || form.value.metadata.country === 'Canada'
+    })
+
     // Watch for type changes to handle template loading
     watch(() => form.value.type, (newType) => {
       if (newType === 'demo' && templates.value.system_prompt) {
@@ -1292,34 +1309,6 @@ You embody the highest standards of customer service that {{company_name}} would
       }
     }
 
-
-
-    // Watch for type changes to handle template loading
-    watch(() => form.value.type, (newType) => {
-      if (newType === 'demo' && templates.value.system_prompt) {
-        // Auto-load templates for demo assistants
-        loadDefaultTemplate()
-        loadDefaultFirstMessage()
-        loadDefaultEndCallMessage()
-      }
-    })
-
-    // Watch for company information changes to update templated data
-    watch([() => form.value.metadata.company_name, () => form.value.metadata.industry, () => form.value.metadata.services_products], () => {
-      updateTemplatedData()
-    }, { deep: true })
-
-    // Watch for company name changes to auto-populate agent name
-    watch(() => form.value.metadata.company_name, (newCompanyName) => {
-      if (newCompanyName && newCompanyName.trim()) {
-        // Auto-populate agent name based on company name for both create and edit
-        form.value.name = `${newCompanyName.trim()} Assistant`
-      } else if (!newCompanyName || !newCompanyName.trim()) {
-        // Clear agent name if company name is empty
-        form.value.name = ''
-      }
-    })
-
     onMounted(async () => {
       await loadTemplates() // Load templates first
       await loadAssistant()
@@ -1359,7 +1348,8 @@ You embody the highest standards of customer service that {{company_name}} would
       replaceWithTemplate,
       replaceWithActual,
       actualVapiData,
-      templatedData
+      templatedData,
+      isAreaCodeSupported
     }
   }
 }

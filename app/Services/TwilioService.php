@@ -31,8 +31,8 @@ class TwilioService
                 'smsEnabled' => true
             ];
             
-            // Add area code filter if provided
-            if ($areaCode) {
+            // Add area code filter only for US and Canada (where area codes are applicable)
+            if ($areaCode && in_array($countryCode, ['US', 'CA'])) {
                 $params['areaCode'] = $areaCode;
             }
             
@@ -54,7 +54,7 @@ class TwilioService
                 ];
             }
 
-            Log::info('Twilio Get Available Numbers Success: ' . count($formattedNumbers) . ' numbers found');
+            Log::info('Twilio Get Available Numbers Success: ' . count($formattedNumbers) . ' numbers found for country: ' . $countryCode);
             return [
                 'success' => true,
                 'data' => $formattedNumbers
@@ -247,16 +247,25 @@ class TwilioService
     }
 
     /**
-     * Format phone number to E.164 format
+     * Format phone number to E.164 format with country-specific handling
      */
-    private function formatPhoneNumber($phoneNumber)
+    private function formatPhoneNumber($phoneNumber, $countryCode = 'US')
     {
         // Remove all non-digit characters except +
         $phoneNumber = preg_replace('/[^0-9+]/', '', $phoneNumber);
         
-        // If it doesn't start with +, assume it's a US number
+        // If it doesn't start with +, add country code
         if (!str_starts_with($phoneNumber, '+')) {
-            $phoneNumber = '+1' . $phoneNumber;
+            $countryPrefixes = [
+                'US' => '+1',
+                'CA' => '+1',
+                'GB' => '+44',
+                'AU' => '+61',
+                'NZ' => '+64',
+                'IE' => '+353'
+            ];
+            
+            $phoneNumber = ($countryPrefixes[$countryCode] ?? '+1') . $phoneNumber;
         }
         
         return $phoneNumber;
