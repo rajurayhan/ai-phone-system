@@ -48,13 +48,13 @@
               <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                 <div class="rounded-md shadow">
                   <router-link to="/register" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:py-4 md:text-lg md:px-10">
-                    Start Free Trial
+                    Get Started
                   </router-link>
                 </div>
                 <div class="mt-3 sm:mt-0 sm:ml-3">
-                  <a href="#demo" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 md:py-4 md:text-lg md:px-10">
-                    Watch Demo
-                  </a>
+                  <router-link to="/demo-request" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 md:py-4 md:text-lg md:px-10">
+                    Request Demo
+                  </router-link>
                 </div>
               </div>
             </div>
@@ -161,14 +161,19 @@
       <div class="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
           <span class="block">Ready to get started?</span>
-          <span class="block">Start your free trial today.</span>
+          <span class="block">Transform your business today.</span>
         </h2>
         <p class="mt-4 text-lg leading-6 text-primary-200">
           Join thousands of businesses already using our voice AI platform.
         </p>
-        <router-link to="/register" class="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 sm:w-auto">
-          Sign up for free
-        </router-link>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <router-link to="/register" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50">
+            Sign up now
+          </router-link>
+          <router-link to="/demo-request" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-primary-600">
+            Request Demo
+          </router-link>
+        </div>
       </div>
     </div>
 

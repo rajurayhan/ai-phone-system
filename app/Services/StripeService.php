@@ -74,7 +74,6 @@ class StripeService
                         ],
                     ],
                 ],
-                'trial_period_days' => config('stripe.subscription.trial_period_days'),
                 'metadata' => [
                     'user_id' => $user->id,
                     'package_id' => $package->id,

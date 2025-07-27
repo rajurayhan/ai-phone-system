@@ -236,3 +236,15 @@ Route::get('/twilio/diagnostics', function () {
         'message' => 'Twilio diagnostics completed'
     ]);
 })->middleware('auth:sanctum');
+
+// Demo request routes
+Route::post('/demo-request', [App\Http\Controllers\DemoRequestController::class, 'store']);
+
+// Admin demo request routes
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/demo-requests', [App\Http\Controllers\DemoRequestController::class, 'adminIndex']);
+    Route::get('/demo-requests/stats', [App\Http\Controllers\DemoRequestController::class, 'adminStats']);
+    Route::get('/demo-requests/{demoRequest}', [App\Http\Controllers\DemoRequestController::class, 'show']);
+    Route::patch('/demo-requests/{demoRequest}/status', [App\Http\Controllers\DemoRequestController::class, 'updateStatus']);
+    Route::delete('/demo-requests/{demoRequest}', [App\Http\Controllers\DemoRequestController::class, 'destroy']);
+});

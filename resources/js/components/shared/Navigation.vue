@@ -64,6 +64,18 @@
               All Assistants
             </router-link>
             <router-link 
+              v-if="isAdmin"
+              to="/admin/demo-requests" 
+              :class="[
+                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                $route.path.startsWith('/admin/demo-requests') 
+                  ? 'border-green-500 text-green-600' 
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              ]"
+            >
+              Demo Requests
+            </router-link>
+            <router-link 
               v-if="!isAdmin"
               to="/subscription" 
               :class="[

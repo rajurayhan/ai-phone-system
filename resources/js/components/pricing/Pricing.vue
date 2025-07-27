@@ -84,6 +84,13 @@
               >
                 {{ pkg.price <= (currentSubscription?.package?.price || 0) ? 'Current Plan' : 'Lower Tier' }}
               </button>
+              <router-link 
+                v-if="!isAuthenticated"
+                to="/demo-request"
+                class="w-full inline-flex justify-center items-center px-6 py-3 mt-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              >
+                Request Demo
+              </router-link>
             </div>
           </div>
         </div>

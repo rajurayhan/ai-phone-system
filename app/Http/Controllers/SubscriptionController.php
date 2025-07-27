@@ -67,20 +67,19 @@ class SubscriptionController extends Controller
             ], 400);
         }
 
-        // Create subscription (for now, we'll create a trial subscription)
+        // Create subscription (no trial period)
         $subscription = UserSubscription::create([
             'user_id' => $user->id,
             'subscription_package_id' => $package->id,
-            'status' => 'trial',
-            'trial_ends_at' => Carbon::now()->addDays(14), // 14-day trial
+            'status' => 'active',
             'current_period_start' => Carbon::now(),
-            'current_period_end' => Carbon::now()->addDays(14),
+            'current_period_end' => Carbon::now()->addMonth(),
         ]);
 
         return response()->json([
             'success' => true,
             'data' => $subscription->load('package'),
-            'message' => 'Subscription created successfully. You are now on a 14-day trial.'
+            'message' => 'Subscription created successfully.'
         ], 201);
     }
 

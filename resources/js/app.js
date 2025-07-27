@@ -23,6 +23,8 @@ import SubscriptionManager from './components/subscription/SubscriptionManager.v
 import TransactionHistory from './components/transactions/TransactionHistory.vue';
 import PaymentForm from './components/transactions/PaymentForm.vue';
 import TransactionManagement from './components/admin/TransactionManagement.vue';
+import DemoRequestForm from './components/demo/DemoRequestForm.vue'
+import DemoRequests from './components/admin/DemoRequests.vue'
 
 // Create router
 const router = createRouter({
@@ -106,6 +108,12 @@ const router = createRouter({
             meta: { requiresAuth: true, requiresAdmin: true }
         },
         {
+            path: '/admin/demo-requests',
+            name: 'admin-demo-requests',
+            component: DemoRequests,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
             path: '/assistants',
             name: 'user-assistants',
             component: UserAssistants,
@@ -144,6 +152,12 @@ const router = createRouter({
             path: '/payment',
             name: 'payment',
             component: PaymentForm,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/demo-request',
+            name: 'demo-request',
+            component: DemoRequestForm,
             meta: { requiresAuth: true }
         }
     ]

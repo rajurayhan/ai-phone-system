@@ -57,7 +57,6 @@ return [
     |
     */
     'subscription' => [
-        'trial_period_days' => env('STRIPE_TRIAL_PERIOD_DAYS', 14),
         'proration_behavior' => env('STRIPE_PRORATION_BEHAVIOR', 'create_prorations'),
         'collection_method' => env('STRIPE_COLLECTION_METHOD', 'charge_automatically'),
     ],

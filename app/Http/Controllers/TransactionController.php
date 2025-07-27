@@ -338,7 +338,6 @@ class TransactionController extends Controller
             'status' => $stripeResult['status'],
             'current_period_start' => $stripeResult['current_period_start'],
             'current_period_end' => $stripeResult['current_period_end'],
-            'trial_ends_at' => $stripeResult['trial_end'],
             'stripe_subscription_id' => $stripeResult['subscription_id'],
             'stripe_customer_id' => $stripeResult['customer_id'],
             'created_by' => $user->id,
@@ -367,9 +366,8 @@ class TransactionController extends Controller
 
         // Create new subscription
         $package = $transaction->package;
-        $trialDays = 14; // 14-day trial
         $currentPeriodStart = Carbon::now();
-        $currentPeriodEnd = Carbon::now()->addDays($trialDays);
+        $currentPeriodEnd = Carbon::now()->addMonth();
 
         $subscription = UserSubscription::create([
             'user_id' => $user->id,
@@ -377,7 +375,6 @@ class TransactionController extends Controller
             'status' => 'active',
             'current_period_start' => $currentPeriodStart,
             'current_period_end' => $currentPeriodEnd,
-            'trial_ends_at' => $currentPeriodEnd,
             'created_by' => $user->id,
         ]);
 
@@ -405,9 +402,8 @@ class TransactionController extends Controller
 
         // Create new pending subscription
         $package = $transaction->package;
-        $trialDays = 14; // 14-day trial
         $currentPeriodStart = Carbon::now();
-        $currentPeriodEnd = Carbon::now()->addDays($trialDays);
+        $currentPeriodEnd = Carbon::now()->addMonth();
 
         $subscription = UserSubscription::create([
             'user_id' => $user->id,
@@ -415,7 +411,6 @@ class TransactionController extends Controller
             'status' => 'pending', // Set status to pending
             'current_period_start' => $currentPeriodStart,
             'current_period_end' => $currentPeriodEnd,
-            'trial_ends_at' => $currentPeriodEnd,
             'created_by' => $user->id,
         ]);
 
