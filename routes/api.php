@@ -21,6 +21,9 @@ use App\Http\Controllers\SubscriptionController;
 Route::get('/features', [App\Http\Controllers\FeatureController::class, 'index']);
 Route::get('/subscriptions/packages', [SubscriptionController::class, 'getPackages']);
 
+// Contact routes
+Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store']);
+
 // Stripe webhook route (no auth required)
 Route::post('/stripe/webhook', [App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
 
@@ -59,6 +62,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     
     // Get users for assistant assignment
     Route::get('/admin/users/for-assignment', [UserController::class, 'getUsersForAssignment']);
+    
+    // Contact management routes
+    Route::get('/admin/contacts', [App\Http\Controllers\ContactController::class, 'index']);
+    Route::get('/admin/contacts/{id}', [App\Http\Controllers\ContactController::class, 'show']);
+    Route::put('/admin/contacts/{id}/status', [App\Http\Controllers\ContactController::class, 'updateStatus']);
 });
 
 // Assistant routes (protected)

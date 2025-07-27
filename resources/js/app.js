@@ -31,6 +31,7 @@ import DemoRequests from './components/admin/DemoRequests.vue'
 import SystemSettings from './components/admin/SystemSettings.vue'
 import CallLogsPage from './components/call-logs/CallLogsPage.vue'
 import AdminCallLogs from './components/admin/CallLogs.vue'
+import ContactManagement from './components/admin/ContactManagement.vue'
 
 // Set initial document title
 updateDocumentTitle('XpartFone - Revolutionary Voice AI Platform')
@@ -197,6 +198,12 @@ const router = createRouter({
             path: '/admin/call-logs',
             name: 'admin-call-logs',
             component: AdminCallLogs,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/contacts',
+            name: 'admin-contacts',
+            component: ContactManagement,
             meta: { requiresAuth: true, requiresAdmin: true }
         }
     ]
