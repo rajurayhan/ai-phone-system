@@ -377,14 +377,12 @@ export default {
       try {
         loading.value = true
         const token = localStorage.getItem('token')
-        console.log('Token exists:', !!token)
         
         const params = {
           page,
           ...filters.value
         }
         
-        console.log('Loading demo requests with params:', params)
         const response = await axios.get('/api/admin/demo-requests', { 
           params,
           headers: {
@@ -392,7 +390,6 @@ export default {
             'Accept': 'application/json'
           }
         })
-        console.log('Demo requests response:', response.data)
         
         // Check if response has the expected structure
         if (response.data.success && response.data.data) {
@@ -414,9 +411,7 @@ export default {
 
     const loadStats = async () => {
       try {
-        console.log('Loading stats...')
         const token = localStorage.getItem('token')
-        console.log('Token exists:', !!token)
         
         const response = await axios.get('/api/admin/demo-requests/stats', {
           headers: {
@@ -425,12 +420,9 @@ export default {
           }
         })
         
-        console.log('Stats API response:', response.data)
-        
         if (response.data.success && response.data.data) {
           stats.value = response.data.data
         } else {
-          console.log('Stats response structure unexpected:', response.data)
           stats.value = {
             total: 0,
             pending: 0,
@@ -509,9 +501,6 @@ export default {
     }
 
     onMounted(() => {
-      console.log('DemoRequests component mounted')
-      console.log('User from localStorage:', JSON.parse(localStorage.getItem('user') || '{}'))
-      console.log('Token exists:', !!localStorage.getItem('token'))
       loadDemoRequests()
       loadStats()
     })

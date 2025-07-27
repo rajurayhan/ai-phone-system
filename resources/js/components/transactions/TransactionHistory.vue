@@ -302,7 +302,6 @@ export default {
             'Content-Type': 'application/json'
           }
         })
-        console.log('Transactions response:', response.data) // Added for debugging
         this.transactions = response.data.data.data || []
         this.summary = response.data.summary || {}
         this.pagination = response.data.data

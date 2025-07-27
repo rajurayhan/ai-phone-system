@@ -367,7 +367,6 @@ export default {
 
     viewSubscription(subscription) {
       // TODO: Implement subscription detail view
-      console.log('View subscription:', subscription)
     }
   }
 }

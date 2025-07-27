@@ -277,7 +277,6 @@ export default {
         if (response.ok) {
           const data = await response.json();
           this.stats = data.data;
-          console.log('Admin stats loaded successfully');
         } else {
           console.error('Failed to load admin stats');
         }
@@ -298,7 +297,6 @@ export default {
         if (response.ok) {
           const data = await response.json();
           this.recentActivity = data.data;
-          console.log('Admin activity loaded successfully');
         } else {
           console.error('Failed to load admin activity');
         }
