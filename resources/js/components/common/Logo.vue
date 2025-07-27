@@ -1,20 +1,41 @@
 <template>
   <div class="flex items-center">
     <div class="flex-shrink-0">
-      <div class="h-8 w-8 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
+      <div v-if="settings.logo_url" class="h-8 w-auto">
+        <img :src="settings.logo_url" :alt="settings.site_title" class="h-full w-auto">
+      </div>
+      <div v-else class="h-8 w-8 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
         <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
         </svg>
       </div>
     </div>
     <div class="ml-2">
-      <h1 class="text-xl font-bold text-gray-900">Hive AI Voice Agent</h1>
+                      <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
     </div>
   </div>
 </template>
 
 <script>
+import { getSystemSettings } from '../../utils/systemSettings.js'
+
 export default {
-  name: 'Logo'
+  name: 'Logo',
+  data() {
+    return {
+      settings: {
+        site_title: 'XpartFone',
+        logo_url: '/logo.png'
+      }
+    }
+  },
+  async created() {
+    try {
+      const settings = await getSystemSettings()
+      this.settings = settings
+    } catch (error) {
+      console.error('Error loading system settings:', error)
+    }
+  }
 }
 </script> 

@@ -1,4 +1,4 @@
-# VoiceAI - AI Voice Agent Platform
+# XpartFone - AI Voice Agent Platform
 
 A modern Laravel SPA application for managing AI voice agents, built with Vue.js and Tailwind CSS. This application is designed to be integrated with Vapi.ai for voice agent functionality.
 
@@ -78,7 +78,7 @@ A modern Laravel SPA application for managing AI voice agents, built with Vue.js
    ```
 
 ### Default Admin Account
-- **Email**: admin@voiceai.com
+- **Email**: admin@xpartfone.com
 - **Password**: password
 
 ## Application Structure

@@ -16,11 +16,11 @@ class AdminUserSeeder extends Seeder
     {
         User::create([
             'name' => 'Admin User',
-            'email' => 'admin@voiceai.com',
+            'email' => 'admin@xpartfone.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
-            'status' => 'active',
-            'company' => 'Voice AI',
+            'email_verified_at' => now(),
+            'company' => 'XpartFone',
             'bio' => 'System Administrator',
         ]);
     }

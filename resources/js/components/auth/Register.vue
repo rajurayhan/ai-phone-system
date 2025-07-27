@@ -4,13 +4,20 @@
       <div>
         <div class="flex justify-center mb-6">
           <router-link to="/" class="flex items-center hover:opacity-80 transition-opacity duration-200">
-            <div class="h-12 w-12 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
-              <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <h1 class="text-2xl font-bold text-gray-900">Hive AI Voice Agent</h1>
+            <div class="flex-shrink-0 flex items-center justify-center">
+              <div class="flex items-center">
+                <div v-if="settings.logo_url" class="h-8 w-auto">
+                  <img :src="settings.logo_url" :alt="settings.site_title" class="h-full w-auto">
+                </div>
+                <div v-else class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center">
+                  <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                </div>
+                <div class="ml-2">
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
+                </div>
+              </div>
             </div>
           </router-link>
         </div>
@@ -139,7 +146,9 @@
 </template>
 
 <script>
+import axios from 'axios'
 import { showError, showSuccess } from '../../utils/sweetalert.js'
+import { updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
   name: 'Register',
@@ -154,7 +163,25 @@ export default {
       },
       errors: {},
       loading: false,
-      error: ''
+      error: '',
+      settings: {
+        site_title: 'XpartFone',
+        logo_url: '/logo.png'
+      }
+    }
+  },
+  async created() {
+    try {
+      const response = await axios.get('/api/public-settings')
+      this.settings = response.data.data
+      await updateDocumentTitle('Register')
+    } catch (error) {
+      console.error('Error fetching site settings:', error)
+      // Set default values if API fails
+      this.settings = {
+        site_title: 'XpartFone',
+        logo_url: '/logo.png'
+      }
     }
   },
   methods: {

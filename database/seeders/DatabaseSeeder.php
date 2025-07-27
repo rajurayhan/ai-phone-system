@@ -27,6 +27,11 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
         ]);
 
+        // Create features
+        $this->call([
+            FeatureSeeder::class,
+        ]);
+
         // Create admin user
         $adminUser = User::create([
             'name' => 'Admin User',

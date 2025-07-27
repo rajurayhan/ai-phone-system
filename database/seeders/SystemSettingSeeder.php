@@ -16,11 +16,11 @@ class SystemSettingSeeder extends Seeder
         $settings = [
             [
                 'key' => 'site_title',
-                'value' => 'Hive AI Voice Agent',
+                'value' => 'XpartFone',
                 'type' => 'text',
                 'group' => 'general',
                 'label' => 'Site Title',
-                'description' => 'The main title of your website',
+                'description' => 'The main title of your website'
             ],
             [
                 'key' => 'site_tagline',
@@ -28,7 +28,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'text',
                 'group' => 'general',
                 'label' => 'Site Tagline',
-                'description' => 'A short description or tagline for your site',
+                'description' => 'A short description or tagline for your site'
             ],
             [
                 'key' => 'meta_description',
@@ -36,15 +36,15 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'textarea',
                 'group' => 'seo',
                 'label' => 'Meta Description',
-                'description' => 'Description for search engines (SEO)',
+                'description' => 'Description for search engines (SEO)'
             ],
             [
                 'key' => 'logo_url',
-                'value' => null,
+                'value' => '/logo.png',
                 'type' => 'image',
                 'group' => 'appearance',
                 'label' => 'Site Logo',
-                'description' => 'Upload your site logo (recommended: 200x60px)',
+                'description' => 'Upload your site logo (recommended: 200x60px)'
             ],
             [
                 'key' => 'homepage_banner',
@@ -52,15 +52,12 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'image',
                 'group' => 'appearance',
                 'label' => 'Homepage Banner',
-                'description' => 'Banner image for the homepage (recommended: 1200x400px)',
-            ],
+                'description' => 'Banner image for the homepage (recommended: 1200x400px)'
+            ]
         ];
 
         foreach ($settings as $setting) {
-            SystemSetting::updateOrCreate(
-                ['key' => $setting['key']],
-                $setting
-            );
+            SystemSetting::updateOrCreate(['key' => $setting['key']], $setting);
         }
     }
 }

@@ -1,6 +1,7 @@
 import './bootstrap';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
+import { updateDocumentTitle } from './utils/systemSettings.js'
 import App from './App.vue';
 
 // Import components
@@ -26,6 +27,9 @@ import TransactionManagement from './components/admin/TransactionManagement.vue'
 import DemoRequestForm from './components/demo/DemoRequestForm.vue'
 import DemoRequests from './components/admin/DemoRequests.vue'
 import SystemSettings from './components/admin/SystemSettings.vue'
+
+// Set initial document title
+updateDocumentTitle()
 
 // Create router
 const router = createRouter({

@@ -13,7 +13,7 @@
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">Hive AI Voice Agent</h1>
+                  <h1 class="text-xl font-bold text-gray-900">XpartFone</h1>
                 </div>
               </router-link>
             </div>
@@ -33,9 +33,13 @@
     <div class="py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="text-center mb-12">
-          <h1 class="text-4xl font-bold text-gray-900 mb-4">Voice Agent Pricing</h1>
-          <p class="text-xl text-gray-600">Choose the perfect plan for your voice agent needs</p>
+        <div class="text-center">
+          <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+                         {{ settings.site_title || 'XpartFone' }} Pricing
+          </h1>
+          <p class="mt-4 text-xl text-gray-600">
+            {{ settings.site_tagline || 'Choose the perfect plan for your business needs' }}
+          </p>
         </div>
 
         <!-- Pricing Cards -->
@@ -196,8 +200,9 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
+import { updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
   name: 'Pricing',
@@ -205,6 +210,7 @@ export default {
     const currentSubscription = ref(null)
     const packages = ref([])
     const isAuthenticated = ref(false)
+    const settings = ref({})
 
     const checkAuthStatus = () => {
       const token = localStorage.getItem('token')
@@ -235,6 +241,20 @@ export default {
       }
     }
 
+    const loadSettings = async () => {
+      try {
+        const response = await axios.get('/api/public-settings')
+        settings.value = response.data.data
+      } catch (error) {
+        console.error('Error loading settings:', error)
+        // Set default values if API fails
+        settings.value = {
+          site_title: 'XpartFone',
+          site_tagline: 'Choose the perfect plan for your business needs'
+        }
+      }
+    }
+
     const isPackageDisabled = (pkg) => {
       // If user is not authenticated, all packages are available
       if (!isAuthenticated.value) return false
@@ -253,13 +273,16 @@ export default {
       checkAuthStatus()
       loadCurrentSubscription()
       loadPackages()
+      loadSettings()
+      updateDocumentTitle('Pricing')
     })
 
     return {
       currentSubscription,
       packages,
       isAuthenticated,
-      isPackageDisabled
+      isPackageDisabled,
+      settings
     }
   }
 }

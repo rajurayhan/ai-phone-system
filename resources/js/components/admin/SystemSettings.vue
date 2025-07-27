@@ -149,6 +149,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import Navigation from '../shared/Navigation.vue'
 import { showSuccess, showError } from '../../utils/sweetalert.js'
+import { clearSettingsCache, updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
   name: 'SystemSettings',
@@ -198,6 +199,10 @@ export default {
         })
 
         if (response.data.success) {
+          // Clear cache so new settings are loaded
+          clearSettingsCache()
+          // Update document title
+          await updateDocumentTitle()
           showSuccess('Settings Saved', 'System settings updated successfully')
         }
       } catch (error) {

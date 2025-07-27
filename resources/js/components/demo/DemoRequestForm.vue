@@ -7,13 +7,16 @@
           <div class="flex">
             <div class="flex-shrink-0 flex items-center">
               <router-link to="/" class="flex items-center hover:opacity-80 transition-opacity">
-                <div class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center">
+                <div v-if="settings.logo_url" class="h-8 w-auto">
+                  <img :src="settings.logo_url" :alt="settings.site_title" class="h-full w-auto">
+                </div>
+                <div v-else class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center">
                   <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">Hive AI Voice Agent</h1>
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
                 </div>
               </router-link>
             </div>
@@ -43,7 +46,7 @@
         <div class="text-center mb-8">
           <h1 class="text-3xl font-bold text-gray-900 mb-4">Request a Demo</h1>
           <p class="text-lg text-gray-600">
-            Experience the power of our voice AI platform firsthand. 
+            Experience the power of our XpartFone platform firsthand.
             Our team will schedule a personalized demo tailored to your business needs.
           </p>
         </div>
@@ -296,7 +299,7 @@
                       placeholder="Describe your services or products"
                     ></textarea>
                     <p class="text-xs text-gray-500 mt-1">
-                      Tell us about your business and how you think voice AI could help
+                      Tell us about your business and how you think XpartFone could help
                     </p>
                   </div>
                 </div>
@@ -363,7 +366,7 @@
               </div>
               <div class="ml-4">
                 <h4 class="text-sm font-medium text-gray-900">Live Demo</h4>
-                <p class="text-sm text-gray-600 mt-1">See our voice AI platform in action with real examples</p>
+                <p class="text-sm text-gray-600 mt-1">See our XpartFone platform in action with real examples</p>
               </div>
             </div>
             <div class="flex items-start">
@@ -390,6 +393,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showSuccess, showError } from '../../utils/sweetalert.js'
+import axios from 'axios'
+import { updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
   name: 'DemoRequestForm',
@@ -399,11 +404,29 @@ export default {
     const checking = ref(true)
     const hasRequestedDemo = ref(false)
     const existingRequest = ref(null)
+    const settings = ref({
+                site_title: 'XpartFone',
+      logo_url: null
+    })
     
     // Check if user is authenticated
     const isAuthenticated = computed(() => {
       return localStorage.getItem('token') !== null
     })
+
+    const loadSettings = async () => {
+      try {
+        const response = await axios.get('/api/public-settings')
+        settings.value = response.data.data
+      } catch (error) {
+        console.error('Error loading settings:', error)
+        // Set default values if API fails
+        settings.value = {
+          site_title: 'XpartFone',
+          logo_url: '/logo.png'
+        }
+      }
+    }
     
     const form = ref({
       name: '',
@@ -506,7 +529,9 @@ export default {
     }
 
     onMounted(() => {
+      loadSettings()
       checkExistingDemoRequest()
+      updateDocumentTitle('Request a Demo')
     })
 
     return {
@@ -517,7 +542,8 @@ export default {
       existingRequest,
       isAuthenticated,
       submitDemoRequest,
-      formatDate
+      formatDate,
+      settings
     }
   }
 }

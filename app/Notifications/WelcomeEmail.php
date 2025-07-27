@@ -40,9 +40,9 @@ class WelcomeEmail extends Notification
         $verificationUrl = config('app.url') . '/api/verify-email/' . $hash . '?t=' . $timestamp;
 
         return (new MailMessage)
-            ->subject('Welcome to Hive AI Voice Agent!')
-            ->greeting('Hello ' . $notifiable->name . '!')
-            ->line('Welcome to Hive AI Voice Agent! We\'re excited to have you on board.')
+            ->subject('Welcome to XpartFone!')
+            ->greeting('Hello!')
+            ->line('Welcome to XpartFone! We\'re excited to have you on board.')
             ->line('To get started with your voice agent platform, please verify your email address by clicking the button below.')
             ->action('Verify Email Address', $verificationUrl)
             ->line('This verification link will expire in 60 minutes.')

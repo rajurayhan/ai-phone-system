@@ -81,7 +81,7 @@ class SystemSettingController extends Controller
     public function getPublicSettings(): JsonResponse
     {
         $settings = [
-            'site_title' => SystemSetting::getValue('site_title', 'Hive AI Voice Agent'),
+            'site_title' => SystemSetting::getValue('site_title', 'XpartFone'),
             'site_tagline' => SystemSetting::getValue('site_tagline', 'Revolutionary Voice AI Platform'),
             'meta_description' => SystemSetting::getValue('meta_description', 'Transform your business with cutting-edge voice AI technology'),
             'logo_url' => SystemSetting::getValue('logo_url'),

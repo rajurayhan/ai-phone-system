@@ -7,13 +7,16 @@
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <div class="flex items-center">
-                <div class="h-8 w-8 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
+                <div v-if="settings.logo_url" class="h-8 w-auto">
+                  <img :src="settings.logo_url" :alt="settings.site_title" class="h-full w-auto">
+                </div>
+                <div v-else class="h-8 w-8 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
                   <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">Hive AI Voice Agent</h1>
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
                 </div>
               </div>
             </div>
@@ -44,12 +47,12 @@
           <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
             <div class="sm:text-center lg:text-left">
               <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                <span class="block xl:inline">Revolutionary</span>
-                <span class="block text-primary-600 xl:inline">Voice AI</span>
+                <span class="block xl:inline">{{ settings.site_title || 'Revolutionary' }}</span>
+                <span class="block text-primary-600 xl:inline">XpartFone</span>
                 <span class="block xl:inline">Platform</span>
               </h1>
               <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                Transform your business with cutting-edge voice AI technology. Create intelligent voice agents that understand, respond, and engage with your customers 24/7.
+                {{ settings.site_tagline || 'Transform your business with cutting-edge voice AI technology. Create intelligent voice agents that understand, respond, and engage with your customers 24/7.' }}
               </p>
               <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                 <div class="rounded-md shadow">
@@ -81,7 +84,7 @@
         <div class="lg:text-center">
           <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">Features</h2>
           <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Everything you need for voice AI
+            Everything you need for XpartFone
           </p>
           <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
             Our platform provides all the tools you need to create, deploy, and manage intelligent voice agents.
@@ -173,7 +176,7 @@
           <span class="block">Transform your business today.</span>
         </h2>
         <p class="mt-4 text-lg leading-6 text-primary-200">
-          Join thousands of businesses already using our voice AI platform.
+          Join thousands of businesses already using our XpartFone platform.
         </p>
         <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           <router-link v-if="!isAuthenticated" to="/register" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50">
@@ -195,13 +198,16 @@
         <div class="xl:grid xl:grid-cols-3 xl:gap-8">
           <div class="space-y-8 xl:col-span-1">
             <div class="flex items-center">
-              <div class="h-8 w-8 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <div v-if="settings.logo_url" class="h-8 w-auto">
+                <img :src="settings.logo_url" :alt="settings.site_title" class="h-full w-auto">
+              </div>
+              <div v-else class="h-8 w-8 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
                 <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
               </div>
               <div class="ml-2">
-                <h3 class="text-xl font-bold text-white">Hive AI Voice Agent</h3>
+                <h3 class="text-xl font-bold text-white">{{ settings.site_title || 'XpartFone' }}</h3>
               </div>
             </div>
             <p class="text-gray-300 text-base">
@@ -231,7 +237,7 @@
         </div>
         <div class="mt-12 border-t border-gray-700 pt-8">
           <p class="text-base text-gray-400 xl:text-center">
-            &copy; 2024 VoiceAI. All rights reserved.
+            &copy; 2024 XpartFone. All rights reserved.
           </p>
         </div>
       </div>
@@ -242,12 +248,14 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
+import { updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
   name: 'LandingPage',
   setup() {
     const packages = ref([])
     const features = ref([])
+    const settings = ref({})
 
     // Check if user is authenticated
     const isAuthenticated = computed(() => {
@@ -272,15 +280,34 @@ export default {
       }
     }
 
+    const loadSettings = async () => {
+      try {
+        const response = await axios.get('/api/public-settings')
+        settings.value = response.data.data
+      } catch (error) {
+        console.error('Error loading settings:', error)
+        // Set default values if API fails
+        settings.value = {
+          site_title: 'XpartFone',
+          site_tagline: 'Revolutionary Voice AI Platform',
+          logo_url: '/logo.png',
+          homepage_banner: null
+        }
+      }
+    }
+
     onMounted(() => {
       loadPackages()
       loadFeatures()
+      loadSettings()
+                  updateDocumentTitle(settings.value.site_title || 'XpartFone')
     })
 
     return {
       packages,
       features,
-      isAuthenticated
+      isAuthenticated,
+      settings
     }
   }
 }

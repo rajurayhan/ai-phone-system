@@ -12,7 +12,7 @@
               Admin Dashboard
             </h2>
             <p class="mt-1 text-sm text-gray-500">
-              Manage your voice AI platform
+              Manage your XpartFone platform
             </p>
           </div>
         </div>
