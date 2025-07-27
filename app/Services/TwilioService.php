@@ -25,6 +25,7 @@ class TwilioService
     public function getAvailableNumbers($countryCode = 'US', $limit = 10, $areaCode = null)
     {
         try {
+            // First try: Local numbers with voice and SMS
             $params = [
                 'limit' => $limit,
                 'voiceEnabled' => true,
@@ -39,6 +40,30 @@ class TwilioService
             $availableNumbers = $this->client->availablePhoneNumbers($countryCode)
                 ->local
                 ->read($params);
+
+            // If no local numbers found, try without voice/SMS requirements
+            if (empty($availableNumbers)) {
+                Log::info('No local numbers with voice+SMS found, trying without restrictions');
+                
+                $params = ['limit' => $limit];
+                if ($areaCode && in_array($countryCode, ['US', 'CA'])) {
+                    $params['areaCode'] = $areaCode;
+                }
+                
+                $availableNumbers = $this->client->availablePhoneNumbers($countryCode)
+                    ->local
+                    ->read($params);
+            }
+
+            // If still no local numbers, try toll-free numbers
+            if (empty($availableNumbers)) {
+                Log::info('No local numbers found, trying toll-free numbers');
+                
+                $params = ['limit' => $limit];
+                $availableNumbers = $this->client->availablePhoneNumbers($countryCode)
+                    ->tollFree
+                    ->read($params);
+            }
 
             $formattedNumbers = [];
             foreach ($availableNumbers as $number) {
@@ -269,5 +294,147 @@ class TwilioService
         }
         
         return $phoneNumber;
+    }
+
+    /**
+     * Run comprehensive diagnostics to identify API issues
+     */
+    public function runDiagnostics()
+    {
+        $results = [];
+        
+        // Test 1: Check credentials
+        $results['credentials'] = !empty($this->accountSid) && !empty($this->authToken);
+        Log::info('Credentials Check: ' . ($results['credentials'] ? 'PASS' : 'FAIL'));
+        
+        // Test 2: Test API connection
+        $results['api_connection'] = $this->testApiConnection();
+        
+        // Test 3: Test available numbers for different countries
+        $countries = ['US', 'CA', 'GB', 'AU'];
+        foreach ($countries as $country) {
+            $results['available_numbers_' . $country] = $this->testAvailableNumbersEndpoint($country);
+        }
+        
+        // Test 4: Check account status
+        try {
+            $account = $this->client->api->accounts($this->accountSid)->fetch();
+            $results['account_status'] = $account->status;
+            $results['account_type'] = $account->type ?? 'unknown';
+            Log::info('Account Status: ' . $account->status);
+            Log::info('Account Type: ' . ($account->type ?? 'unknown'));
+        } catch (\Exception $e) {
+            $results['account_status'] = 'error: ' . $e->getMessage();
+            Log::error('Account Status Check Failed: ' . $e->getMessage());
+        }
+        
+        Log::info('Twilio Diagnostics Results: ' . json_encode($results));
+        return $results;
+    }
+
+    /**
+     * Test basic API connection
+     */
+    public function testApiConnection()
+    {
+        try {
+            $account = $this->client->api->accounts($this->accountSid)->fetch();
+            Log::info('API Connection Successful');
+            Log::info('Account Name: ' . $account->friendlyName);
+            Log::info('Account Status: ' . $account->status);
+            return true;
+        } catch (TwilioException $e) {
+            Log::error('API Connection Failed: ' . $e->getMessage());
+            Log::error('Error Code: ' . $e->getCode());
+            return false;
+        }
+    }
+
+    /**
+     * Test available numbers endpoint for specific country
+     */
+    public function testAvailableNumbersEndpoint($countryCode = 'US')
+    {
+        try {
+            Log::info('Testing Available Numbers for: ' . $countryCode);
+            
+            $numbers = $this->client->availablePhoneNumbers($countryCode)
+                ->local
+                ->read(['limit' => 1]);
+            
+            Log::info('Available Numbers Test Successful for ' . $countryCode);
+            Log::info('Numbers Found: ' . count($numbers));
+            
+            if (count($numbers) > 0) {
+                Log::info('Sample Number: ' . $numbers[0]->phoneNumber);
+            }
+            
+            return count($numbers) > 0;
+        } catch (TwilioException $e) {
+            Log::error('Available Numbers Test Failed for ' . $countryCode . ': ' . $e->getMessage());
+            Log::error('Error Code: ' . $e->getCode());
+            return false;
+        }
+    }
+
+    /**
+     * Check account status and type
+     */
+    public function checkAccountStatus()
+    {
+        try {
+            $account = $this->client->api->accounts($this->accountSid)->fetch();
+            Log::info('Account Status: ' . $account->status);
+            Log::info('Account Type: ' . ($account->type ?? 'unknown'));
+            return $account;
+        } catch (TwilioException $e) {
+            Log::error('Account Status Check Error: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get available countries for this account
+     */
+    public function getAvailableCountries()
+    {
+        try {
+            $countries = $this->client->availablePhoneNumbers->read();
+            Log::info('Available Countries: ' . json_encode($countries));
+            return $countries;
+        } catch (TwilioException $e) {
+            Log::error('Countries Check Error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Test different number types (local, toll-free, mobile)
+     */
+    public function testNumberTypes($countryCode = 'US')
+    {
+        $results = [];
+        
+        try {
+            // Test local numbers
+            $localNumbers = $this->client->availablePhoneNumbers($countryCode)->local->read(['limit' => 1]);
+            $results['local'] = count($localNumbers) > 0;
+            Log::info('Local numbers available: ' . (count($localNumbers) > 0 ? 'YES' : 'NO'));
+        } catch (TwilioException $e) {
+            $results['local'] = false;
+            Log::error('Local numbers test failed: ' . $e->getMessage());
+        }
+        
+        try {
+            // Test toll-free numbers
+            $tollFreeNumbers = $this->client->availablePhoneNumbers($countryCode)->tollFree->read(['limit' => 1]);
+            $results['toll_free'] = count($tollFreeNumbers) > 0;
+            Log::info('Toll-free numbers available: ' . (count($tollFreeNumbers) > 0 ? 'YES' : 'NO'));
+        } catch (TwilioException $e) {
+            $results['toll_free'] = false;
+            Log::error('Toll-free numbers test failed: ' . $e->getMessage());
+        }
+        
+        return $results;
     }
 } 

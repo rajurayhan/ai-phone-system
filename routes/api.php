@@ -224,3 +224,15 @@ Route::post('/test-headers', function (Request $request) {
         'content_type' => $request->header('Content-Type')
     ]);
 });
+
+// Temporary Twilio diagnostic route
+Route::get('/twilio/diagnostics', function () {
+    $twilioService = app(\App\Services\TwilioService::class);
+    $results = $twilioService->runDiagnostics();
+    
+    return response()->json([
+        'success' => true,
+        'data' => $results,
+        'message' => 'Twilio diagnostics completed'
+    ]);
+})->middleware('auth:sanctum');
