@@ -27,6 +27,7 @@ import TransactionManagement from './components/admin/TransactionManagement.vue'
 import DemoRequestForm from './components/demo/DemoRequestForm.vue'
 import DemoRequests from './components/admin/DemoRequests.vue'
 import SystemSettings from './components/admin/SystemSettings.vue'
+import CallLogsPage from './components/call-logs/CallLogsPage.vue'
 
 // Set initial document title
 updateDocumentTitle('XpartFone - Revolutionary Voice AI Platform')
@@ -169,6 +170,12 @@ const router = createRouter({
             path: '/demo-request',
             name: 'demo-request',
             component: DemoRequestForm,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/call-logs',
+            name: 'call-logs',
+            component: CallLogsPage,
             meta: { requiresAuth: true }
         }
     ]

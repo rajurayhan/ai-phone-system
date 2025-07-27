@@ -56,14 +56,23 @@
             My Assistants
           </router-link>
           
-          <router-link
-            v-if="!isAdmin"
-            to="/demo-request"
-            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-            @click="mobileMenuOpen = false"
-          >
-            Request Demo
-          </router-link>
+                      <router-link
+              v-if="!isAdmin"
+              to="/demo-request"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+              @click="mobileMenuOpen = false"
+            >
+              Request Demo
+            </router-link>
+            
+            <router-link
+              v-if="!isAdmin"
+              to="/call-logs"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+              @click="mobileMenuOpen = false"
+            >
+              Call Logs
+            </router-link>
           
           <router-link
             v-if="!isAdmin"

@@ -24,6 +24,9 @@ Route::get('/subscriptions/packages', [SubscriptionController::class, 'getPackag
 // Stripe webhook route (no auth required)
 Route::post('/stripe/webhook', [App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
 
+// Vapi webhook route (no auth required)
+Route::post('/vapi/webhook', [App\Http\Controllers\VapiWebhookController::class, 'handleWebhook']);
+
 // Email verification route
 Route::get('/verify-email/{hash}', [App\Http\Controllers\Auth\VerifyEmailController::class, '__invoke'])
     ->middleware(['throttle:6,1'])
@@ -104,6 +107,13 @@ Route::middleware('auth:sanctum')->group(function () {
             'success' => true,
             'data' => []
         ]);
+    });
+    
+    // Call logs routes
+    Route::prefix('call-logs')->group(function () {
+        Route::get('/', [App\Http\Controllers\CallLogController::class, 'index']);
+        Route::get('/stats', [App\Http\Controllers\CallLogController::class, 'stats']);
+        Route::get('/{callId}', [App\Http\Controllers\CallLogController::class, 'show']);
     });
 });
 
