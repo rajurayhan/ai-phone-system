@@ -69,7 +69,13 @@ export const updateDocumentTitle = async (pageTitle = '') => {
     const siteTitle = settings.site_title || 'XpartFone'
     
     if (pageTitle) {
-      document.title = `${pageTitle} - ${siteTitle}`
+      // If pageTitle already contains the site title (like "XpartFone - Tagline"), use it as is
+      if (pageTitle.includes(siteTitle)) {
+        document.title = pageTitle
+      } else {
+        // Otherwise, append site title to page title
+        document.title = `${pageTitle} - ${siteTitle}`
+      }
     } else {
       document.title = siteTitle
     }
@@ -77,7 +83,7 @@ export const updateDocumentTitle = async (pageTitle = '') => {
     console.error('Error updating document title:', error)
     // Fallback to default title
     if (pageTitle) {
-      document.title = `${pageTitle} - XpartFone`
+      document.title = pageTitle
     } else {
       document.title = 'XpartFone'
     }

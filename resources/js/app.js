@@ -29,7 +29,7 @@ import DemoRequests from './components/admin/DemoRequests.vue'
 import SystemSettings from './components/admin/SystemSettings.vue'
 
 // Set initial document title
-updateDocumentTitle()
+updateDocumentTitle('XpartFone - Revolutionary Voice AI Platform')
 
 // Create router
 const router = createRouter({
