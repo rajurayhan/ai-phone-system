@@ -276,6 +276,13 @@
                   <span class="font-medium">ℹ️ Note:</span> Area codes are only supported for United States and Canada. For other countries, all available numbers in the country will be shown.
                 </div>
                 
+                <!-- Search Reset Message -->
+                <div v-if="form.metadata.country && availableNumbers.length === 0 && !loadingNumbers" class="mb-3 p-2 rounded text-xs" :class="searchReset ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'">
+                  <span v-if="searchReset" class="font-medium">🔄 Search Reset:</span>
+                  <span v-else class="font-medium">ℹ️ Ready to search:</span>
+                  Click "Get Available Numbers" to search for phone numbers in {{ form.metadata.country }}.
+                </div>
+                
                 <!-- Available Numbers List -->
                 <div v-if="availableNumbers.length > 0" class="space-y-2">
                   <p class="text-xs text-blue-700 mb-2">Select a phone number to purchase when creating assistant:</p>
@@ -644,6 +651,7 @@ export default {
     const purchasingNumber = ref(false)
     const areaCode = ref('')
     const selectedPhoneNumber = ref('')
+    const searchReset = ref(false) // Track when search results have been reset
     
     // Check if we're creating a new assistant or editing an existing one
     const isCreating = computed(() => {
@@ -831,6 +839,18 @@ You embody the highest standards of customer service that {{company_name}} would
       } else if (!newCompanyName || !newCompanyName.trim()) {
         // Clear agent name if company name is empty
         form.value.name = ''
+      }
+    })
+
+    // Watch for country changes to reset available numbers
+    watch(() => form.value.metadata.country, (newCountry, oldCountry) => {
+      if (newCountry !== oldCountry) {
+        // Reset available numbers when country changes
+        availableNumbers.value = []
+        selectedPhoneNumber.value = ''
+        areaCode.value = ''
+        searchReset.value = true // Set flag to true
+        console.log('Country changed from', oldCountry, 'to', newCountry, '- resetting number search results')
       }
     })
 
@@ -1283,6 +1303,7 @@ You embody the highest standards of customer service that {{company_name}} would
     const loadAvailableNumbers = async () => {
       try {
         loadingNumbers.value = true
+        searchReset.value = false // Reset the flag when starting a new search
         const params = {}
         if (areaCode.value.trim()) {
           params.area_code = areaCode.value.trim()
@@ -1349,7 +1370,8 @@ You embody the highest standards of customer service that {{company_name}} would
       replaceWithActual,
       actualVapiData,
       templatedData,
-      isAreaCodeSupported
+      isAreaCodeSupported,
+      searchReset
     }
   }
 }
