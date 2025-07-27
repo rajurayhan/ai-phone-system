@@ -73,7 +73,8 @@ class UserSubscription extends Model
             return 0;
         }
         
-        return max(0, now()->diffInDays($this->current_period_end, false));
+        $days = now()->diffInDays($this->current_period_end, false);
+        return max(0, (int) $days);
     }
 
     public function getStatusBadgeClassAttribute()
