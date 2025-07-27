@@ -25,6 +25,7 @@ import PaymentForm from './components/transactions/PaymentForm.vue';
 import TransactionManagement from './components/admin/TransactionManagement.vue';
 import DemoRequestForm from './components/demo/DemoRequestForm.vue'
 import DemoRequests from './components/admin/DemoRequests.vue'
+import SystemSettings from './components/admin/SystemSettings.vue'
 
 // Create router
 const router = createRouter({
@@ -111,6 +112,12 @@ const router = createRouter({
             path: '/admin/demo-requests',
             name: 'admin-demo-requests',
             component: DemoRequests,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/system-settings',
+            name: 'admin-system-settings',
+            component: SystemSettings,
             meta: { requiresAuth: true, requiresAdmin: true }
         },
         {

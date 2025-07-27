@@ -212,6 +212,13 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 // Public assistant templates endpoint
 Route::get('/assistant-templates', [App\Http\Controllers\SettingController::class, 'getAssistantTemplates']);
 
+// System settings routes
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/system-settings', [App\Http\Controllers\SystemSettingController::class, 'index']);
+    Route::post('/system-settings', [App\Http\Controllers\SystemSettingController::class, 'update']);
+});
+Route::get('/public-settings', [App\Http\Controllers\SystemSettingController::class, 'getPublicSettings']);
+
 // Test route for debugging request headers
 Route::post('/test-headers', function (Request $request) {
     return response()->json([
