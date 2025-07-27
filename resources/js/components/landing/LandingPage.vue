@@ -47,11 +47,11 @@
           <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
             <div class="sm:text-center lg:text-left">
               <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl"> 
-                <span class="block text-primary-600 xl:inline"> AI Voice Agent </span>
-                <span class="block xl:inline">Simplified</span>
+                <span class="block xl:inline">AI Voice Agent </span>
+                <span class="block text-primary-600 xl:inline"> for Phone</span> 
               </h1>
               <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                {{ settings.site_tagline || 'Transform your business with cutting-edge voice AI technology. Create intelligent voice agents that understand, respond, and engage with your customers 24/7.' }}
+                {{ 'Transform your business with cutting-edge voice AI technology. Create intelligent voice agents that understand, respond, and engage with your customers 24/7.' }}
               </p>
               <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                 <div class="rounded-md shadow">
@@ -73,7 +73,10 @@
         </div>
       </div>
       <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-        <div class="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full bg-gradient-to-r from-primary-400 to-blue-500 rounded-lg shadow-xl"></div>
+        <div v-if="settings.homepage_banner" class="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full rounded-lg shadow-xl overflow-hidden">
+          <img :src="settings.homepage_banner" :alt="settings.site_title" class="w-full h-full object-cover">
+        </div>
+        <div v-else class="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full bg-gradient-to-r from-primary-400 to-blue-500 rounded-lg shadow-xl"></div>
       </div>
     </div>
 
