@@ -22,7 +22,7 @@ return [
     | The Stripe API version to use for requests.
     |
     */
-    'api_version' => env('STRIPE_API_VERSION', '2024-12-18'),
+    'api_version' => env('STRIPE_API_VERSION', '2024-06-20'),
 
     /*
     |--------------------------------------------------------------------------

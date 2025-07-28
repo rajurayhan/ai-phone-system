@@ -246,6 +246,7 @@ class TransactionController extends Controller
 
         // Create Stripe subscription
         $stripeResult = $this->stripeService->createSubscription($user, $package);
+        \Log::info('Stripe subscription result: ' . json_encode($stripeResult));
 
         if (!$stripeResult) {
             $transaction->update([

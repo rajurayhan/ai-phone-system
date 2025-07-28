@@ -11,6 +11,8 @@ use Stripe\Stripe;
 use Stripe\Customer;
 use Stripe\Subscription;
 use Stripe\PaymentIntent;
+use Stripe\Product;
+use Stripe\PaymentMethod;
 use Stripe\Exception\ApiErrorException;
 use Carbon\Carbon;
 
@@ -56,6 +58,11 @@ class StripeService
                 throw new \Exception('Failed to create or retrieve customer');
             }
 
+            // If payment method is provided, attach it to the customer first
+            if ($paymentMethodId) {
+                $this->attachPaymentMethodToCustomer($customerId, $paymentMethodId);
+            }
+
             // Create subscription parameters
             $subscriptionData = [
                 'customer' => $customerId,
@@ -63,10 +70,7 @@ class StripeService
                     [
                         'price_data' => [
                             'currency' => config('stripe.currency'),
-                            'product_data' => [
-                                'name' => $package->name,
-                                'description' => $package->description,
-                            ],
+                            'product' => $this->getOrCreateProduct($package),
                             'unit_amount' => (int) ($package->price * 100), // Convert to cents
                             'recurring' => [
                                 'interval' => 'month',
@@ -84,6 +88,14 @@ class StripeService
             // Add payment method if provided
             if ($paymentMethodId) {
                 $subscriptionData['default_payment_method'] = $paymentMethodId;
+            } else {
+                // Only use payment_behavior when no payment method is provided
+                $subscriptionData['payment_behavior'] = 'default_incomplete';
+                $subscriptionData['payment_settings'] = [
+                    'payment_method_types' => ['card'],
+                    'save_default_payment_method' => 'on_subscription',
+                ];
+                $subscriptionData['expand'] = ['latest_invoice.payment_intent'];
             }
 
             $subscription = Subscription::create($subscriptionData);
@@ -223,6 +235,57 @@ class StripeService
     }
 
     /**
+     * Get or create a Stripe product
+     */
+    private function getOrCreateProduct(SubscriptionPackage $package): string
+    {
+        try {
+            // Check if product already exists
+            $existingProducts = \Stripe\Product::all(['limit' => 1, 'active' => true]);
+            foreach ($existingProducts->data as $product) {
+                if ($product->name === $package->name) {
+                    return $product->id;
+                }
+            }
+
+            // Create new product
+            $product = \Stripe\Product::create([
+                'name' => $package->name,
+                'description' => $package->description,
+                'metadata' => [
+                    'package_id' => $package->id,
+                    'package_name' => $package->name,
+                ],
+            ]);
+
+            return $product->id;
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe product creation failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Attach a payment method to a customer
+     */
+    private function attachPaymentMethodToCustomer(string $customerId, string $paymentMethodId): void
+    {
+        try {
+            // Attach the payment method to the customer
+            $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
+            $paymentMethod->attach(['customer' => $customerId]);
+            
+            Log::info('Payment method attached to customer', [
+                'customer_id' => $customerId,
+                'payment_method_id' => $paymentMethodId
+            ]);
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe payment method attachment failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
      * Verify webhook signature
      */
     public function verifyWebhookSignature(string $payload, string $signature, string $secret): bool
@@ -288,7 +351,29 @@ class StripeService
                 'current_period_end' => Carbon::createFromTimestamp($subscriptionData['current_period_end']),
                 'trial_ends_at' => $subscriptionData['trial_end'] ? Carbon::createFromTimestamp($subscriptionData['trial_end']) : null,
             ]);
+        } else {
+            // Create local subscription if it doesn't exist
+            $packageId = $subscriptionData['metadata']['package_id'] ?? null;
+            if ($packageId) {
+                UserSubscription::create([
+                    'user_id' => $userId,
+                    'subscription_package_id' => $packageId,
+                    'status' => $subscriptionData['status'],
+                    'current_period_start' => Carbon::createFromTimestamp($subscriptionData['current_period_start']),
+                    'current_period_end' => Carbon::createFromTimestamp($subscriptionData['current_period_end']),
+                    'trial_ends_at' => $subscriptionData['trial_end'] ? Carbon::createFromTimestamp($subscriptionData['trial_end']) : null,
+                    'stripe_subscription_id' => $subscriptionData['id'],
+                    'stripe_customer_id' => $subscriptionData['customer'],
+                    'created_by' => $userId,
+                ]);
+            }
         }
+
+        Log::info('Subscription created/updated via webhook', [
+            'subscription_id' => $subscriptionData['id'],
+            'user_id' => $userId,
+            'status' => $subscriptionData['status']
+        ]);
     }
 
     /**
@@ -331,6 +416,13 @@ class StripeService
 
         $localSubscription = UserSubscription::where('stripe_subscription_id', $subscriptionId)->first();
         if ($localSubscription) {
+            // Activate the subscription
+            $localSubscription->update([
+                'status' => 'active',
+                'current_period_start' => Carbon::createFromTimestamp($invoiceData['period_start'] ?? time()),
+                'current_period_end' => Carbon::createFromTimestamp($invoiceData['period_end'] ?? time() + 30 * 24 * 60 * 60),
+            ]);
+
             // Update transaction status
             $transaction = Transaction::where('user_subscription_id', $localSubscription->id)
                 ->where('status', Transaction::STATUS_PENDING)
@@ -344,6 +436,12 @@ class StripeService
                     'processed_at' => Carbon::now(),
                 ]);
             }
+
+            Log::info('Subscription activated via webhook', [
+                'subscription_id' => $subscriptionId,
+                'user_id' => $localSubscription->user_id,
+                'invoice_id' => $invoiceData['id']
+            ]);
         }
     }
 

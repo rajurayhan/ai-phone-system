@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SubscriptionPackage;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -57,7 +58,7 @@ class StripeController extends Controller
     {
         $request->validate([
             'package_id' => 'required|exists:subscription_packages,id',
-            'payment_method_id' => 'nullable|string',
+            'payment_method_id' => 'required|string',
         ]);
 
         $user = Auth::user();
@@ -100,7 +101,6 @@ class StripeController extends Controller
             'trial_ends_at' => $stripeResult['trial_end'],
             'stripe_subscription_id' => $stripeResult['subscription_id'],
             'stripe_customer_id' => $stripeResult['customer_id'],
-            'created_by' => $user->id,
         ]);
 
         // Update transaction with subscription reference
@@ -211,7 +211,7 @@ class StripeController extends Controller
     }
 
     /**
-     * Get subscription details from Stripe
+     * Get subscription details
      */
     public function getSubscriptionDetails(Request $request): JsonResponse
     {

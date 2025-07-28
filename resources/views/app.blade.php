@@ -13,6 +13,11 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Global Variables -->
+    <script>
+        window.MIX_STRIPE_PUBLISHABLE_KEY = '{{ env("MIX_STRIPE_PUBLISHABLE_KEY") }}';
+    </script>
 </head>
 <body class="font-sans antialiased">
     <div id="app"></div>
