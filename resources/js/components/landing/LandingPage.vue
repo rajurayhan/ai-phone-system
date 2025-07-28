@@ -322,6 +322,35 @@
           <!-- Contact Form -->
           <div class="bg-white border border-gray-200 rounded-lg p-8">
             <h3 class="text-lg font-medium text-gray-900 mb-6">Send us a Message</h3>
+            
+            <!-- Success Message -->
+            <div v-if="contactFormSuccess" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-medium text-green-800">{{ contactFormSuccess }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Error Message -->
+            <div v-if="contactFormError" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-medium text-red-800">{{ contactFormError }}</p>
+                </div>
+              </div>
+            </div>
+            
             <form @submit.prevent="submitContactForm" class="space-y-6">
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
@@ -506,6 +535,8 @@ export default {
     const settings = ref({})
     const mobileMenuOpen = ref(false)
     const contactFormSubmitting = ref(false)
+    const contactFormSuccess = ref('')
+    const contactFormError = ref('')
     const contactForm = ref({
       first_name: '',
       last_name: '',
@@ -555,6 +586,8 @@ export default {
 
     const submitContactForm = async () => {
       contactFormSubmitting.value = true
+      contactFormSuccess.value = ''
+      contactFormError.value = ''
       try {
         const response = await axios.post('/api/contact', contactForm.value)
         
@@ -570,17 +603,17 @@ export default {
           }
           
           // Show success message
-          alert(response.data.message)
+          contactFormSuccess.value = response.data.message
         } else {
-          alert('There was an error sending your message. Please try again.')
+          contactFormError.value = response.data.message || 'There was an error sending your message. Please try again.'
         }
         
       } catch (error) {
         console.error('Error submitting contact form:', error)
         if (error.response && error.response.data && error.response.data.message) {
-          alert(error.response.data.message)
+          contactFormError.value = error.response.data.message
         } else {
-          alert('There was an error sending your message. Please try again or contact us directly.')
+          contactFormError.value = 'There was an error sending your message. Please try again or contact us directly.'
         }
       } finally {
         contactFormSubmitting.value = false
@@ -613,6 +646,8 @@ export default {
       mobileMenuOpen,
       contactForm,
       contactFormSubmitting,
+      contactFormSuccess,
+      contactFormError,
       submitContactForm
     }
   }
