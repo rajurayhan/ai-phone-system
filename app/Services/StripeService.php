@@ -364,7 +364,6 @@ class StripeService
                     'trial_ends_at' => $subscriptionData['trial_end'] ? Carbon::createFromTimestamp($subscriptionData['trial_end']) : null,
                     'stripe_subscription_id' => $subscriptionData['id'],
                     'stripe_customer_id' => $subscriptionData['customer'],
-                    'created_by' => $userId,
                 ]);
             }
         }
@@ -372,7 +371,9 @@ class StripeService
         Log::info('Subscription created/updated via webhook', [
             'subscription_id' => $subscriptionData['id'],
             'user_id' => $userId,
-            'status' => $subscriptionData['status']
+            'status' => $subscriptionData['status'],
+            'period_start' => Carbon::createFromTimestamp($subscriptionData['current_period_start']),
+            'period_end' => Carbon::createFromTimestamp($subscriptionData['current_period_end'])
         ]);
     }
 
@@ -416,12 +417,30 @@ class StripeService
 
         $localSubscription = UserSubscription::where('stripe_subscription_id', $subscriptionId)->first();
         if ($localSubscription) {
-            // Activate the subscription
-            $localSubscription->update([
-                'status' => 'active',
-                'current_period_start' => Carbon::createFromTimestamp($invoiceData['period_start'] ?? time()),
-                'current_period_end' => Carbon::createFromTimestamp($invoiceData['period_end'] ?? time() + 30 * 24 * 60 * 60),
-            ]);
+            // Get the actual subscription data from Stripe to get correct period dates
+            try {
+                $stripeSubscription = Subscription::retrieve($subscriptionId);
+                
+                // Activate the subscription with correct period dates
+                $localSubscription->update([
+                    'status' => 'active',
+                    'current_period_start' => Carbon::createFromTimestamp($stripeSubscription->current_period_start),
+                    'current_period_end' => Carbon::createFromTimestamp($stripeSubscription->current_period_end),
+                    'trial_ends_at' => $stripeSubscription->trial_end ? Carbon::createFromTimestamp($stripeSubscription->trial_end) : null,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to retrieve Stripe subscription for period dates', [
+                    'subscription_id' => $subscriptionId,
+                    'error' => $e->getMessage()
+                ]);
+                
+                // Fallback to invoice data if Stripe subscription retrieval fails
+                $localSubscription->update([
+                    'status' => 'active',
+                    'current_period_start' => Carbon::createFromTimestamp($invoiceData['period_start'] ?? time()),
+                    'current_period_end' => Carbon::createFromTimestamp($invoiceData['period_end'] ?? time() + 30 * 24 * 60 * 60),
+                ]);
+            }
 
             // Update transaction status
             $transaction = Transaction::where('user_subscription_id', $localSubscription->id)
@@ -440,7 +459,9 @@ class StripeService
             Log::info('Subscription activated via webhook', [
                 'subscription_id' => $subscriptionId,
                 'user_id' => $localSubscription->user_id,
-                'invoice_id' => $invoiceData['id']
+                'invoice_id' => $invoiceData['id'],
+                'period_start' => $localSubscription->current_period_start,
+                'period_end' => $localSubscription->current_period_end
             ]);
         }
     }

@@ -193,3 +193,26 @@ Route::get('/test-null-filters', function () {
         'all_request_params' => $request->all()
     ]);
 });
+
+// Test route for subscription period verification
+Route::get('/test-subscription-periods', function () {
+    $subscriptions = \App\Models\UserSubscription::with(['user', 'package'])->get();
+    
+    return response()->json([
+        'subscriptions' => $subscriptions->map(function($s) {
+            return [
+                'id' => $s->id,
+                'user_name' => $s->user->name ?? 'Unknown',
+                'package_name' => $s->package->name ?? 'Unknown',
+                'status' => $s->status,
+                'current_period_start' => $s->current_period_start ? $s->current_period_start->toISOString() : null,
+                'current_period_end' => $s->current_period_end ? $s->current_period_end->toISOString() : null,
+                'trial_ends_at' => $s->trial_ends_at ? $s->trial_ends_at->toISOString() : null,
+                'stripe_subscription_id' => $s->stripe_subscription_id,
+                'days_remaining' => $s->current_period_end ? now()->diffInDays($s->current_period_end, false) : null,
+                'is_active' => $s->status === 'active',
+                'is_expired' => $s->current_period_end ? $s->current_period_end->isPast() : false
+            ];
+        })
+    ]);
+});
