@@ -370,3 +370,45 @@ Route::get('/test-email-templates', function () {
         ]);
     }
 });
+
+// Test route for password reset email
+Route::get('/test-password-reset-email', function () {
+    try {
+        $user = \App\Models\User::first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No users found in database'
+            ]);
+        }
+
+        // Create a test token
+        $token = \Illuminate\Support\Str::random(60);
+        
+        // Send test password reset email
+        $user->notify(new \App\Notifications\PasswordResetEmail($token));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password reset email sent successfully',
+            'data' => [
+                'user_email' => $user->email,
+                'user_name' => $user->name,
+                'template_used' => 'password-reset.blade.php',
+                'features' => [
+                    'Professional design with logo',
+                    'Security notice and tips',
+                    'Clear call-to-action button',
+                    'Expiration warning (60 minutes)',
+                    'Helpful links and support info'
+                ]
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to send password reset email',
+            'error' => $e->getMessage()
+        ]);
+    }
+});
