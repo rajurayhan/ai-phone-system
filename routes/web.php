@@ -308,3 +308,65 @@ Route::get('/test-invoice-email', function () {
         ]);
     }
 });
+
+// Test route for all email templates
+Route::get('/test-email-templates', function () {
+    try {
+        $user = \App\Models\User::first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No users found in database'
+            ]);
+        }
+
+        $subscription = $user->subscriptions()->first();
+        $transaction = $user->transactions()->first();
+
+        if (!$subscription || !$transaction) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No subscription or transaction found for testing'
+            ]);
+        }
+
+        // Send test emails
+        $user->notify(new \App\Notifications\SubscriptionInvoice($subscription, $transaction));
+        $user->notify(new \App\Notifications\WelcomeEmail());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Professional email templates tested successfully',
+            'data' => [
+                'user_email' => $user->email,
+                'emails_sent' => [
+                    'Welcome Email',
+                    'Subscription Invoice'
+                ],
+                'templates_available' => [
+                    'Welcome Email (welcome.blade.php)',
+                    'Subscription Invoice (subscription-invoice.blade.php)',
+                    'Password Reset (password-reset.blade.php)',
+                    'Subscription Cancelled (subscription-cancelled.blade.php)',
+                    'Subscription Updated (subscription-updated.blade.php)',
+                    'Payment Failed (payment-failed.blade.php)'
+                ],
+                'features' => [
+                    'Professional logo and branding',
+                    'Responsive design for all devices',
+                    'Consistent color scheme and typography',
+                    'Clear call-to-action buttons',
+                    'Informative cards and sections',
+                    'Social media links',
+                    'Professional footer with contact info'
+                ]
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to test email templates',
+            'error' => $e->getMessage()
+        ]);
+    }
+});

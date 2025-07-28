@@ -34,7 +34,7 @@ import AdminCallLogs from './components/admin/CallLogs.vue'
 import ContactManagement from './components/admin/ContactManagement.vue'
 
 // Set initial document title
-updateDocumentTitle('XpartFone - Revolutionary Voice AI Platform')
+updateDocumentTitle('XpartFone - Never Miss a call Again XpartFone answers 24x7!')
 
 // Create router
 const router = createRouter({

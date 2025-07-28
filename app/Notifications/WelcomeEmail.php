@@ -40,14 +40,13 @@ class WelcomeEmail extends Notification
         $verificationUrl = config('app.url') . '/api/verify-email/' . $hash . '?t=' . $timestamp;
 
         return (new MailMessage)
-            ->subject('Welcome to XpartFone!')
-            ->greeting('Hello!')
-            ->line('Welcome to XpartFone! We\'re excited to have you on board.')
-            ->line('To get started with your voice agent platform, please verify your email address by clicking the button below.')
-            ->action('Verify Email Address', $verificationUrl)
-            ->line('This verification link will expire in 60 minutes.')
-            ->line('If you did not create an account, no further action is required.')
-            ->salutation('Best regards, The Hive AI Team');
+            ->subject('Welcome to XpartFone! 🎉')
+            ->view('emails.welcome', [
+                'user' => $notifiable,
+                'verificationUrl' => $verificationUrl,
+                'headerTitle' => 'Welcome to XpartFone!',
+                'headerSubtitle' => 'Your Voice AI Platform',
+            ]);
     }
 
     /**

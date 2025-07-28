@@ -37,7 +37,7 @@ export const getSystemSettings = async () => {
 const getDefaultSettings = () => {
   return {
     site_title: 'XpartFone',
-    site_tagline: 'Revolutionary Voice AI Platform',
+    site_tagline: 'Never Miss a call Again XpartFone answers 24x7!',
     meta_description: 'Transform your business with cutting-edge voice AI technology',
     logo_url: '/logo.png',
     homepage_banner: null

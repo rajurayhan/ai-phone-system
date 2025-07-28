@@ -546,7 +546,7 @@ export default {
         // Set default values if API fails
         settings.value = {
           site_title: 'XpartFone',
-          site_tagline: 'Revolutionary Voice AI Platform',
+          site_tagline: 'Never Miss a call Again XpartFone answers 24x7!',
           logo_url: '/logo.png',
           homepage_banner: null
         }
@@ -593,7 +593,7 @@ export default {
       loadSettings()
       // Set document title as "title - tagline"
       const title = settings.value.site_title || 'XpartFone'
-      const tagline = settings.value.site_tagline || 'Revolutionary Voice AI Platform'
+      const tagline = settings.value.site_tagline || 'Never Miss a call Again XpartFone answers 24x7!'
       updateDocumentTitle(`${title} - ${tagline}`)
       
       // Close mobile menu when clicking outside

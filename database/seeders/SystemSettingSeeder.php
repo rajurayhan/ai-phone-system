@@ -24,7 +24,7 @@ class SystemSettingSeeder extends Seeder
             ],
             [
                 'key' => 'site_tagline',
-                'value' => 'Revolutionary Voice AI Platform',
+                'value' => 'Never Miss a call Again XpartFone answers 24x7!',
                 'type' => 'text',
                 'group' => 'general',
                 'label' => 'Site Tagline',
