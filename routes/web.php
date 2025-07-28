@@ -13,6 +13,27 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Authentication routes
+Route::get('/login', function () {
+    return view('app');
+})->name('login');
+
+Route::get('/register', function () {
+    return view('app');
+})->name('register');
+
+Route::get('/forgot-password', function () {
+    return view('app');
+})->name('password.request');
+
+Route::get('/reset-password/{token}', function () {
+    return view('app');
+})->name('password.reset');
+
+Route::get('/verify-email', function () {
+    return view('app');
+})->name('verification.notice');
+
 Route::get('/test-filtering', function () {
     return view('test-filtering');
 });
@@ -214,5 +235,18 @@ Route::get('/test-subscription-periods', function () {
                 'is_expired' => $s->current_period_end ? $s->current_period_end->isPast() : false
             ];
         })
+    ]);
+});
+
+// Test route for authentication routes
+Route::get('/test-auth-routes', function () {
+    return response()->json([
+        'routes' => [
+            'login' => route('login'),
+            'register' => route('register'),
+            'forgot_password' => route('password.request'),
+            'verify_email' => route('verification.notice'),
+        ],
+        'message' => 'Authentication routes are properly configured'
     ]);
 });

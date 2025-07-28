@@ -241,6 +241,76 @@
       </div>
     </div>
   </div>
+
+  <!-- Subscription Details Modal -->
+  <div v-if="showDetailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+      <div class="mt-3">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-medium text-gray-900">Subscription Details</h3>
+          <button @click="showDetailsModal = false" class="text-gray-400 hover:text-gray-600">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div v-if="selectedSubscription" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">User</label>
+              <p class="text-sm text-gray-900">{{ selectedSubscription.user.name }}</p>
+              <p class="text-xs text-gray-500">{{ selectedSubscription.user.email }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Package</label>
+              <p class="text-sm text-gray-900">{{ selectedSubscription.package.name }}</p>
+              <p class="text-xs text-gray-500">${{ selectedSubscription.package.price }}/month</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Status</label>
+              <span :class="getStatusBadgeClass(selectedSubscription.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                {{ selectedSubscription.status }}
+              </span>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Stripe ID</label>
+              <p class="text-sm text-gray-900">{{ selectedSubscription.stripe_subscription_id || 'N/A' }}</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Period Start</label>
+              <p class="text-sm text-gray-900">{{ formatDate(selectedSubscription.current_period_start) }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Period End</label>
+              <p class="text-sm text-gray-900">{{ formatDate(selectedSubscription.current_period_end) }}</p>
+            </div>
+          </div>
+          
+          <div v-if="selectedSubscription.trial_ends_at">
+            <label class="block text-sm font-medium text-gray-700">Trial Ends</label>
+            <p class="text-sm text-gray-900">{{ formatDate(selectedSubscription.trial_ends_at) }}</p>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Created</label>
+            <p class="text-sm text-gray-900">{{ formatDate(selectedSubscription.created_at) }}</p>
+          </div>
+          
+          <div v-if="selectedSubscription.updated_at !== selectedSubscription.created_at">
+            <label class="block text-sm font-medium text-gray-700">Last Updated</label>
+            <p class="text-sm text-gray-900">{{ formatDate(selectedSubscription.updated_at) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -265,7 +335,9 @@ export default {
         package_id: '',
         date_range: '',
         search: ''
-      }
+      },
+      showDetailsModal: false,
+      selectedSubscription: null
     }
   },
   computed: {
@@ -366,8 +438,8 @@ export default {
     },
 
     viewSubscription(subscription) {
-      // TODO: Implement subscription detail view
-      
+      this.selectedSubscription = subscription
+      this.showDetailsModal = true
     }
   }
 }
