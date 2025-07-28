@@ -24,9 +24,17 @@
     <script>
         async function testAdmin() {
             try {
+                // Get token from localStorage instead of hardcoding
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    document.getElementById('admin-result').innerHTML = 
+                        '<h3>Admin Error:</h3><pre>No authentication token found. Please log in first.</pre>';
+                    return;
+                }
+                
                 const response = await axios.get('/api/assistants', {
                     headers: {
-                        'Authorization': 'Bearer 5|skomAPEHL8Qxraetixzkiwz3GJe2wOg3BEyrhacIb8725541',
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -41,9 +49,17 @@
         
         async function testUser() {
             try {
+                // Get token from localStorage instead of hardcoding
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    document.getElementById('user-result').innerHTML = 
+                        '<h3>User Error:</h3><pre>No authentication token found. Please log in first.</pre>';
+                    return;
+                }
+                
                 const response = await axios.get('/api/assistants', {
                     headers: {
-                        'Authorization': 'Bearer 4|ct3JyRfUuc7YACWVcIkWvquZVC02Eg0kC5kpdFkqb44c3f47',
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 });

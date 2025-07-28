@@ -32,6 +32,7 @@ import SystemSettings from './components/admin/SystemSettings.vue'
 import CallLogsPage from './components/call-logs/CallLogsPage.vue'
 import AdminCallLogs from './components/admin/CallLogs.vue'
 import ContactManagement from './components/admin/ContactManagement.vue'
+import NotFound from './components/shared/NotFound.vue'
 
 // Set initial document title
 updateDocumentTitle('XpartFone - Never Miss a call Again XpartFone answers 24x7!')
@@ -205,6 +206,11 @@ const router = createRouter({
             name: 'admin-contacts',
             component: ContactManagement,
             meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'not-found',
+            component: NotFound
         }
     ]
 });

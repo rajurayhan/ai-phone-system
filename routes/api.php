@@ -251,18 +251,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 Route::get('/public-settings', [App\Http\Controllers\SystemSettingController::class, 'getPublicSettings']);
 
-// Test route for debugging request headers
-Route::post('/test-headers', function (Request $request) {
-    return response()->json([
-        'success' => true,
-        'headers' => $request->headers->all(),
-        'method' => $request->method(),
-        'url' => $request->url(),
-        'has_csrf' => $request->hasHeader('X-CSRF-TOKEN'),
-        'has_authorization' => $request->hasHeader('Authorization'),
-        'content_type' => $request->header('Content-Type')
-    ]);
-});
+
 
 // Temporary Twilio diagnostic route
 Route::get('/twilio/diagnostics', function () {
