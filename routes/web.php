@@ -250,3 +250,61 @@ Route::get('/test-auth-routes', function () {
         'message' => 'Authentication routes are properly configured'
     ]);
 });
+
+// Test route for payment form
+Route::get('/test-payment-form', function () {
+    return response()->json([
+        'message' => 'Payment form with professional card design is ready',
+        'features' => [
+            'Physical card display with gradient background',
+            'Real-time card number formatting',
+            'Card type detection (Visa, Mastercard, Amex, etc.)',
+            'Professional chip and signature strip design',
+            'Comprehensive card validation',
+            'Responsive design with hover effects'
+        ]
+    ]);
+});
+
+// Test route for invoice email functionality
+Route::get('/test-invoice-email', function () {
+    try {
+        $user = \App\Models\User::first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No users found in database'
+            ]);
+        }
+
+        $subscription = $user->subscriptions()->first();
+        $transaction = $user->transactions()->first();
+
+        if (!$subscription || !$transaction) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No subscription or transaction found for testing'
+            ]);
+        }
+
+        // Send test invoice email
+        $user->notify(new \App\Notifications\SubscriptionInvoice($subscription, $transaction));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Test invoice email sent successfully',
+            'data' => [
+                'user_email' => $user->email,
+                'subscription_id' => $subscription->id,
+                'transaction_id' => $transaction->id,
+                'package_name' => $subscription->package->name ?? 'Unknown'
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to send test invoice email',
+            'error' => $e->getMessage()
+        ]);
+    }
+});

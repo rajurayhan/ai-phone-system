@@ -6,9 +6,11 @@ use App\Models\SubscriptionPackage;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\StripeService;
+use App\Notifications\SubscriptionInvoice;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class StripeController extends Controller
@@ -107,6 +109,25 @@ class StripeController extends Controller
         $transaction->update([
             'user_subscription_id' => $subscription->id,
         ]);
+
+        // Send invoice email to user
+        try {
+            $user->notify(new SubscriptionInvoice($subscription, $transaction));
+            
+            Log::info('Invoice email sent for new subscription', [
+                'user_id' => $user->id,
+                'subscription_id' => $subscription->id,
+                'transaction_id' => $transaction->id,
+                'package_name' => $package->name
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send invoice email for new subscription', [
+                'user_id' => $user->id,
+                'subscription_id' => $subscription->id,
+                'transaction_id' => $transaction->id,
+                'error' => $e->getMessage()
+            ]);
+        }
 
         return response()->json([
             'success' => true,

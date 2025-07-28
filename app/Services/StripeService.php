@@ -454,6 +454,26 @@ class StripeService
                     'external_transaction_id' => $invoiceData['id'],
                     'processed_at' => Carbon::now(),
                 ]);
+
+                // Send invoice email to user
+                try {
+                    $user = $localSubscription->user;
+                    $user->notify(new \App\Notifications\SubscriptionInvoice($localSubscription, $transaction, $invoiceData));
+                    
+                    Log::info('Invoice email sent successfully', [
+                        'user_id' => $user->id,
+                        'subscription_id' => $localSubscription->id,
+                        'transaction_id' => $transaction->id,
+                        'invoice_id' => $invoiceData['id']
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send invoice email', [
+                        'user_id' => $localSubscription->user_id,
+                        'subscription_id' => $localSubscription->id,
+                        'transaction_id' => $transaction->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
             Log::info('Subscription activated via webhook', [
