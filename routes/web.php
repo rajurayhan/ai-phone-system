@@ -128,3 +128,68 @@ Route::get('/test-stripe-api', function () {
         ]);
     }
 });
+
+// Test route for database data verification
+Route::get('/test-database-data', function () {
+    $transactions = \App\Models\Transaction::with(['user', 'package'])->get();
+    $subscriptions = \App\Models\UserSubscription::with(['user', 'package'])->get();
+    
+    return response()->json([
+        'transactions' => [
+            'count' => $transactions->count(),
+            'data' => $transactions->map(function($t) {
+                return [
+                    'id' => $t->id,
+                    'user_id' => $t->user_id,
+                    'user_name' => $t->user->name ?? 'Unknown',
+                    'amount' => $t->amount,
+                    'status' => $t->status,
+                    'type' => $t->type,
+                    'created_at' => $t->created_at
+                ];
+            })
+        ],
+        'subscriptions' => [
+            'count' => $subscriptions->count(),
+            'data' => $subscriptions->map(function($s) {
+                return [
+                    'id' => $s->id,
+                    'user_id' => $s->user_id,
+                    'user_name' => $s->user->name ?? 'Unknown',
+                    'status' => $s->status,
+                    'package_name' => $s->package->name ?? 'Unknown',
+                    'created_at' => $s->created_at
+                ];
+            })
+        ]
+    ]);
+});
+
+// Test route for null value handling
+Route::get('/test-null-filters', function () {
+    $request = request();
+    
+    return response()->json([
+        'test_filters' => [
+            'status' => [
+                'value' => $request->get('status'),
+                'filled' => $request->filled('status'),
+                'is_null' => $request->get('status') === null,
+                'is_string_null' => $request->get('status') === 'null'
+            ],
+            'payment_method' => [
+                'value' => $request->get('payment_method'),
+                'filled' => $request->filled('payment_method'),
+                'is_null' => $request->get('payment_method') === null,
+                'is_string_null' => $request->get('payment_method') === 'null'
+            ],
+            'user_id' => [
+                'value' => $request->get('user_id'),
+                'filled' => $request->filled('user_id'),
+                'is_null' => $request->get('user_id') === null,
+                'is_string_null' => $request->get('user_id') === 'null'
+            ]
+        ],
+        'all_request_params' => $request->all()
+    ]);
+});

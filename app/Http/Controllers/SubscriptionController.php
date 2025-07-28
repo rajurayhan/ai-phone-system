@@ -35,9 +35,20 @@ class SubscriptionController extends Controller
         $subscription = $user->activeSubscription;
 
         if (!$subscription) {
+            // Check if there are any subscriptions for this user
+            $anySubscription = $user->subscriptions()->latest()->first();
+            
+            if ($anySubscription) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $anySubscription->load('package'),
+                    'message' => 'Latest subscription found (may not be active)'
+                ]);
+            }
+            
             return response()->json([
                 'success' => false,
-                'message' => 'No active subscription found'
+                'message' => 'No subscription found'
             ], 404);
         }
 
@@ -210,16 +221,16 @@ class SubscriptionController extends Controller
 
         $query = UserSubscription::with(['user', 'package']);
 
-        // Apply filters
-        if ($request->filled('status')) {
+        // Apply filters - handle null and 'null' values
+        if ($request->filled('status') && $request->status !== 'null' && $request->status !== null) {
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('package_id')) {
+        if ($request->filled('package_id') && $request->package_id !== 'null' && $request->package_id !== null) {
             $query->where('subscription_package_id', $request->package_id);
         }
 
-        if ($request->filled('search')) {
+        if ($request->filled('search') && $request->search !== 'null' && $request->search !== null) {
             $search = $request->search;
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -227,7 +238,7 @@ class SubscriptionController extends Controller
             });
         }
 
-        if ($request->filled('date_range')) {
+        if ($request->filled('date_range') && $request->date_range !== 'null' && $request->date_range !== null) {
             $dateRange = $request->date_range;
             $now = Carbon::now();
             
@@ -277,7 +288,15 @@ class SubscriptionController extends Controller
                 'per_page' => $subscriptions->perPage(),
                 'total' => $subscriptions->total(),
             ],
-            'stats' => $stats
+            'stats' => $stats,
+            'debug' => [
+                'filters_applied' => [
+                    'status' => $request->get('status'),
+                    'package_id' => $request->get('package_id'),
+                    'search' => $request->get('search'),
+                    'date_range' => $request->get('date_range')
+                ]
+            ]
         ]);
     }
 

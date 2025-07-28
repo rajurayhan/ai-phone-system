@@ -102,7 +102,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function activeSubscription()
     {
-        return $this->hasOne(UserSubscription::class)->where('status', 'active')->orWhere('status', 'pending')->where('user_id', $this->id);
+        return $this->hasOne(UserSubscription::class)
+            ->where(function($query) {
+                $query->where('status', 'active')
+                      ->orWhere('status', 'pending');
+            });
     }
 
     public function hasActiveSubscription()

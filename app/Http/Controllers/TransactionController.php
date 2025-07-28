@@ -9,6 +9,7 @@ use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
@@ -28,34 +29,92 @@ class TransactionController extends Controller
     {
         $user = Auth::user();
         
-        $query = Transaction::where('user_id', $user->id)
-            ->with(['package', 'subscription'])
-            ->orderBy('created_at', 'desc');
+        // Debug: Log the user and check all transactions
+        Log::info('Transaction index called', [
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'total_transactions_in_db' => Transaction::count(),
+            'transactions_for_user' => Transaction::where('user_id', $user->id)->count(),
+            'all_transaction_user_ids' => Transaction::pluck('user_id')->toArray(),
+            'request_filters' => $request->all()
+        ]);
+        
+        // Build query - admin can see all transactions, regular users see only their own
+        if ($user->isAdmin()) {
+            $query = Transaction::with(['package', 'subscription', 'user'])
+                ->orderBy('created_at', 'desc');
+            
+            // If admin specifies a user_id, filter by that user - handle null and 'null' values
+            if ($request->filled('user_id') && $request->user_id !== 'null' && $request->user_id !== null) {
+                $query->where('user_id', $request->user_id);
+            }
+        } else {
+            $query = Transaction::where('user_id', $user->id)
+                ->with(['package', 'subscription'])
+                ->orderBy('created_at', 'desc');
+        }
 
-        // Filter by status
-        if ($request->has('status')) {
+        // Filter by status - handle null and 'null' values
+        if ($request->filled('status') && $request->status !== 'null' && $request->status !== null) {
             $query->where('status', $request->status);
         }
 
-        // Filter by payment method
-        if ($request->has('payment_method')) {
+        // Filter by payment method - handle null and 'null' values
+        if ($request->filled('payment_method') && $request->payment_method !== 'null' && $request->payment_method !== null) {
             $query->where('payment_method', $request->payment_method);
         }
 
-        // Filter by date range
-        if ($request->has('start_date')) {
+        // Filter by type - handle null and 'null' values
+        if ($request->filled('type') && $request->type !== 'null' && $request->type !== null) {
+            $query->where('type', $request->type);
+        }
+
+        // Filter by date range - handle null and 'null' values
+        if ($request->filled('start_date') && $request->start_date !== 'null' && $request->start_date !== null) {
             $query->whereDate('created_at', '>=', $request->start_date);
         }
 
-        if ($request->has('end_date')) {
+        if ($request->filled('end_date') && $request->end_date !== 'null' && $request->end_date !== null) {
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
         $transactions = $query->paginate(20);
 
+        // Calculate summary statistics
+        if ($user->isAdmin()) {
+            $summaryQuery = Transaction::query();
+            if ($request->filled('user_id') && $request->user_id !== 'null' && $request->user_id !== null) {
+                $summaryQuery->where('user_id', $request->user_id);
+            }
+        } else {
+            $summaryQuery = Transaction::where('user_id', $user->id);
+        }
+        $summary = [
+            'total_transactions' => $summaryQuery->count(),
+            'total_amount' => $summaryQuery->where('status', Transaction::STATUS_COMPLETED)->sum('amount'),
+            'pending_transactions' => $summaryQuery->where('status', Transaction::STATUS_PENDING)->count(),
+            'failed_transactions' => $summaryQuery->where('status', Transaction::STATUS_FAILED)->count(),
+            'completed_transactions' => $summaryQuery->where('status', Transaction::STATUS_COMPLETED)->count(),
+        ];
+
         return response()->json([
             'success' => true,
-            'data' => $transactions
+            'data' => $transactions,
+            'summary' => $summary,
+            'debug' => [
+                'user_id' => $user->id,
+                'is_admin' => $user->isAdmin(),
+                'total_in_db' => Transaction::count(),
+                'for_user' => Transaction::where('user_id', $user->id)->count(),
+                'requested_user_id' => $request->get('user_id'),
+                'filters_applied' => [
+                    'status' => $request->get('status'),
+                    'payment_method' => $request->get('payment_method'),
+                    'type' => $request->get('type'),
+                    'start_date' => $request->get('start_date'),
+                    'end_date' => $request->get('end_date')
+                ]
+            ]
         ]);
     }
 
@@ -246,7 +305,7 @@ class TransactionController extends Controller
 
         // Create Stripe subscription
         $stripeResult = $this->stripeService->createSubscription($user, $package);
-        \Log::info('Stripe subscription result: ' . json_encode($stripeResult));
+        Log::info('Stripe subscription result: ' . json_encode($stripeResult));
 
         if (!$stripeResult) {
             $transaction->update([
@@ -429,27 +488,32 @@ class TransactionController extends Controller
         $query = Transaction::with(['user', 'package', 'subscription'])
             ->orderBy('created_at', 'desc');
 
-        // Filter by status
-        if ($request->has('status')) {
+        // Filter by status - handle null and 'null' values
+        if ($request->filled('status') && $request->status !== 'null' && $request->status !== null) {
             $query->where('status', $request->status);
         }
 
-        // Filter by payment method
-        if ($request->has('payment_method')) {
+        // Filter by payment method - handle null and 'null' values
+        if ($request->filled('payment_method') && $request->payment_method !== 'null' && $request->payment_method !== null) {
             $query->where('payment_method', $request->payment_method);
         }
 
-        // Filter by user
-        if ($request->has('user_id')) {
+        // Filter by type - handle null and 'null' values
+        if ($request->filled('type') && $request->type !== 'null' && $request->type !== null) {
+            $query->where('type', $request->type);
+        }
+
+        // Filter by user - handle null and 'null' values
+        if ($request->filled('user_id') && $request->user_id !== 'null' && $request->user_id !== null) {
             $query->where('user_id', $request->user_id);
         }
 
-        // Filter by date range
-        if ($request->has('start_date')) {
+        // Filter by date range - handle null and 'null' values
+        if ($request->filled('start_date') && $request->start_date !== 'null' && $request->start_date !== null) {
             $query->whereDate('created_at', '>=', $request->start_date);
         }
 
-        if ($request->has('end_date')) {
+        if ($request->filled('end_date') && $request->end_date !== 'null' && $request->end_date !== null) {
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
@@ -457,7 +521,17 @@ class TransactionController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $transactions
+            'data' => $transactions,
+            'debug' => [
+                'filters_applied' => [
+                    'status' => $request->get('status'),
+                    'payment_method' => $request->get('payment_method'),
+                    'type' => $request->get('type'),
+                    'user_id' => $request->get('user_id'),
+                    'start_date' => $request->get('start_date'),
+                    'end_date' => $request->get('end_date')
+                ]
+            ]
         ]);
     }
 
