@@ -156,7 +156,9 @@ export default {
   },
   mounted() {
     console.log('AudioPlayer mounted with URL:', this.audioUrl)
-    this.setVolume(this.volume)
+    this.$nextTick(() => {
+      this.setVolume()
+    })
   },
   methods: {
     togglePlay() {
@@ -196,9 +198,18 @@ export default {
     },
 
     setVolume(event) {
-      const newVolume = parseFloat(event.target.value)
-      this.volume = newVolume
-      this.$refs.audioElement.volume = newVolume
+      if (event && event.target) {
+        const newVolume = parseFloat(event.target.value)
+        this.volume = newVolume
+        if (this.$refs.audioElement) {
+          this.$refs.audioElement.volume = newVolume
+        }
+      } else {
+        // Direct volume setting (for mounted hook)
+        if (this.$refs.audioElement) {
+          this.$refs.audioElement.volume = this.volume
+        }
+      }
     },
 
     formatDuration(seconds) {

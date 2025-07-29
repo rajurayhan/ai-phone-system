@@ -262,6 +262,7 @@ export default {
     }
   },
   async mounted() {
+    console.log('CallLogDetailsPage mounted')
     this.checkAdminStatus()
     await this.loadCallLog()
   },
@@ -275,7 +276,9 @@ export default {
       try {
         this.loading = true
         const callId = this.$route.params.call_id
+        console.log('Loading call log for ID:', callId)
         const response = await axios.get(`/api/call-logs/${callId}`)
+        console.log('Call log response:', response.data)
         this.callLog = response.data.data
       } catch (error) {
         console.error('Error loading call log:', error)
@@ -330,11 +333,15 @@ export default {
     },
 
     toggleMetadata() {
+      console.log('toggleMetadata clicked, current state:', this.metadataCollapsed)
       this.metadataCollapsed = !this.metadataCollapsed
+      console.log('toggleMetadata new state:', this.metadataCollapsed)
     },
 
     toggleWebhookData() {
+      console.log('toggleWebhookData clicked, current state:', this.webhookDataCollapsed)
       this.webhookDataCollapsed = !this.webhookDataCollapsed
+      console.log('toggleWebhookData new state:', this.webhookDataCollapsed)
     }
   }
 }
