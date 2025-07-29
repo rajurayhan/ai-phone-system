@@ -351,7 +351,22 @@ export default {
           await showSuccess('Payment Successful', 'Your subscription has been activated successfully! You can now create voice assistants.')
           this.$router.push('/dashboard')
         } else {
-          showError('Payment Error', response.data.message || 'Failed to create subscription')
+          // Handle specific PaymentMethod errors
+          let errorMessage = response.data.message || 'Failed to create subscription'
+          
+          if (errorMessage.includes('payment method is invalid') || errorMessage.includes('expired')) {
+            errorMessage = 'Your payment method is invalid or has expired. Please try again with a different card.'
+            // Clear the card element to force user to re-enter
+            this.cardElement.clear()
+          } else if (errorMessage.includes('card was declined')) {
+            errorMessage = 'Your card was declined. Please try a different payment method.'
+            this.cardElement.clear()
+          } else if (errorMessage.includes('insufficient funds')) {
+            errorMessage = 'Insufficient funds. Please try a different payment method.'
+            this.cardElement.clear()
+          }
+          
+          showError('Payment Error', errorMessage)
         }
       } catch (error) {
         showError('Payment Error', error.response?.data?.message || 'Failed to process payment')

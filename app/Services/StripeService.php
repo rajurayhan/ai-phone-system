@@ -58,9 +58,9 @@ class StripeService
                 throw new \Exception('Failed to create or retrieve customer');
             }
 
-            // If payment method is provided, attach it to the customer first
+            // If payment method is provided, validate and attach it to the customer first
             if ($paymentMethodId) {
-                $this->attachPaymentMethodToCustomer($customerId, $paymentMethodId);
+                $this->validateAndAttachPaymentMethod($customerId, $paymentMethodId);
             }
 
             // Create subscription parameters
@@ -109,8 +109,25 @@ class StripeService
                 'trial_end' => $subscription->trial_end ? Carbon::createFromTimestamp($subscription->trial_end) : null,
             ];
         } catch (ApiErrorException $e) {
-            Log::error('Stripe subscription creation failed: ' . $e->getMessage());
-            return null;
+            Log::error('Stripe subscription creation failed: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'package_id' => $package->id,
+                'payment_method_id' => $paymentMethodId,
+                'error_code' => $e->getStripeCode(),
+                'error_type' => $e->getStripeCode(),
+            ]);
+            
+            // Provide more specific error messages
+            $errorMessage = 'Failed to create subscription';
+            if (str_contains($e->getMessage(), 'No such PaymentMethod')) {
+                $errorMessage = 'The payment method is invalid or has expired. Please try again with a different payment method.';
+            } elseif (str_contains($e->getMessage(), 'card was declined')) {
+                $errorMessage = 'Your card was declined. Please try a different payment method.';
+            } elseif (str_contains($e->getMessage(), 'insufficient funds')) {
+                $errorMessage = 'Insufficient funds. Please try a different payment method.';
+            }
+            
+            throw new \Exception($errorMessage);
         }
     }
 
@@ -282,6 +299,113 @@ class StripeService
         } catch (ApiErrorException $e) {
             Log::error('Stripe payment method attachment failed: ' . $e->getMessage());
             throw $e;
+        }
+    }
+
+    /**
+     * Validate and attach a payment method to a customer
+     */
+    private function validateAndAttachPaymentMethod(string $customerId, string $paymentMethodId): void
+    {
+        try {
+            // First, validate the payment method exists
+            $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
+            
+            // Check if payment method is already attached to this customer
+            if ($paymentMethod->customer && $paymentMethod->customer !== $customerId) {
+                throw new \Exception('Payment method is already attached to a different customer');
+            }
+            
+            // Attach the payment method to the customer if not already attached
+            if (!$paymentMethod->customer) {
+                $paymentMethod->attach(['customer' => $customerId]);
+            }
+            
+            Log::info('Payment method validated and attached to customer', [
+                'customer_id' => $customerId,
+                'payment_method_id' => $paymentMethodId,
+                'payment_method_type' => $paymentMethod->type
+            ]);
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe payment method validation/attachment failed: ' . $e->getMessage(), [
+                'customer_id' => $customerId,
+                'payment_method_id' => $paymentMethodId,
+                'error_code' => $e->getStripeCode(),
+                'error_type' => $e->getStripeCode(),
+            ]);
+            
+            // Provide specific error messages based on the error
+            if (str_contains($e->getMessage(), 'No such PaymentMethod')) {
+                throw new \Exception('The payment method is invalid or has expired. Please try again with a different payment method.');
+            } elseif (str_contains($e->getMessage(), 'already attached')) {
+                throw new \Exception('This payment method is already in use. Please try a different payment method.');
+            } else {
+                throw new \Exception('Failed to validate payment method: ' . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Clean up invalid PaymentMethod references in transactions
+     */
+    public function cleanupInvalidPaymentMethods(): array
+    {
+        $results = [
+            'checked' => 0,
+            'cleaned' => 0,
+            'errors' => []
+        ];
+        
+        try {
+            // Get all transactions with payment_method_id
+            $transactions = \App\Models\Transaction::whereNotNull('payment_method_id')->get();
+            
+            foreach ($transactions as $transaction) {
+                $results['checked']++;
+                
+                try {
+                    // Try to retrieve the PaymentMethod from Stripe
+                    $paymentMethod = PaymentMethod::retrieve($transaction->payment_method_id);
+                    
+                    // If successful, the PaymentMethod exists
+                    Log::info('PaymentMethod validation successful', [
+                        'transaction_id' => $transaction->id,
+                        'payment_method_id' => $transaction->payment_method_id
+                    ]);
+                    
+                } catch (ApiErrorException $e) {
+                    // PaymentMethod doesn't exist, clean it up
+                    if (str_contains($e->getMessage(), 'No such PaymentMethod')) {
+                        $transaction->update([
+                            'payment_method_id' => null,
+                            'payment_details' => array_merge($transaction->payment_details ?? [], [
+                                'cleaned_up' => true,
+                                'cleanup_reason' => 'PaymentMethod not found in Stripe',
+                                'cleanup_date' => now()->toISOString()
+                            ])
+                        ]);
+                        
+                        $results['cleaned']++;
+                        Log::info('Cleaned up invalid PaymentMethod reference', [
+                            'transaction_id' => $transaction->id,
+                            'payment_method_id' => $transaction->payment_method_id
+                        ]);
+                    } else {
+                        $results['errors'][] = [
+                            'transaction_id' => $transaction->id,
+                            'error' => $e->getMessage()
+                        ];
+                    }
+                }
+            }
+            
+            Log::info('PaymentMethod cleanup completed', $results);
+            return $results;
+            
+        } catch (\Exception $e) {
+            Log::error('PaymentMethod cleanup failed: ' . $e->getMessage());
+            $results['errors'][] = ['error' => $e->getMessage()];
+            return $results;
         }
     }
 

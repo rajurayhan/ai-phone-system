@@ -68,12 +68,12 @@ class StripeController extends Controller
         $paymentMethodId = $request->payment_method_id;
 
         // Create Stripe subscription
-        $stripeResult = $this->stripeService->createSubscription($user, $package, $paymentMethodId);
-
-        if (!$stripeResult) {
+        try {
+            $stripeResult = $this->stripeService->createSubscription($user, $package, $paymentMethodId);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create subscription'
+                'message' => $e->getMessage()
             ], 400);
         }
 
