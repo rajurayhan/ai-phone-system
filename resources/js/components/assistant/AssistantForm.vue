@@ -156,11 +156,6 @@
               ]"
             >
               <option value="United States">United States</option>
-              <option value="United Kingdom">United Kingdom (England, Scotland, Wales, Northern Ireland)</option>
-              <option value="Canada">Canada</option>
-              <option value="Australia">Australia</option>
-              <option value="New Zealand">New Zealand</option>
-              <option value="Ireland">Ireland</option>
             </select>
             <p v-if="fieldErrors.country" class="text-xs text-red-600 mt-1">{{ fieldErrors.country }}</p>
             <p v-else class="text-xs text-gray-500 mt-1">Country for Twilio phone number search</p>
@@ -288,7 +283,7 @@
                 
                 <!-- Area Code Support Info -->
                 <div v-if="form.metadata.country && !isAreaCodeSupported" class="mb-3 p-2 bg-yellow-100 rounded text-xs text-yellow-800">
-                  <span class="font-medium">ℹ️ Note:</span> Area codes are only supported for United States and Canada. For other countries, all available numbers in the country will be shown.
+                  <span class="font-medium">ℹ️ Note:</span> Area codes are supported for United States phone numbers.
                 </div>
                 
                 <!-- Search Reset Message -->
@@ -828,7 +823,7 @@ You embody the highest standards of customer service that {{company_name}} would
 
     // Computed property to check if area code is supported for the selected country
     const isAreaCodeSupported = computed(() => {
-      return form.value.metadata.country === 'United States' || form.value.metadata.country === 'Canada'
+      return form.value.metadata.country === 'United States'
     })
 
     // Watch for type changes to handle template loading

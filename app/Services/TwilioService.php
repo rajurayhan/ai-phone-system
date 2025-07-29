@@ -32,8 +32,8 @@ class TwilioService
                 'smsEnabled' => true
             ];
             
-            // Add area code filter only for US and Canada (where area codes are applicable)
-            if ($areaCode && in_array($countryCode, ['US', 'CA'])) {
+            // Add area code filter only for US (where area codes are applicable)
+            if ($areaCode && $countryCode === 'US') {
                 $params['areaCode'] = $areaCode;
             }
             
@@ -282,12 +282,7 @@ class TwilioService
         // If it doesn't start with +, add country code
         if (!str_starts_with($phoneNumber, '+')) {
             $countryPrefixes = [
-                'US' => '+1',
-                'CA' => '+1',
-                'GB' => '+44',
-                'AU' => '+61',
-                'NZ' => '+64',
-                'IE' => '+353'
+                'US' => '+1'
             ];
             
             $phoneNumber = ($countryPrefixes[$countryCode] ?? '+1') . $phoneNumber;
@@ -311,7 +306,7 @@ class TwilioService
         $results['api_connection'] = $this->testApiConnection();
         
         // Test 3: Test available numbers for different countries
-        $countries = ['US', 'CA', 'GB', 'AU'];
+        $countries = ['US'];
         foreach ($countries as $country) {
             $results['available_numbers_' . $country] = $this->testAvailableNumbersEndpoint($country);
         }
