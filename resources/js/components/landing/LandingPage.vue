@@ -289,7 +289,7 @@
                 </div>
                 <div class="ml-4">
                   <p class="text-sm font-medium text-gray-900">Phone</p>
-                  <a href="tel:+12314445797" class="text-lg text-primary-600 hover:text-primary-700 font-medium">(231) 444-5797</a>
+                  <a href="tel:+12314445797" class="text-lg text-primary-600 hover:text-primary-700 font-medium">(682) 582 8396</a>
                 </div>
               </div>
               
