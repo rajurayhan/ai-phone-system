@@ -60,4 +60,8 @@
     <p style="margin-top: 20px; font-size: 14px; color: #6c757d;">
         <strong>Security reminder:</strong> Never share your password reset link with anyone. Our support team will never ask for your password or reset link.
     </p>
+    
+    <p style="margin-top: 20px; font-size: 12px; color: #6c757d;">
+        By using our service, you agree to our <a href="{{ config('app.url') }}/terms" style="color: #667eea;">Terms of Service</a> and <a href="{{ config('app.url') }}/privacy" style="color: #667eea;">Privacy Policy</a>.
+    </p>
 @endsection 

@@ -52,4 +52,8 @@
     <p style="margin-top: 30px; font-size: 14px; color: #6c757d;">
         <strong>Note:</strong> If you did not create an account with XpartFone, please ignore this email. No further action is required.
     </p>
+    
+    <p style="margin-top: 20px; font-size: 12px; color: #6c757d;">
+        By using our service, you agree to our <a href="{{ config('app.url') }}/terms" style="color: #667eea;">Terms of Service</a> and <a href="{{ config('app.url') }}/privacy" style="color: #667eea;">Privacy Policy</a>.
+    </p>
 @endsection 

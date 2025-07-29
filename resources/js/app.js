@@ -32,6 +32,8 @@ import SystemSettings from './components/admin/SystemSettings.vue'
 import CallLogsPage from './components/call-logs/CallLogsPage.vue'
 import AdminCallLogs from './components/admin/CallLogs.vue'
 import ContactManagement from './components/admin/ContactManagement.vue'
+import TermsOfService from './components/shared/TermsOfService.vue'
+import PrivacyPolicy from './components/shared/PrivacyPolicy.vue'
 import NotFound from './components/shared/NotFound.vue'
 
 // Set initial document title
@@ -206,6 +208,16 @@ const router = createRouter({
             name: 'admin-contacts',
             component: ContactManagement,
             meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/terms',
+            name: 'terms',
+            component: TermsOfService
+        },
+        {
+            path: '/privacy',
+            name: 'privacy',
+            component: PrivacyPolicy
         },
         {
             path: '/:pathMatch(.*)*',

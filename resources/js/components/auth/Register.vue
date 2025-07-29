@@ -106,9 +106,9 @@
           />
           <label for="terms" class="ml-2 block text-sm text-gray-700">
             I agree to the
-            <a href="#" class="text-primary-600 hover:text-primary-500 transition-colors duration-200">Terms of Service</a>
+            <router-link to="/terms" class="text-primary-600 hover:text-primary-500 transition-colors duration-200">Terms of Service</router-link>
             and
-            <a href="#" class="text-primary-600 hover:text-primary-500 transition-colors duration-200">Privacy Policy</a>
+            <router-link to="/privacy" class="text-primary-600 hover:text-primary-500 transition-colors duration-200">Privacy Policy</router-link>
           </label>
         </div>
 

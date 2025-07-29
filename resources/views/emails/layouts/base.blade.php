@@ -314,7 +314,8 @@
                 <a href="{{ config('app.url') }}">Home</a>
                 <a href="{{ config('app.url') }}/dashboard">Dashboard</a>
                 <a href="{{ config('app.url') }}/support">Support</a>
-                <a href="{{ config('app.url') }}/privacy">Privacy</a>
+                <a href="{{ config('app.url') }}/terms">Terms of Service</a>
+                <a href="{{ config('app.url') }}/privacy">Privacy Policy</a>
             </div>
             
             <div class="social-links">

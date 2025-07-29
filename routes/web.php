@@ -42,6 +42,14 @@ Route::get('/debug', function () {
     return view('debug');
 });
 
+Route::get('/terms', function () {
+    return view('app');
+})->name('terms');
+
+Route::get('/privacy', function () {
+    return view('app');
+})->name('privacy');
+
 // Serve the SPA for all routes except API routes
 Route::get('/{any}', function () {
     return view('app');
