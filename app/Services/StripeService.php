@@ -308,6 +308,19 @@ class StripeService
     private function validateAndAttachPaymentMethod(string $customerId, string $paymentMethodId): void
     {
         try {
+            // Log the environment being used
+            $isTestMode = config('stripe.test_mode', true);
+            $apiKey = config('stripe.secret_key');
+            $keyType = strpos($apiKey, 'sk_test_') === 0 ? 'TEST' : 'LIVE';
+            
+            Log::info('Validating payment method', [
+                'customer_id' => $customerId,
+                'payment_method_id' => $paymentMethodId,
+                'environment' => $isTestMode ? 'TEST' : 'LIVE',
+                'key_type' => $keyType,
+                'api_key_prefix' => substr($apiKey, 0, 20) . '...'
+            ]);
+            
             // First, validate the payment method exists
             $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
             
@@ -324,23 +337,36 @@ class StripeService
             Log::info('Payment method validated and attached to customer', [
                 'customer_id' => $customerId,
                 'payment_method_id' => $paymentMethodId,
-                'payment_method_type' => $paymentMethod->type
+                'payment_method_type' => $paymentMethod->type,
+                'environment' => $isTestMode ? 'TEST' : 'LIVE'
             ]);
         } catch (ApiErrorException $e) {
-            Log::error('Stripe payment method validation/attachment failed: ' . $e->getMessage(), [
+            $errorCode = $e->getStripeCode();
+            $errorType = $e->getStripeCode();
+            $errorMessage = $e->getMessage();
+            
+            Log::error('Stripe payment method validation/attachment failed', [
                 'customer_id' => $customerId,
                 'payment_method_id' => $paymentMethodId,
-                'error_code' => $e->getStripeCode(),
-                'error_type' => $e->getStripeCode(),
+                'error_code' => $errorCode,
+                'error_type' => $errorType,
+                'error_message' => $errorMessage,
+                'environment' => config('stripe.test_mode', true) ? 'TEST' : 'LIVE',
+                'api_key_prefix' => substr(config('stripe.secret_key'), 0, 20) . '...'
             ]);
             
             // Provide specific error messages based on the error
-            if (str_contains($e->getMessage(), 'No such PaymentMethod')) {
-                throw new \Exception('The payment method is invalid or has expired. Please try again with a different payment method.');
-            } elseif (str_contains($e->getMessage(), 'already attached')) {
+            if (str_contains($errorMessage, 'No such PaymentMethod')) {
+                $envInfo = config('stripe.test_mode', true) ? 'test' : 'production';
+                throw new \Exception("The payment method is invalid or has expired. This could be because you're using a {$envInfo} payment method with the wrong environment. Please try again with a different payment method.");
+            } elseif (str_contains($errorMessage, 'already attached')) {
                 throw new \Exception('This payment method is already in use. Please try a different payment method.');
+            } elseif (str_contains($errorMessage, 'authentication_required')) {
+                throw new \Exception('Payment requires authentication. Please complete the 3D Secure verification.');
+            } elseif (str_contains($errorMessage, 'card_declined')) {
+                throw new \Exception('Your card was declined. Please try a different payment method.');
             } else {
-                throw new \Exception('Failed to validate payment method: ' . $e->getMessage());
+                throw new \Exception('Failed to validate payment method: ' . $errorMessage);
             }
         }
     }
