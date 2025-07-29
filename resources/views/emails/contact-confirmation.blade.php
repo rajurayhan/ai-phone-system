@@ -3,7 +3,7 @@
 @section('content')
     <h2>Thank You for Contacting Us! 📧</h2>
     
-    <p>Hello <strong>{{ $contact->first_name }}</strong>, thank you for reaching out to HiveAIPhone. We've received your message and will get back to you as soon as possible.</p>
+    <p>Hello <strong>{{ $contact->first_name }}</strong>, thank you for reaching out to XpartFone. We've received your message and will get back to you as soon as possible.</p>
     
     <div class="card success-card">
         <h3 style="color: #2d3748; margin-bottom: 15px;">✅ Message Received</h3>
@@ -60,7 +60,7 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
             <div style="background: #f0fff4; padding: 15px; border-radius: 8px; border: 2px solid #48bb78;">
                 <h4 style="color: #2d3748; margin-bottom: 10px;">📧 Email</h4>
-                <p style="color: #4a5568;">HiveAIPhone@gmail.com</p>
+                <p style="color: #4a5568;">XpartFone@gmail.com</p>
             </div>
             <div style="background: #fffaf0; padding: 15px; border-radius: 8px; border: 2px solid #ed8936;">
                 <h4 style="color: #2d3748; margin-bottom: 10px;">📞 Phone</h4>
@@ -82,7 +82,7 @@
     </div>
     
     <p style="margin-top: 30px; color: #4a5568;">
-        Thank you for choosing HiveAIPhone! We're excited to help you with your voice AI needs.
+        Thank you for choosing XpartFone! We're excited to help you with your voice AI needs.
     </p>
     
     <p style="margin-top: 20px; font-size: 14px; color: #6c757d;">

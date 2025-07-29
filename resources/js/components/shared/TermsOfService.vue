@@ -18,12 +18,12 @@
         <div class="prose prose-lg max-w-none">
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
           <p class="mb-6">
-            By accessing and using HiveAIPhone ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+            By accessing and using XpartFone ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
           <p class="mb-6">
-            HiveAIPhone provides voice AI assistant services, including but not limited to:
+            XpartFone provides voice AI assistant services, including but not limited to:
           </p>
           <ul class="list-disc pl-6 mb-6 space-y-2">
             <li>Voice assistant creation and customization</li>
@@ -76,12 +76,12 @@
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Intellectual Property</h2>
           <p class="mb-6">
-            The Service and its original content, features, and functionality are owned by HiveAIPhone and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+            The Service and its original content, features, and functionality are owned by XpartFone and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">8. Limitation of Liability</h2>
           <p class="mb-6">
-            In no event shall HiveAIPhone, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the Service.
+            In no event shall XpartFone, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the Service.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">9. Termination</h2>
@@ -99,7 +99,7 @@
             If you have any questions about these Terms of Service, please contact us at:
           </p>
           <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="mb-2"><strong>Email:</strong> support@HiveAIPhone.com</p>
+            <p class="mb-2"><strong>Email:</strong> support@XpartFone.com</p>
             <p><strong>Phone:</strong> (231) 444-5797
             </p>
           </div>

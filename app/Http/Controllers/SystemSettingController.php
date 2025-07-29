@@ -93,8 +93,8 @@ class SystemSettingController extends Controller
     public function getPublicSettings(): JsonResponse
     {
         $settings = [
-            'site_title' => SystemSetting::getValue('site_title', 'HiveAIPhone'),
-            'site_tagline' => SystemSetting::getValue('site_tagline', 'Never Miss a call Again HiveAIPhone answers 24x7! Voice AI Platform'),
+            'site_title' => SystemSetting::getValue('site_title', 'XpartFone'),
+            'site_tagline' => SystemSetting::getValue('site_tagline', 'Never Miss a call Again XpartFone answers 24x7! Voice AI Platform'),
             'meta_description' => SystemSetting::getValue('meta_description', 'Transform your business with cutting-edge voice AI technology'),
             'logo_url' => SystemSetting::getValue('logo_url'),
             'homepage_banner' => SystemSetting::getValue('homepage_banner'),
