@@ -130,7 +130,8 @@
           </p>
           <div class="bg-gray-50 p-4 rounded-lg">
             <p class="mb-2"><strong>Email:</strong> privacy@xpartfone.com</p>
-            <p><strong>Phone:</strong> (682) 582 8396</p>
+            <p><strong>Phone:</strong> (231) 444-5797
+            </p>
           </div>
         </div>
       </div>

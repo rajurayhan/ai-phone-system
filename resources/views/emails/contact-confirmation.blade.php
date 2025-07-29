@@ -64,7 +64,7 @@
             </div>
             <div style="background: #fffaf0; padding: 15px; border-radius: 8px; border: 2px solid #ed8936;">
                 <h4 style="color: #2d3748; margin-bottom: 10px;">📞 Phone</h4>
-                <p style="color: #4a5568;">(682) 582 8396</p>
+                <p style="color: #4a5568;">(231) 444-5797</p>
             </div>
         </div>
         <p style="color: #6c757d; font-size: 14px; margin-top: 15px;">
