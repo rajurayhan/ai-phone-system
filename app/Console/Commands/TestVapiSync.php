@@ -34,7 +34,7 @@ class TestVapiSync extends Command
         // Get Vapi API token from environment
         $vapiToken = config('services.vapi.token');
         if (!$vapiToken) {
-            $this->error('VAPI_TOKEN not found in environment variables');
+            $this->error('VAPI_API_KEY not found in environment variables');
             return 1;
         }
 

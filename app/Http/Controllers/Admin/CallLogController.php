@@ -121,13 +121,16 @@ class CallLogController extends Controller
                 DB::raw('count(*) as total_calls'),
                 DB::raw('sum(case when status = "completed" then 1 else 0 end) as completed_calls')
             )
-            ->with('assistant.user')
             ->groupBy('assistant_id')
             ->having('total_calls', '>', 0)
             ->orderBy('total_calls', 'desc')
             ->limit(10)
             ->get()
             ->map(function ($item) {
+                // Load assistant data separately
+                $assistant = Assistant::with('user')->find($item->assistant_id);
+                $item->assistant_name = $assistant ? $assistant->name : 'Unknown Assistant';
+                $item->assistant_user_name = $assistant && $assistant->user ? $assistant->user->name : 'Unknown User';
                 $item->completion_rate = $item->total_calls > 0 
                     ? round(($item->completed_calls / $item->total_calls) * 100, 1)
                     : 0;

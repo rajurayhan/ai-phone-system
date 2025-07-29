@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Assistant;
 use App\Models\CallLog;
 use App\Models\User;
@@ -39,7 +40,7 @@ class SyncVapiCalls extends Command
         // Get Vapi API token from environment
         $vapiToken = config('services.vapi.token');
         if (!$vapiToken) {
-            $this->error('VAPI_TOKEN not found in environment variables');
+            $this->error('VAPI_API_KEY not found in environment variables');
             return 1;
         }
 
@@ -194,12 +195,11 @@ class SyncVapiCalls extends Command
         
         if ($existingCall) {
             if ($dryRun) {
-                $this->line("Would update existing call: {$callId}");
+                $this->line("Would skip existing call: {$callId}");
             } else {
-                $this->updateCallLog($existingCall, $call, $assistant);
-                $this->line("Updated call: {$callId}");
+                $this->line("Skipped existing call: {$callId}");
             }
-            return 'synced';
+            return 'skipped';
         }
 
         if ($dryRun) {
@@ -263,7 +263,8 @@ class SyncVapiCalls extends Command
         
         // Calculate duration
         if ($callLog->start_time && $callLog->end_time) {
-            $callLog->duration = $callLog->end_time->diffInSeconds($callLog->start_time);
+            $duration = $callLog->end_time->diffInSeconds($callLog->start_time);
+            $callLog->duration = max(0, $duration); // Ensure non-negative duration
         }
         
         // Status mapping
@@ -302,6 +303,9 @@ class SyncVapiCalls extends Command
         if (!empty($metadata)) {
             $callLog->metadata = $metadata;
         }
+
+        // Download call recording if available
+        $this->downloadCallRecording($callLog, $call);
     }
 
     /**
@@ -337,5 +341,86 @@ class SyncVapiCalls extends Command
         }
 
         return str_contains($vapiType, 'outbound') ? 'outbound' : 'inbound';
+    }
+
+    /**
+     * Download call recording if available
+     */
+    private function downloadCallRecording(CallLog $callLog, array $call)
+    {
+        try {
+            // Check for recording URL in different possible locations
+            $recordingUrl = $call['recordingUrl'] ?? 
+                           $call['artifact']['recordingUrl'] ?? 
+                           $call['messages'][0]['artifact']['recordingUrl'] ?? 
+                           null;
+
+            if (!$recordingUrl) {
+                return; // No recording available
+            }
+
+            // Generate alphanumeric filename (same as webhook processor)
+            $fileName = $this->generateAlphanumericFileName();
+            $fileExtension = 'wav'; // Vapi recordings are typically WAV
+            $fullFileName = $fileName . '.' . $fileExtension;
+            
+            // Create recordings directory if it doesn't exist
+            $directory = 'recordings';
+            if (!Storage::disk('public')->exists($directory)) {
+                Storage::disk('public')->makeDirectory($directory);
+            }
+            
+            $filePath = $directory . '/' . $fullFileName;
+            
+            // Download the file
+            $fileContent = file_get_contents($recordingUrl);
+            if ($fileContent === false) {
+                $this->warn("Failed to download recording for call: {$callLog->call_id}");
+                return;
+            }
+            
+            // Store the file
+            $stored = Storage::disk('public')->put($filePath, $fileContent);
+            if (!$stored) {
+                $this->warn("Failed to store recording for call: {$callLog->call_id}");
+                return;
+            }
+            
+            // Update call log with filename
+            $callLog->call_record_file_name = $fullFileName;
+            $callLog->save();
+            
+            $this->line("Downloaded recording for call: {$callLog->call_id} -> {$fullFileName}");
+            
+            Log::info('Downloaded call recording from Vapi sync', [
+                'call_id' => $callLog->call_id,
+                'filename' => $fullFileName,
+                'file_path' => $filePath,
+                'file_size' => strlen($fileContent)
+            ]);
+
+        } catch (\Exception $e) {
+            $this->error("Error downloading recording for call {$callLog->call_id}: " . $e->getMessage());
+            Log::error('Error downloading call recording', [
+                'call_id' => $callLog->call_id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Generate alphanumeric filename with mix of capital and small letters
+     */
+    private function generateAlphanumericFileName(): string
+    {
+        $length = 12; // 12 characters for good uniqueness
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        $fileName = '';
+        
+        for ($i = 0; $i < $length; $i++) {
+            $fileName .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        
+        return $fileName;
     }
 } 
