@@ -15,7 +15,7 @@
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'Hive AI Phone' }}</h1>
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
                 </div>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default {
       loading: false,
       error: '',
       settings: {
-        site_title: 'Hive AI Phone',
+        site_title: 'XpartFone',
         logo_url: '/logo.png'
       }
     }
@@ -178,7 +178,7 @@ export default {
     } catch (error) {
       // Set default values if API fails
       this.settings = {
-        site_title: 'Hive AI Phone',
+        site_title: 'XpartFone',
         logo_url: '/logo.png'
       }
     }

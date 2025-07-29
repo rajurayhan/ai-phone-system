@@ -62,7 +62,7 @@
     </div>
     
     <p style="margin-top: 30px; color: #4a5568;">
-        We'd love to hear your feedback about your experience with Hive AI Phone. Your input helps us improve our platform for all users.
+        We'd love to hear your feedback about your experience with XpartFone. Your input helps us improve our platform for all users.
     </p>
     
     <p style="margin-top: 20px; font-size: 14px; color: #6c757d;">

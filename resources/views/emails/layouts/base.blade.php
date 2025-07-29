@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $subject ?? 'Hive AI Phone' }}</title>
+    <title>{{ $subject ?? 'XpartFone' }}</title>
     <style>
         /* Reset and base styles */
         * {
@@ -299,7 +299,7 @@
         <div class="header">
             <div class="logo">
                 <span class="logo-icon"></span>
-                Hive AI Phone
+                XpartFone
             </div>
             <h1>{{ $headerTitle ?? 'Welcome' }}</h1>
             <p>{{ $headerSubtitle ?? 'Your Voice AI Platform' }}</p>
@@ -325,10 +325,10 @@
                 <a href="#" title="Email">📧</a>
             </div>
             
-            <p><strong>Hive AI Phone Team</strong></p>
+            <p><strong>XpartFone Team</strong></p>
             <p>This is an automated email. Please do not reply to this message.</p>
-            <p>For support, contact us at <a href="mailto:support@Hive AI Phone.com">support@Hive AI Phone.com</a></p>
-            <p>&copy; {{ date('Y') }} Hive AI Phone. All rights reserved.</p>
+            <p>For support, contact us at <a href="mailto:support@XpartFone.com">support@XpartFone.com</a></p>
+            <p>&copy; {{ date('Y') }} XpartFone. All rights reserved.</p>
         </div>
     </div>
 </body>

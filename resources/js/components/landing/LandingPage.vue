@@ -16,7 +16,7 @@
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'Hive AI Phone' }}</h1>
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@
             <div class="sm:text-center lg:text-left">
               <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl"> 
                 <span class="block xl:inline">Never Miss a call Again </span>
-                <span class="block text-primary-600 xl:inline"> Hive AI Phone answers 24x7!</span> 
+                <span class="block text-primary-600 xl:inline"> XpartFone answers 24x7!</span> 
               </h1>
               <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
                 {{ 'Transform your business with cutting-edge voice AI technology. Create intelligent voice agents that understand, respond, and engage with your customers 24/7.' }}
@@ -180,7 +180,7 @@
         <div class="lg:text-center">
           <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">Features</h2>
           <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Everything you need for Hive AI Phone
+            Everything you need for XpartFone
           </p>
           <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
             Our platform provides all the tools you need to create, deploy, and manage intelligent voice agents.
@@ -301,7 +301,7 @@
                 </div>
                 <div class="ml-4">
                   <p class="text-sm font-medium text-gray-900">Email</p>
-                  <a href="mailto:Hive AI Phone@gmail.com" class="text-lg text-primary-600 hover:text-primary-700 font-medium">Hive AI Phone@gmail.com</a>
+                  <a href="mailto:XpartFone@gmail.com" class="text-lg text-primary-600 hover:text-primary-700 font-medium">XpartFone@gmail.com</a>
                 </div>
               </div>
               
@@ -453,7 +453,7 @@
           <span class="block">Transform your business today.</span>
         </h2>
         <p class="mt-4 text-lg leading-6 text-primary-200">
-          Join thousands of businesses already using our Hive AI Phone platform.
+          Join thousands of businesses already using our XpartFone platform.
         </p>
         <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           <router-link v-if="!isAuthenticated" to="/register" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50">
@@ -484,7 +484,7 @@
                 </svg>
               </div>
               <div class="ml-2">
-                <h3 class="text-xl font-bold text-white">{{ settings.site_title || 'Hive AI Phone' }}</h3>
+                <h3 class="text-xl font-bold text-white">{{ settings.site_title || 'XpartFone' }}</h3>
               </div>
             </div>
             <p class="text-gray-300 text-base">
@@ -514,7 +514,7 @@
         </div>
         <div class="mt-12 border-t border-gray-700 pt-8">
           <p class="text-base text-gray-400 xl:text-center">
-            &copy; 2024 Hive AI Phone. All rights reserved.
+            &copy; 2024 XpartFone. All rights reserved.
           </p>
         </div>
       </div>
@@ -576,8 +576,8 @@ export default {
       } catch (error) {
         // Set default values if API fails
         settings.value = {
-          site_title: 'Hive AI Phone',
-          site_tagline: 'Never Miss a call Again Hive AI Phone answers 24x7!',
+          site_title: 'XpartFone',
+          site_tagline: 'Never Miss a call Again XpartFone answers 24x7!',
           logo_url: '/logo.png',
           homepage_banner: null
         }
@@ -625,8 +625,8 @@ export default {
       loadFeatures()
       loadSettings()
       // Set document title as "title - tagline"
-      const title = settings.value.site_title || 'Hive AI Phone'
-      const tagline = settings.value.site_tagline || 'Never Miss a call Again Hive AI Phone answers 24x7!'
+      const title = settings.value.site_title || 'XpartFone'
+      const tagline = settings.value.site_tagline || 'Never Miss a call Again XpartFone answers 24x7!'
       updateDocumentTitle(`${title} - ${tagline}`)
       
       // Close mobile menu when clicking outside

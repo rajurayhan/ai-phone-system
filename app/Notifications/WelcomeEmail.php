@@ -40,11 +40,11 @@ class WelcomeEmail extends Notification
         $verificationUrl = config('app.url') . '/api/verify-email/' . $hash . '?t=' . $timestamp;
 
         return (new MailMessage)
-            ->subject('Welcome to Hive AI Phone! 🎉')
+            ->subject('Welcome to XpartFone! 🎉')
             ->view('emails.welcome', [
                 'user' => $notifiable,
                 'verificationUrl' => $verificationUrl,
-                'headerTitle' => 'Welcome to Hive AI Phone!',
+                'headerTitle' => 'Welcome to XpartFone!',
                 'headerSubtitle' => 'Your Voice AI Platform',
             ]);
     }
