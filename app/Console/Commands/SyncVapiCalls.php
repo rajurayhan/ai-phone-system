@@ -10,6 +10,7 @@ use App\Models\Assistant;
 use App\Models\CallLog;
 use App\Models\User;
 use Carbon\Carbon;
+use getID3;
 
 class SyncVapiCalls extends Command
 {
@@ -261,11 +262,13 @@ class SyncVapiCalls extends Command
         $callLog->start_time = $call['startedAt'] ? Carbon::parse($call['startedAt']) : null;
         $callLog->end_time = $call['endedAt'] ? Carbon::parse($call['endedAt']) : null;
         
-        // Calculate duration
+        // Calculate duration from timestamps (fallback)
         if ($callLog->start_time && $callLog->end_time) {
             $duration = $callLog->end_time->diffInSeconds($callLog->start_time);
             $callLog->duration = max(0, $duration); // Ensure non-negative duration
         }
+        
+        // Note: Duration will be updated from audio file if available during download
         
         // Status mapping
         $callLog->status = $this->mapVapiStatus($call['status']);
@@ -386,18 +389,27 @@ class SyncVapiCalls extends Command
                 return;
             }
             
-            // Update call log with filename
-            $callLog->call_record_file_name = $fullFileName;
-            $callLog->save();
-            
-            $this->line("Downloaded recording for call: {$callLog->call_id} -> {$fullFileName}");
-            
-            Log::info('Downloaded call recording from Vapi sync', [
-                'call_id' => $callLog->call_id,
-                'filename' => $fullFileName,
-                'file_path' => $filePath,
-                'file_size' => strlen($fileContent)
-            ]);
+                    // Update call log with filename
+        $callLog->call_record_file_name = $fullFileName;
+        
+        // Extract duration from audio file and update call log
+        $duration = $this->extractAudioDuration($filePath);
+        if ($duration !== null) {
+            $callLog->duration = $duration;
+            $this->line("Extracted duration from audio: {$duration} seconds");
+        }
+        
+        $callLog->save();
+        
+        $this->line("Downloaded recording for call: {$callLog->call_id} -> {$fullFileName}");
+        
+        Log::info('Downloaded call recording from Vapi sync', [
+            'call_id' => $callLog->call_id,
+            'filename' => $fullFileName,
+            'file_path' => $filePath,
+            'file_size' => strlen($fileContent),
+            'duration' => $duration
+        ]);
 
         } catch (\Exception $e) {
             $this->error("Error downloading recording for call {$callLog->call_id}: " . $e->getMessage());
@@ -422,5 +434,114 @@ class SyncVapiCalls extends Command
         }
         
         return $fileName;
+    }
+
+    /**
+     * Extract duration from audio file
+     */
+    private function extractAudioDuration(string $filePath): ?int
+    {
+        try {
+            // Get full path to the file
+            $fullPath = Storage::disk('public')->path($filePath);
+            
+            if (!file_exists($fullPath)) {
+                $this->warn("Audio file not found: {$fullPath}");
+                return null;
+            }
+
+            // Method 1: Try using getID3 library
+            if (class_exists('getID3')) {
+                $getID3 = new getID3();
+                $fileInfo = $getID3->analyze($fullPath);
+                
+                if (isset($fileInfo['playtime_seconds'])) {
+                    return (int) $fileInfo['playtime_seconds'];
+                }
+            }
+
+            // Method 2: Try using FFmpeg if available
+            $ffmpegPath = $this->findFFmpeg();
+            if ($ffmpegPath) {
+                $command = "{$ffmpegPath} -i " . escapeshellarg($fullPath) . " 2>&1";
+                $output = shell_exec($command);
+                
+                // Parse duration from FFmpeg output
+                if (preg_match('/Duration: (\d{2}):(\d{2}):(\d{2})\.(\d{2})/', $output, $matches)) {
+                    $hours = (int) $matches[1];
+                    $minutes = (int) $matches[2];
+                    $seconds = (int) $matches[3];
+                    $centiseconds = (int) $matches[4];
+                    
+                    $totalSeconds = ($hours * 3600) + ($minutes * 60) + $seconds + ($centiseconds / 100);
+                    return (int) $totalSeconds;
+                }
+            }
+
+            // Method 3: Try using soxi (Sound eXchange Info) if available
+            $soxiPath = $this->findSoxi();
+            if ($soxiPath) {
+                $command = "{$soxiPath} -D " . escapeshellarg($fullPath) . " 2>/dev/null";
+                $output = shell_exec($command);
+                
+                if (is_numeric($output)) {
+                    return (int) $output;
+                }
+            }
+
+            $this->warn("Could not extract duration from audio file: {$filePath}");
+            return null;
+
+        } catch (\Exception $e) {
+            $this->error("Error extracting audio duration: " . $e->getMessage());
+            Log::error('Error extracting audio duration', [
+                'file_path' => $filePath,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Find FFmpeg executable
+     */
+    private function findFFmpeg(): ?string
+    {
+        $possiblePaths = [
+            'ffmpeg',
+            '/usr/bin/ffmpeg',
+            '/usr/local/bin/ffmpeg',
+            '/opt/homebrew/bin/ffmpeg',
+            '/usr/local/opt/ffmpeg/bin/ffmpeg'
+        ];
+
+        foreach ($possiblePaths as $path) {
+            if (is_executable($path) || shell_exec("which {$path} 2>/dev/null")) {
+                return $path;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find soxi executable
+     */
+    private function findSoxi(): ?string
+    {
+        $possiblePaths = [
+            'soxi',
+            '/usr/bin/soxi',
+            '/usr/local/bin/soxi',
+            '/opt/homebrew/bin/soxi'
+        ];
+
+        foreach ($possiblePaths as $path) {
+            if (is_executable($path) || shell_exec("which {$path} 2>/dev/null")) {
+                return $path;
+            }
+        }
+
+        return null;
     }
 } 
