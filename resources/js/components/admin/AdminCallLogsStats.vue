@@ -239,7 +239,6 @@
               </div>
               <div class="text-right">
                 <div class="text-sm font-medium text-gray-900">{{ assistant.total_calls }} calls</div>
-                <div class="text-xs text-gray-500">{{ assistant.completion_rate }}% success</div>
               </div>
             </div>
           </div>
