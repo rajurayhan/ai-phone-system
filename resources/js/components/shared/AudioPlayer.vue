@@ -113,9 +113,14 @@
       :src="audioUrl"
       @loadedmetadata="onLoadedMetadata"
       @timeupdate="onTimeUpdate"
+      @play="onPlay"
+      @pause="onPause"
       @ended="onEnded"
       @error="onError"
+      @loadstart="onLoadStart"
+      @canplay="onCanPlay"
       preload="metadata"
+      crossorigin="anonymous"
     ></audio>
   </div>
 </template>
@@ -150,16 +155,25 @@ export default {
     }
   },
   mounted() {
+    console.log('AudioPlayer mounted with URL:', this.audioUrl)
     this.setVolume(this.volume)
   },
   methods: {
     togglePlay() {
-      if (!this.isLoaded) return
+      console.log('Toggle play clicked, isLoaded:', this.isLoaded, 'isPlaying:', this.isPlaying)
+      if (!this.isLoaded) {
+        console.log('Audio not loaded yet')
+        return
+      }
       
       if (this.isPlaying) {
+        console.log('Pausing audio')
         this.$refs.audioElement.pause()
       } else {
-        this.$refs.audioElement.play()
+        console.log('Playing audio')
+        this.$refs.audioElement.play().catch(error => {
+          console.error('Error playing audio:', error)
+        })
       }
     },
 
@@ -195,6 +209,7 @@ export default {
     },
 
     onLoadedMetadata() {
+      console.log('Audio metadata loaded, duration:', this.$refs.audioElement.duration)
       this.isLoaded = true
       this.duration = this.$refs.audioElement.duration
     },
@@ -203,8 +218,27 @@ export default {
       this.currentTime = this.$refs.audioElement.currentTime
     },
 
-    onEnded() {
+    onPlay() {
+      console.log('Audio started playing')
+      this.isPlaying = true
+    },
+
+    onPause() {
+      console.log('Audio paused')
       this.isPlaying = false
+    },
+
+    onEnded() {
+      console.log('Audio ended')
+      this.isPlaying = false
+    },
+
+    onLoadStart() {
+      console.log('Audio load started')
+    },
+
+    onCanPlay() {
+      console.log('Audio can play')
     },
 
     onError(event) {

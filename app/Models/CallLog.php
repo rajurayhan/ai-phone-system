@@ -36,6 +36,16 @@ class CallLog extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'has_recording',
+        'public_audio_url',
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
@@ -189,5 +199,13 @@ class CallLog extends Model
     public function hasRecording(): bool
     {
         return !empty($this->call_record_file_name);
+    }
+
+    /**
+     * Get has_recording attribute for API
+     */
+    public function getHasRecordingAttribute(): bool
+    {
+        return $this->hasRecording();
     }
 } 

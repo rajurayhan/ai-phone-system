@@ -179,16 +179,36 @@
 
           <!-- Metadata - Admin Only -->
           <div v-if="callLog.metadata" class="p-6 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Metadata</h3>
-            <div class="bg-gray-50 p-4 rounded-md">
+            <div class="flex items-center justify-between cursor-pointer" @click="toggleMetadata">
+              <h3 class="text-lg font-medium text-gray-900">Metadata</h3>
+              <svg 
+                :class="['w-5 h-5 text-gray-500 transition-transform', { 'rotate-180': !metadataCollapsed }]"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+            <div v-show="!metadataCollapsed" class="mt-4 bg-gray-50 p-4 rounded-md">
               <pre class="text-xs text-gray-700 overflow-x-auto">{{ JSON.stringify(callLog.metadata, null, 2) }}</pre>
             </div>
           </div>
 
           <!-- Webhook Data - Admin Only -->
           <div v-if="callLog.webhook_data" class="p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Webhook Data</h3>
-            <div class="bg-gray-50 p-4 rounded-md">
+            <div class="flex items-center justify-between cursor-pointer" @click="toggleWebhookData">
+              <h3 class="text-lg font-medium text-gray-900">Webhook Data</h3>
+              <svg 
+                :class="['w-5 h-5 text-gray-500 transition-transform', { 'rotate-180': !webhookDataCollapsed }]"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+            <div v-show="!webhookDataCollapsed" class="mt-4 bg-gray-50 p-4 rounded-md">
               <pre class="text-xs text-gray-700 overflow-x-auto">{{ JSON.stringify(callLog.webhook_data, null, 2) }}</pre>
             </div>
           </div>
@@ -231,7 +251,9 @@ export default {
   data() {
     return {
       loading: true,
-      callLog: null
+      callLog: null,
+      metadataCollapsed: true,
+      webhookDataCollapsed: true
     }
   },
   computed: {
@@ -313,6 +335,14 @@ export default {
         minute: '2-digit',
         second: '2-digit'
       })
+    },
+
+    toggleMetadata() {
+      this.metadataCollapsed = !this.metadataCollapsed
+    },
+
+    toggleWebhookData() {
+      this.webhookDataCollapsed = !this.webhookDataCollapsed
     }
   }
 }
