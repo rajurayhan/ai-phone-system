@@ -35,7 +35,7 @@ class VapiCallReportProcessor
             $costBreakdown = $message['costBreakdown'] ?? [];
             $summary = $message['analysis']['summary'] ?? null;
             $successEvaluation = $message['analysis']['successEvaluation'] ?? null;
-            $transcript = $message['transcript'] ?? null;
+            $transcript = $message['transcript'] ?? $message['artifact']['transcript'] ?? null;
             $messages = $message['artifact']['messages'] ?? [];
             $recordingUrl = $message['recordingUrl'] ?? $message['artifact']['recordingUrl'] ?? null;
             $stereoRecordingUrl = $message['stereoRecordingUrl'] ?? $message['artifact']['stereoRecordingUrl'] ?? null;

@@ -106,15 +106,10 @@
           <div v-if="callLog.has_recording" class="p-6 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Call Recording</h3>
             <div class="bg-gray-50 p-4 rounded-md">
-              <audio controls class="w-full">
-                <source :src="callLog.public_audio_url" type="audio/wav">
-                Your browser does not support the audio element.
-              </audio>
-              <p class="mt-2 text-sm text-gray-600">
-                <a :href="callLog.public_audio_url" target="_blank" class="text-green-600 hover:text-green-700">
-                  Open in new tab
-                </a>
-              </p>
+              <AudioPlayer 
+                :audio-url="callLog.public_audio_url"
+                title="Call Recording"
+              />
             </div>
           </div>
 
@@ -128,25 +123,56 @@
 
           <!-- Transcript -->
           <div v-if="callLog.transcript" class="p-6 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Transcript</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Call Transcript</h3>
             <div class="bg-gray-50 p-4 rounded-md max-h-96 overflow-y-auto">
-              <div v-if="isJsonTranscript" class="space-y-3">
+              <div v-if="isJsonTranscript" class="space-y-4">
                 <div
                   v-for="(message, index) in parsedTranscript"
                   :key="index"
                   :class="[
-                    'p-3 rounded-md',
-                    message.role === 'user' ? 'bg-blue-100 ml-4' : 'bg-green-100 mr-4'
+                    'flex items-start space-x-3 p-4 rounded-lg shadow-sm',
+                    message.role === 'user' ? 'bg-blue-50 border-l-4 border-blue-400' : 'bg-green-50 border-l-4 border-green-400'
                   ]"
                 >
-                  <div class="text-xs font-medium text-gray-600 mb-1">
-                    {{ message.role === 'user' ? 'User' : 'Assistant' }}
+                  <!-- Avatar -->
+                  <div :class="[
+                    'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium',
+                    message.role === 'user' ? 'bg-blue-500' : 'bg-green-500'
+                  ]">
+                    {{ message.role === 'user' ? 'U' : 'A' }}
                   </div>
-                  <div class="text-sm text-gray-900">{{ message.content }}</div>
+                  
+                  <!-- Message Content -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                      <span :class="[
+                        'text-sm font-medium',
+                        message.role === 'user' ? 'text-blue-700' : 'text-green-700'
+                      ]">
+                        {{ message.role === 'user' ? 'User' : 'Assistant' }}
+                      </span>
+                      <span class="text-xs text-gray-500">
+                        {{ formatMessageTime(message.time) }}
+                      </span>
+                    </div>
+                    <div class="text-sm text-gray-900 leading-relaxed">
+                      {{ message.content }}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div v-else class="text-sm text-gray-900 whitespace-pre-wrap">
-                {{ callLog.transcript }}
+              
+              <!-- Plain Text Transcript -->
+              <div v-else class="space-y-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Call Transcript</span>
+                    <span class="text-xs text-gray-500">Raw Format</span>
+                  </div>
+                  <div class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap bg-gray-50 p-3 rounded">
+                    {{ callLog.transcript }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -193,12 +219,14 @@
 
 <script>
 import Navigation from '../shared/Navigation.vue'
+import AudioPlayer from '../shared/AudioPlayer.vue'
 import axios from 'axios'
 
 export default {
   name: 'AdminCallLogDetailsPage',
   components: {
-    Navigation
+    Navigation,
+    AudioPlayer
   },
   data() {
     return {
@@ -275,6 +303,16 @@ export default {
         style: 'currency',
         currency: currency
       }).format(cost)
+    },
+
+    formatMessageTime(timestamp) {
+      if (!timestamp) return ''
+      const date = new Date(timestamp)
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      })
     }
   }
 }
