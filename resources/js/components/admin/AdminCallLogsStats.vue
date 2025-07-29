@@ -262,15 +262,15 @@
           <div v-else-if="stats.costAnalysis" class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600">Total Cost</span>
-              <span class="text-sm font-medium text-gray-900">${{ stats.costAnalysis.total_cost?.toFixed(2) || '0.00' }}</span>
+              <span class="text-sm font-medium text-gray-900">${{ formatCost(stats.costAnalysis.total_cost) }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600">Average Cost per Call</span>
-              <span class="text-sm font-medium text-gray-900">${{ stats.costAnalysis.average_cost?.toFixed(4) || '0.0000' }}</span>
+              <span class="text-sm font-medium text-gray-900">${{ formatCost(stats.costAnalysis.average_cost, 4) }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600">Highest Cost Call</span>
-              <span class="text-sm font-medium text-gray-900">${{ stats.costAnalysis.highest_cost?.toFixed(2) || '0.00' }}</span>
+              <span class="text-sm font-medium text-gray-900">${{ formatCost(stats.costAnalysis.highest_cost) }}</span>
             </div>
           </div>
           <div v-else class="text-center py-8 text-gray-500">
@@ -308,10 +308,24 @@ export default {
       localFilters: { ...this.filters }
     }
   },
+  mounted() {
+    console.log('AdminCallLogsStats mounted with stats:', this.stats)
+  },
   watch: {
     filters: {
       handler(newFilters) {
         this.localFilters = { ...newFilters }
+      },
+      deep: true
+    },
+    stats: {
+      handler(newStats) {
+        console.log('AdminCallLogsStats stats updated:', newStats)
+        if (newStats.costAnalysis) {
+          console.log('Cost analysis data:', newStats.costAnalysis)
+          console.log('Total cost type:', typeof newStats.costAnalysis.total_cost)
+          console.log('Total cost value:', newStats.costAnalysis.total_cost)
+        }
       },
       deep: true
     }
@@ -325,6 +339,21 @@ export default {
       const minutes = Math.floor(seconds / 60)
       const remainingSeconds = Math.floor(seconds % 60)
       return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+    },
+    formatCost(cost, decimals = 2) {
+      if (!cost || cost === null || cost === undefined) {
+        return decimals === 4 ? '0.0000' : '0.00'
+      }
+      
+      // Convert to number if it's a string
+      const numCost = typeof cost === 'string' ? parseFloat(cost) : Number(cost)
+      
+      // Check if it's a valid number
+      if (isNaN(numCost)) {
+        return decimals === 4 ? '0.0000' : '0.00'
+      }
+      
+      return numCost.toFixed(decimals)
     },
     getStatusClass(status) {
       const classes = {

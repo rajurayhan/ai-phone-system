@@ -129,14 +129,14 @@
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <svg class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                <svg class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Total Cost</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ formatCost(stats.totalCost) }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Average Duration</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ formatDuration(stats.averageDuration) }}</dd>
                 </dl>
               </div>
             </div>
@@ -201,7 +201,6 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Success Rate</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Duration</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -220,9 +219,6 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ formatDuration(assistant.avg_duration) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatCost(assistant.total_cost) }}
                 </td>
               </tr>
             </tbody>
@@ -267,6 +263,17 @@ export default {
         end_date: '',
         assistant_id: ''
       }
+    }
+  },
+  mounted() {
+    console.log('CallLogsStats mounted with stats:', this.stats)
+  },
+  watch: {
+    stats: {
+      handler(newStats) {
+        console.log('CallLogsStats stats updated:', newStats)
+      },
+      deep: true
     }
   },
   methods: {

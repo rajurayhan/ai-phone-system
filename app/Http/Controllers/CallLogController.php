@@ -119,8 +119,11 @@ class CallLogController extends Controller
         $failedCalls = (clone $query)->whereIn('status', ['failed', 'busy', 'no-answer'])->count();
         $inboundCalls = (clone $query)->where('direction', 'inbound')->count();
         $outboundCalls = (clone $query)->where('direction', 'outbound')->count();
-        $totalCost = (clone $query)->sum('cost');
         $averageDuration = (clone $query)->whereNotNull('duration')->avg('duration');
+        
+        // Only get cost data for admin users
+        $isAdmin = Auth::user()->is_admin ?? false;
+        $totalCost = $isAdmin ? (clone $query)->sum('cost') : 0;
 
         // Get status breakdown
         $statusBreakdown = $query->select('status', DB::raw('count(*) as count'))
@@ -129,15 +132,19 @@ class CallLogController extends Controller
             ->toArray();
 
         // Get assistant performance
-        $assistantPerformance = $query->select(
+        $assistantPerformanceQuery = $query->select(
                 'assistant_id',
                 DB::raw('count(*) as total_calls'),
                 DB::raw('sum(case when status = "completed" then 1 else 0 end) as completed_calls'),
-                DB::raw('avg(duration) as avg_duration'),
-                DB::raw('sum(cost) as total_cost')
-            )
-            ->groupBy('assistant_id')
-            ->get();
+                DB::raw('avg(duration) as avg_duration')
+            );
+        
+        // Only include cost for admin users
+        if ($isAdmin) {
+            $assistantPerformanceQuery->addSelect(DB::raw('sum(cost) as total_cost'));
+        }
+        
+        $assistantPerformance = $assistantPerformanceQuery->groupBy('assistant_id')->get();
 
         return response()->json([
             'success' => true,

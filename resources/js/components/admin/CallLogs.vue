@@ -146,6 +146,7 @@ export default {
           ...this.filters
         }
         
+        console.log('Loading admin stats with params:', params)
         const response = await axios.get('/api/admin/call-logs/stats', {
           params,
           headers: {
@@ -153,8 +154,10 @@ export default {
           }
         })
         
+        console.log('Admin stats response:', response.data)
         this.stats = response.data.data || {}
       } catch (error) {
+        console.error('Error loading admin stats:', error)
         if (error.response && error.response.status === 401) {
           this.$router.push('/login')
         }
