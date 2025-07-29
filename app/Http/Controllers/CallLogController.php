@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\CallLog;
 use App\Models\Assistant;
+use Illuminate\Support\Facades\Auth;
 
 class CallLogController extends Controller
 {
@@ -58,9 +59,23 @@ class CallLogController extends Controller
         $perPage = $request->get('per_page', 15);
         $callLogs = $query->paginate($perPage);
 
+        // Filter out sensitive data for non-admin users
+        $isAdmin = Auth::user()->is_admin ?? false;
+        $callLogsData = $callLogs->items();
+        
+        if (!$isAdmin) {
+            $callLogsData = collect($callLogsData)->map(function ($callLog) {
+                unset($callLog->webhook_data);
+                unset($callLog->metadata);
+                unset($callLog->cost);
+                unset($callLog->currency);
+                return $callLog;
+            })->toArray();
+        }
+
         return response()->json([
             'success' => true,
-            'data' => $callLogs->items(),
+            'data' => $callLogsData,
             'meta' => [
                 'current_page' => $callLogs->currentPage(),
                 'last_page' => $callLogs->lastPage(),
@@ -161,9 +176,20 @@ class CallLogController extends Controller
             ], 404);
         }
 
+        // Filter out sensitive data for non-admin users
+        $isAdmin = Auth::user()->is_admin ?? false;
+        $callLogData = $callLog->toArray();
+        
+        if (!$isAdmin) {
+            unset($callLogData['webhook_data']);
+            unset($callLogData['metadata']);
+            unset($callLogData['cost']);
+            unset($callLogData['currency']);
+        }
+
         return response()->json([
             'success' => true,
-            'data' => $callLog
+            'data' => $callLogData
         ]);
     }
 } 

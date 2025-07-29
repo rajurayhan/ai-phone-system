@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\CallLog;
 use App\Models\Assistant;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class VapiCallReportProcessor
 {
@@ -35,8 +37,8 @@ class VapiCallReportProcessor
             $successEvaluation = $message['analysis']['successEvaluation'] ?? null;
             $transcript = $message['transcript'] ?? null;
             $messages = $message['artifact']['messages'] ?? [];
-            $recordingUrl = $message['recordingUrl'] ?? null;
-            $stereoRecordingUrl = $message['stereoRecordingUrl'] ?? null;
+            $recordingUrl = $message['recordingUrl'] ?? $message['artifact']['recordingUrl'] ?? null;
+            $stereoRecordingUrl = $message['stereoRecordingUrl'] ?? $message['artifact']['stereoRecordingUrl'] ?? null;
 
             // Extract phone numbers
             $phoneNumber = $message['phoneNumber']['number'] ?? null;
@@ -52,46 +54,72 @@ class VapiCallReportProcessor
                 return null;
             }
 
+            // Check if call was already processed
+            $existingCallLog = CallLog::where('call_id', $callId)->first();
+            if ($existingCallLog) {
+                Log::info('Call already processed, skipping', [
+                    'call_id' => $callId,
+                    'assistant_id' => $assistantId
+                ]);
+                return $existingCallLog;
+            }
+
+            // Download call recording if available
+            $callRecordFileName = null;
+            if ($recordingUrl) {
+                Log::info('Attempting to download recording', [
+                    'call_id' => $callId,
+                    'recording_url' => $recordingUrl
+                ]);
+                $callRecordFileName = $this->downloadCallRecording($recordingUrl, $callId);
+                Log::info('Download result', [
+                    'call_id' => $callId,
+                    'file_name' => $callRecordFileName
+                ]);
+            } else {
+                Log::info('No recording URL available', ['call_id' => $callId]);
+            }
+
             // Determine call status based on ended reason
             $status = $this->mapEndedReasonToStatus($endedReason);
 
-            // Create or update call log
-            $callLog = CallLog::updateOrCreate(
-                ['call_id' => $callId],
-                [
-                    'assistant_id' => $assistant->id,
-                    'user_id' => $assistant->user_id,
-                    'phone_number' => $phoneNumber,
-                    'caller_number' => $callerNumber,
-                    'duration' => $durationSeconds,
-                    'status' => $status,
-                    'direction' => 'inbound', // Most Vapi calls are inbound
-                    'start_time' => $startedAt ? \Carbon\Carbon::parse($startedAt) : null,
-                    'end_time' => $endedAt ? \Carbon\Carbon::parse($endedAt) : null,
-                    'transcript' => $transcript,
-                    'summary' => $summary,
-                    'cost' => $cost,
-                    'currency' => 'USD',
-                    'metadata' => [
-                        'ended_reason' => $endedReason,
-                        'duration_ms' => $durationMs,
-                        'success_evaluation' => $successEvaluation,
-                        'recording_url' => $recordingUrl,
-                        'stereo_recording_url' => $stereoRecordingUrl,
-                        'cost_breakdown' => $costBreakdown,
-                        'messages_count' => count($messages),
-                        'timestamp' => $timestamp,
-                    ],
-                    'webhook_data' => $webhookData,
-                ]
-            );
+            // Create call log
+            $callLog = CallLog::create([
+                'call_id' => $callId,
+                'assistant_id' => $assistant->id,
+                'user_id' => $assistant->user_id,
+                'phone_number' => $phoneNumber,
+                'caller_number' => $callerNumber,
+                'duration' => $durationSeconds,
+                'status' => $status,
+                'direction' => 'inbound', // Most Vapi calls are inbound
+                'start_time' => $startedAt ? \Carbon\Carbon::parse($startedAt) : null,
+                'end_time' => $endedAt ? \Carbon\Carbon::parse($endedAt) : null,
+                'transcript' => $transcript,
+                'summary' => $summary,
+                'cost' => $cost,
+                'currency' => 'USD',
+                'call_record_file_name' => $callRecordFileName,
+                'metadata' => [
+                    'ended_reason' => $endedReason,
+                    'duration_ms' => $durationMs,
+                    'success_evaluation' => $successEvaluation,
+                    'recording_url' => $recordingUrl,
+                    'stereo_recording_url' => $stereoRecordingUrl,
+                    'cost_breakdown' => $costBreakdown,
+                    'messages_count' => count($messages),
+                    'timestamp' => $timestamp,
+                ],
+                'webhook_data' => $webhookData,
+            ]);
 
             Log::info('Call log processed from end-of-call-report', [
                 'call_id' => $callId,
                 'assistant_id' => $assistantId,
                 'status' => $status,
                 'duration' => $durationSeconds,
-                'cost' => $cost
+                'cost' => $cost,
+                'call_record_file_name' => $callRecordFileName
             ]);
 
             return $callLog;
@@ -103,6 +131,80 @@ class VapiCallReportProcessor
             ]);
             return null;
         }
+    }
+
+    /**
+     * Download call recording and store locally
+     */
+    private function downloadCallRecording(string $recordingUrl, string $callId): ?string
+    {
+        try {
+            // Generate alphanumeric filename
+            $fileName = $this->generateAlphanumericFileName();
+            $fileExtension = 'wav'; // Vapi recordings are typically WAV
+            $fullFileName = $fileName . '.' . $fileExtension;
+            
+            // Create recordings directory if it doesn't exist
+            $directory = 'recordings';
+            if (!Storage::disk('public')->exists($directory)) {
+                Storage::disk('public')->makeDirectory($directory);
+            }
+            
+            $filePath = $directory . '/' . $fullFileName;
+            
+            // Download the file
+            $fileContent = file_get_contents($recordingUrl);
+            if ($fileContent === false) {
+                Log::error('Failed to download recording', [
+                    'url' => $recordingUrl,
+                    'call_id' => $callId
+                ]);
+                return null;
+            }
+            
+            // Store the file
+            $stored = Storage::disk('public')->put($filePath, $fileContent);
+            if (!$stored) {
+                Log::error('Failed to store recording', [
+                    'file_path' => $filePath,
+                    'call_id' => $callId
+                ]);
+                return null;
+            }
+            
+            Log::info('Call recording downloaded successfully', [
+                'file_name' => $fullFileName,
+                'file_path' => $filePath,
+                'call_id' => $callId,
+                'file_size' => strlen($fileContent)
+            ]);
+            
+            return $fullFileName;
+            
+        } catch (\Exception $e) {
+            Log::error('Error downloading call recording', [
+                'error' => $e->getMessage(),
+                'url' => $recordingUrl,
+                'call_id' => $callId
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Generate alphanumeric filename with mix of capital and small letters
+     */
+    private function generateAlphanumericFileName(): string
+    {
+        $length = 12; // 12 characters for good uniqueness
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        $fileName = '';
+        
+        for ($i = 0; $i < $length; $i++) {
+            $fileName .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        
+        return $fileName;
     }
 
     /**

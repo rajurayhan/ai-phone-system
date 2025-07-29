@@ -32,6 +32,7 @@ class CallLog extends Model
         'webhook_data',
         'cost',
         'currency',
+        'call_record_file_name',
     ];
 
     /**
@@ -168,5 +169,25 @@ class CallLog extends Model
         }
 
         return number_format($this->cost, 4) . ' ' . ($this->currency ?? 'USD');
+    }
+
+    /**
+     * Get public audio URL for call recording
+     */
+    public function getPublicAudioUrlAttribute(): ?string
+    {
+        if (!$this->call_record_file_name) {
+            return null;
+        }
+
+        return url('/p/' . $this->call_record_file_name);
+    }
+
+    /**
+     * Check if call has recording
+     */
+    public function hasRecording(): bool
+    {
+        return !empty($this->call_record_file_name);
     }
 } 

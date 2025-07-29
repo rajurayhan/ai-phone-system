@@ -30,6 +30,8 @@ import DemoRequestForm from './components/demo/DemoRequestForm.vue'
 import DemoRequests from './components/admin/DemoRequests.vue'
 import SystemSettings from './components/admin/SystemSettings.vue'
 import CallLogsPage from './components/call-logs/CallLogsPage.vue'
+import CallLogDetailsPage from './components/call-logs/CallLogDetailsPage.vue'
+import AdminCallLogDetailsPage from './components/admin/AdminCallLogDetailsPage.vue'
 import AdminCallLogs from './components/admin/CallLogs.vue'
 import ContactManagement from './components/admin/ContactManagement.vue'
 import TermsOfService from './components/shared/TermsOfService.vue'
@@ -198,9 +200,21 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
+            path: '/call-logs/:call_id',
+            name: 'call-log-details',
+            component: CallLogDetailsPage,
+            meta: { requiresAuth: true }
+        },
+        {
             path: '/admin/call-logs',
             name: 'admin-call-logs',
             component: AdminCallLogs,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/call-logs/:call_id',
+            name: 'admin-call-log-details',
+            component: AdminCallLogDetailsPage,
             meta: { requiresAuth: true, requiresAdmin: true }
         },
         {

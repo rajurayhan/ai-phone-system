@@ -139,12 +139,17 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+              <th v-if="isAdmin" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="callLog in callLogs" :key="callLog.id" class="hover:bg-gray-50">
+            <tr 
+              v-for="callLog in callLogs" 
+              :key="callLog.id" 
+              class="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+              @click="viewCallDetails(callLog)"
+            >
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ callLog.call_id }}
               </td>
@@ -168,12 +173,12 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatDate(callLog.start_time) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td v-if="isAdmin" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatCost(callLog.cost, callLog.currency) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button
-                  @click="viewCallDetails(callLog)"
+                  @click.stop="viewCallDetails(callLog)"
                   class="text-green-600 hover:text-green-900"
                 >
                   View Details
@@ -220,23 +225,13 @@
       </div>
     </div>
 
-    <!-- Call Details Modal -->
-    <CallLogDetails
-      v-if="showDetailsModal"
-      :call-log="selectedCallLog"
-      @close="showDetailsModal = false"
-    />
+
   </div>
 </template>
 
 <script>
-import CallLogDetails from './CallLogDetails.vue'
-
 export default {
   name: 'CallLogsList',
-  components: {
-    CallLogDetails
-  },
   props: {
     assistants: {
       type: Array,
@@ -270,9 +265,9 @@ export default {
         end_date: '',
         search: ''
       },
-      showDetailsModal: false,
-      selectedCallLog: null,
-      searchTimeout: null
+
+      searchTimeout: null,
+      isAdmin: false
     }
   },
   watch: {
@@ -282,6 +277,9 @@ export default {
       },
       immediate: true
     }
+  },
+  mounted() {
+    this.checkAdminStatus()
   },
   methods: {
     getAssistantName(assistantId) {
@@ -353,8 +351,12 @@ export default {
     },
 
     viewCallDetails(callLog) {
-      this.selectedCallLog = callLog
-      this.showDetailsModal = true
+      this.$router.push(`/call-logs/${callLog.call_id}`)
+    },
+
+    checkAdminStatus() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}')
+      this.isAdmin = user.role === 'admin'
     }
   }
 }

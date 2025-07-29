@@ -50,6 +50,15 @@ Route::get('/privacy', function () {
     return view('app');
 })->name('privacy');
 
+// Public audio player routes
+Route::get('/p/{fileName}', [App\Http\Controllers\PublicAudioController::class, 'playAudio'])
+    ->where('fileName', '[A-Za-z0-9]{12}\.(wav|mp3)')
+    ->name('public.audio');
+
+Route::get('/api/public/audio/{fileName}/info', [App\Http\Controllers\PublicAudioController::class, 'getCallInfo'])
+    ->where('fileName', '[A-Za-z0-9]{12}\.(wav|mp3)')
+    ->name('public.audio.info');
+
 // Serve the SPA for all routes except API routes
 Route::get('/{any}', function () {
     return view('app');

@@ -53,21 +53,24 @@ class ProcessVapiWebhookSample extends Command
 
             if ($callLog) {
                 $this->info('✅ Call log created successfully!');
-                $this->table(
-                    ['Field', 'Value'],
-                    [
-                        ['Call ID', $callLog->call_id],
-                        ['Assistant ID', $callLog->assistant_id],
-                        ['User ID', $callLog->user_id],
-                        ['Status', $callLog->status],
-                        ['Duration', $callLog->duration . ' seconds'],
-                        ['Cost', $callLog->cost . ' ' . $callLog->currency],
-                        ['Phone Number', $callLog->phone_number],
-                        ['Caller Number', $callLog->caller_number],
-                        ['Has Transcript', $callLog->transcript ? 'Yes' : 'No'],
-                        ['Has Summary', $callLog->summary ? 'Yes' : 'No'],
-                    ]
-                );
+                                    $this->table(
+                        ['Field', 'Value'],
+                        [
+                            ['Call ID', $callLog->call_id],
+                            ['Assistant ID', $callLog->assistant_id],
+                            ['User ID', $callLog->user_id],
+                            ['Status', $callLog->status],
+                            ['Duration', $callLog->duration . ' seconds'],
+                            ['Cost', $callLog->cost . ' ' . $callLog->currency],
+                            ['Phone Number', $callLog->phone_number],
+                            ['Caller Number', $callLog->caller_number],
+                            ['Has Transcript', $callLog->transcript ? 'Yes' : 'No'],
+                            ['Has Summary', $callLog->summary ? 'Yes' : 'No'],
+                            ['Has Recording', $callLog->hasRecording() ? 'Yes' : 'No'],
+                            ['Recording File', $callLog->call_record_file_name ?: 'N/A'],
+                            ['Public Audio URL', $callLog->public_audio_url ?: 'N/A'],
+                        ]
+                    );
 
                 // Extract contact information
                 $contactInfo = $processor->extractContactInfo($webhookData);

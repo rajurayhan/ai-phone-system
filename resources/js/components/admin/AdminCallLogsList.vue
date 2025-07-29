@@ -160,7 +160,12 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="callLog in callLogs" :key="callLog.id" class="hover:bg-gray-50">
+            <tr 
+              v-for="callLog in callLogs" 
+              :key="callLog.id" 
+              class="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+              @click="viewDetails(callLog)"
+            >
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ callLog.call_id }}
               </td>
@@ -201,7 +206,7 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button
-                  @click="viewDetails(callLog)"
+                  @click.stop="viewDetails(callLog)"
                   class="text-green-600 hover:text-green-900 mr-3"
                 >
                   View
@@ -286,23 +291,13 @@
       </div>
     </div>
 
-    <!-- Call Log Details Modal -->
-    <CallLogDetails
-      v-if="showDetailsModal"
-      :call-log="selectedCallLog"
-      @close="showDetailsModal = false"
-    />
+
   </div>
 </template>
 
 <script>
-import CallLogDetails from '../call-logs/CallLogDetails.vue'
-
 export default {
   name: 'AdminCallLogsList',
-  components: {
-    CallLogDetails
-  },
   props: {
     assistants: {
       type: Array,
@@ -328,8 +323,7 @@ export default {
   data() {
     return {
       localFilters: { ...this.filters },
-      showDetailsModal: false,
-      selectedCallLog: null,
+
       searchTimeout: null
     }
   },
@@ -364,8 +358,7 @@ export default {
       this.applyFilters()
     },
     viewDetails(callLog) {
-      this.selectedCallLog = callLog
-      this.showDetailsModal = true
+      this.$router.push(`/admin/call-logs/${callLog.call_id}`)
     },
     getStatusClass(status) {
       const classes = {
