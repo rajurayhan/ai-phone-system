@@ -3,7 +3,7 @@
 @section('content')
     <h2>New Contact Form Submission 📧</h2>
     
-    <p>A new contact form has been submitted on the HiveAIPhone website. Here are the details:</p>
+    <p>A new contact form has been submitted on the SulusAI website. Here are the details:</p>
     
     <div class="card success-card">
         <h3 style="color: #2d3748; margin-bottom: 15px;">📋 Contact Information</h3>

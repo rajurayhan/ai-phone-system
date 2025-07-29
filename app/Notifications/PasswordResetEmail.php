@@ -40,7 +40,7 @@ class PasswordResetEmail extends Notification
         $resetUrl = config('app.frontend_url') . "/password-reset/{$this->token}?email=" . urlencode($notifiable->getEmailForPasswordReset());
 
         return (new MailMessage)
-            ->subject('Reset Your Password - HiveAIPhone 🔐')
+            ->subject('Reset Your Password - SulusAI 🔐')
             ->view('emails.password-reset', [
                 'user' => $notifiable,
                 'resetUrl' => $resetUrl,

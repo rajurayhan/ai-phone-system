@@ -54,10 +54,10 @@ class ContactController extends Controller
                     'totalContacts' => $totalContacts,
                     'newToday' => $newToday,
                     'headerTitle' => 'New Contact Form Submission',
-                    'headerSubtitle' => 'HiveAIPhone Website',
+                    'headerSubtitle' => 'SulusAI Website',
                 ], function($message) {
-                    $message->to('HiveAIPhone@gmail.com')
-                            ->subject('New Contact Form Submission - HiveAIPhone');
+                    $message->to('SulusAI@gmail.com')
+                            ->subject('New Contact Form Submission - SulusAI');
                 });
             } catch (\Exception $e) {
                 // Log email error but don't fail the contact submission
@@ -69,10 +69,10 @@ class ContactController extends Controller
                 Mail::send('emails.contact-confirmation', [
                     'contact' => $contact,
                     'headerTitle' => 'Thank You for Contacting Us',
-                    'headerSubtitle' => 'HiveAIPhone Support',
+                    'headerSubtitle' => 'SulusAI Support',
                 ], function($message) use ($contact) {
                     $message->to($contact->email)
-                            ->subject('Thank You for Contacting HiveAIPhone - Reference #' . $contact->id);
+                            ->subject('Thank You for Contacting SulusAI - Reference #' . $contact->id);
                 });
             } catch (\Exception $e) {
                 // Log email error but don't fail the contact submission

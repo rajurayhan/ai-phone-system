@@ -36,8 +36,8 @@ export const getSystemSettings = async () => {
  */
 const getDefaultSettings = () => {
   return {
-    site_title: 'HiveAIPhone',
-    site_tagline: 'Never Miss a call Again HiveAIPhone answers 24x7!',
+    site_title: 'SulusAI',
+    site_tagline: 'Never Miss a call Again SulusAI answers 24x7!',
     meta_description: 'Transform your business with cutting-edge voice AI technology',
     logo_url: '/logo.png',
     homepage_banner: null
@@ -66,10 +66,10 @@ export const getSetting = async (key, defaultValue = '') => {
 export const updateDocumentTitle = async (pageTitle = '') => {
   try {
     const settings = await getSystemSettings()
-    const siteTitle = settings.site_title || 'HiveAIPhone'
+    const siteTitle = settings.site_title || 'SulusAI'
     
     if (pageTitle) {
-      // If pageTitle already contains the site title (like "HiveAIPhone - Tagline"), use it as is
+      // If pageTitle already contains the site title (like "SulusAI - Tagline"), use it as is
       if (pageTitle.includes(siteTitle)) {
         document.title = pageTitle
       } else {
@@ -85,7 +85,7 @@ export const updateDocumentTitle = async (pageTitle = '') => {
     if (pageTitle) {
       document.title = pageTitle
     } else {
-      document.title = 'HiveAIPhone'
+      document.title = 'SulusAI'
     }
   }
 } 

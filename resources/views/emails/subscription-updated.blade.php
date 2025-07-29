@@ -90,7 +90,7 @@
     </div>
     
     <p style="margin-top: 30px; color: #4a5568;">
-        Thank you for choosing HiveAIPhone! We're excited to see what you'll create with your {{ $isUpgrade ? 'enhanced' : 'new' }} plan.
+        Thank you for choosing SulusAI! We're excited to see what you'll create with your {{ $isUpgrade ? 'enhanced' : 'new' }} plan.
     </p>
     
     <p style="margin-top: 20px; font-size: 14px; color: #6c757d;">
