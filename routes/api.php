@@ -96,30 +96,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Dashboard routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/dashboard/stats', function (Request $request) {
-        $user = $request->user();
-        $assistants = \App\Models\Assistant::where('user_id', $user->id)->count();
-        
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'total_assistants' => $assistants,
-                'recent_activity' => [],
-                'quick_stats' => [
-                    'assistants' => $assistants,
-                    'calls_today' => 0,
-                    'total_calls' => 0
-                ]
-            ]
-        ]);
-    });
-    
-    Route::get('/dashboard/activity', function (Request $request) {
-        return response()->json([
-            'success' => true,
-            'data' => []
-        ]);
-    });
+    Route::get('/dashboard/stats', [App\Http\Controllers\DashboardController::class, 'stats']);
+    Route::get('/dashboard/activity', [App\Http\Controllers\DashboardController::class, 'activity']);
     
     // Call logs routes
     Route::prefix('call-logs')->group(function () {
@@ -133,32 +111,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Admin dashboard routes
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/admin/dashboard/stats', function (Request $request) {
-        $totalUsers = \App\Models\User::count();
-        $totalAssistants = \App\Models\Assistant::count();
-        $activeUsers = \App\Models\User::where('status', 'active')->count();
-        
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'total_users' => $totalUsers,
-                'total_assistants' => $totalAssistants,
-                'active_users' => $activeUsers,
-                'quick_stats' => [
-                    'users' => $totalUsers,
-                    'assistants' => $totalAssistants,
-                    'active_users' => $activeUsers
-                ]
-            ]
-        ]);
-    });
-    
-    Route::get('/admin/dashboard/activity', function (Request $request) {
-        return response()->json([
-            'success' => true,
-            'data' => []
-        ]);
-    });
+    Route::get('/admin/dashboard/stats', [App\Http\Controllers\DashboardController::class, 'adminStats']);
+    Route::get('/admin/dashboard/activity', [App\Http\Controllers\DashboardController::class, 'adminActivity']);
 });
 
 // Subscription routes (protected)

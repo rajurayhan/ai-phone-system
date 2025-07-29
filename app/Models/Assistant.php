@@ -88,4 +88,12 @@ class Assistant extends Model
     {
         return $this->type === 'production';
     }
+    
+    /**
+     * Get the call logs for this assistant.
+     */
+    public function callLogs()
+    {
+        return $this->hasMany(CallLog::class);
+    }
 }

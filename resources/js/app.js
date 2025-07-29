@@ -1,5 +1,5 @@
 import './bootstrap';
-import { createApp } from 'vue';
+import { createApp, h } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { updateDocumentTitle } from './utils/systemSettings.js'
 import App from './App.vue';
@@ -41,6 +41,27 @@ import NotFound from './components/shared/NotFound.vue'
 // Set initial document title
 updateDocumentTitle('HiveAIPhone - Never Miss a call Again HiveAIPhone answers 24x7!')
 
+// Create a conditional dashboard component
+const ConditionalDashboard = {
+    name: 'ConditionalDashboard',
+    components: {
+        Dashboard,
+        AdminDashboard
+    },
+    computed: {
+        isAdmin() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            return user.role === 'admin';
+        }
+    },
+    template: `
+        <div>
+            <AdminDashboard v-if="isAdmin" />
+            <Dashboard v-else />
+        </div>
+    `
+};
+
 // Create router
 const router = createRouter({
     history: createWebHistory(),
@@ -77,7 +98,7 @@ const router = createRouter({
         {
             path: '/dashboard',
             name: 'dashboard',
-            component: Dashboard,
+            component: ConditionalDashboard,
             meta: { requiresAuth: true }
         },
         {
