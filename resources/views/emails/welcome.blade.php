@@ -1,7 +1,7 @@
 @extends('emails.layouts.base')
 
 @section('content')
-    <h2>Welcome to XpartFone, {{ $user->name }}! 🎉</h2>
+    <h2>Welcome to HiveAIPhone, {{ $user->name }}! 🎉</h2>
     
     <p>We're thrilled to have you join our community of voice AI enthusiasts. You're now part of a platform that's revolutionizing how people interact with artificial intelligence through voice.</p>
     
@@ -21,7 +21,7 @@
         <p>This verification link will expire in <strong>60 minutes</strong> for security reasons. If you don't verify within this time, you can request a new verification link from your dashboard.</p>
     </div>
     
-    <h3 style="color: #2d3748; margin: 30px 0 20px 0;">🚀 What You Can Do With XpartFone</h3>
+    <h3 style="color: #2d3748; margin: 30px 0 20px 0;">🚀 What You Can Do With HiveAIPhone</h3>
     
     <ul class="feature-list">
         <li>Create intelligent voice assistants</li>
@@ -50,7 +50,7 @@
     </div>
     
     <p style="margin-top: 30px; font-size: 14px; color: #6c757d;">
-        <strong>Note:</strong> If you did not create an account with XpartFone, please ignore this email. No further action is required.
+        <strong>Note:</strong> If you did not create an account with HiveAIPhone, please ignore this email. No further action is required.
     </p>
     
     <p style="margin-top: 20px; font-size: 12px; color: #6c757d;">

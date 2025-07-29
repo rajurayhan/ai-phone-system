@@ -126,7 +126,7 @@
             </p>
             <div class="flex space-x-3">
               <a 
-                href="mailto:support@XpartFone.com" 
+                href="mailto:support@HiveAIPhone.com" 
                 class="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +150,7 @@ export default {
   data() {
     return {
       settings: {
-        site_title: 'XpartFone',
+        site_title: 'HiveAIPhone',
         logo_url: '/logo.png'
       }
     }
@@ -165,14 +165,14 @@ export default {
       const settings = await getSystemSettings()
       this.settings = settings
       // Update document title
-      document.title = '404 - Page Not Found | ' + (this.settings.site_title || 'XpartFone')
+      document.title = '404 - Page Not Found | ' + (this.settings.site_title || 'HiveAIPhone')
     } catch (error) {
       // Set default values if API fails
       this.settings = {
-        site_title: 'XpartFone',
+        site_title: 'HiveAIPhone',
         logo_url: '/logo.png'
       }
-      document.title = '404 - Page Not Found | XpartFone'
+      document.title = '404 - Page Not Found | HiveAIPhone'
     }
   }
 }

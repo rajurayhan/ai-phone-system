@@ -39,7 +39,7 @@ import PrivacyPolicy from './components/shared/PrivacyPolicy.vue'
 import NotFound from './components/shared/NotFound.vue'
 
 // Set initial document title
-updateDocumentTitle('XpartFone - Never Miss a call Again XpartFone answers 24x7!')
+updateDocumentTitle('HiveAIPhone - Never Miss a call Again HiveAIPhone answers 24x7!')
 
 // Create router
 const router = createRouter({

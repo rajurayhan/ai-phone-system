@@ -13,7 +13,7 @@
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">XpartFone</h1>
+                  <h1 class="text-xl font-bold text-gray-900">HiveAIPhone</h1>
                 </div>
               </router-link>
             </div>
@@ -35,7 +35,7 @@
         <!-- Header -->
         <div class="text-center">
           <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-                         {{ settings.site_title || 'XpartFone' }} Pricing
+                         {{ settings.site_title || 'HiveAIPhone' }} Pricing
           </h1>
           <p class="mt-4 text-xl text-gray-600">
             {{ settings.site_tagline || 'Choose the perfect plan for your business needs' }}
@@ -248,7 +248,7 @@ export default {
       } catch (error) {
         // Set default values if API fails
         settings.value = {
-          site_title: 'XpartFone',
+          site_title: 'HiveAIPhone',
           site_tagline: 'Choose the perfect plan for your business needs'
         }
       }
