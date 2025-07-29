@@ -130,8 +130,7 @@
           </p>
           <div class="bg-gray-50 p-4 rounded-lg">
             <p class="mb-2"><strong>Email:</strong> privacy@xpartfone.com</p>
-            <p class="mb-2"><strong>Address:</strong> [Your Company Address]</p>
-            <p><strong>Phone:</strong> [Your Phone Number]</p>
+            <p><strong>Phone:</strong> (231) 444-5797</p>
           </div>
         </div>
       </div>
