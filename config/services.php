@@ -36,7 +36,8 @@ return [
     ],
 
     'vapi' => [
-        'api_key' => env('VAPI_API_KEY'),
+        'token' => env('VAPI_API_KEY'),
+        'base_url' => env('VAPI_BASE_URL', 'https://api.vapi.ai'),
     ],
 
     'twilio' => [
