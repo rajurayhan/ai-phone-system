@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\CallLog;
 use App\Models\Assistant;
 
@@ -129,12 +130,22 @@ class CallLogController extends Controller
             ->map(function ($item) {
                 // Load assistant data separately
                 $assistant = Assistant::with('user')->find($item->assistant_id);
-                $item->assistant_name = $assistant ? $assistant->name : 'Unknown Assistant';
-                $item->assistant_user_name = $assistant && $assistant->user ? $assistant->user->name : 'Unknown User';
-                $item->completion_rate = $item->total_calls > 0 
-                    ? round(($item->completed_calls / $item->total_calls) * 100, 1)
-                    : 0;
-                return $item;
+                
+                // Create assistant object in the format expected by frontend
+                $assistantData = [
+                    'id' => $item->assistant_id,
+                    'name' => $assistant ? $assistant->name : 'Unknown Assistant',
+                    'user' => $assistant && $assistant->user ? [
+                        'name' => $assistant->user->name
+                    ] : null,
+                    'total_calls' => $item->total_calls,
+                    'completed_calls' => $item->completed_calls,
+                    'completion_rate' => $item->total_calls > 0 
+                        ? round(($item->completed_calls / $item->total_calls) * 100, 1)
+                        : 0
+                ];
+                
+                return (object) $assistantData;
             });
 
         // Get cost analysis
@@ -146,6 +157,12 @@ class CallLogController extends Controller
             )
             ->whereNotNull('cost')
             ->first();
+
+        // Add debugging for top assistants
+        Log::info('Admin analytics top assistants', [
+            'count' => $topAssistants->count(),
+            'sample' => $topAssistants->take(2)->toArray()
+        ]);
 
         return response()->json([
             'success' => true,

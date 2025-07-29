@@ -116,10 +116,10 @@ class CallLogController extends Controller
         // Get basic stats
         $totalCalls = $query->count();
         $completedCalls = (clone $query)->where('status', 'completed')->count();
-        $failedCalls = (clone $query)->whereIn('status', ['failed', 'busy', 'no-answer'])->count();
         $inboundCalls = (clone $query)->where('direction', 'inbound')->count();
         $outboundCalls = (clone $query)->where('direction', 'outbound')->count();
         $averageDuration = (clone $query)->whereNotNull('duration')->avg('duration');
+        $totalDuration = (clone $query)->whereNotNull('duration')->sum('duration');
         
         // Only get cost data for admin users
         $isAdmin = Auth::user()->is_admin ?? false;
@@ -151,7 +151,7 @@ class CallLogController extends Controller
             'data' => [
                 'totalCalls' => $totalCalls,
                 'completedCalls' => $completedCalls,
-                'failedCalls' => $failedCalls,
+                'totalDuration' => (int) ($totalDuration ?? 0),
                 'inboundCalls' => $inboundCalls,
                 'outboundCalls' => $outboundCalls,
                 'totalCost' => $totalCost,
