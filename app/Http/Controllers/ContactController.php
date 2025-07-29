@@ -45,25 +45,38 @@ class ContactController extends Controller
 
             // Send email notification to admin
             try {
-                Mail::raw("
-New Contact Form Submission
-
-Name: {$contact->full_name}
-Email: {$contact->email}
-Phone: " . ($contact->phone ?: 'Not provided') . "
-Subject: {$contact->subject}
-
-Message:
-{$contact->message}
-
-Submitted at: {$contact->created_at}
-                ", function($message) {
+                // Get contact statistics
+                $totalContacts = Contact::count();
+                $newToday = Contact::whereDate('created_at', today())->count();
+                
+                Mail::send('emails.contact-submission', [
+                    'contact' => $contact,
+                    'totalContacts' => $totalContacts,
+                    'newToday' => $newToday,
+                    'headerTitle' => 'New Contact Form Submission',
+                    'headerSubtitle' => 'XpartFone Website',
+                ], function($message) {
                     $message->to('xpartfone@gmail.com')
                             ->subject('New Contact Form Submission - XpartFone');
                 });
             } catch (\Exception $e) {
                 // Log email error but don't fail the contact submission
-                Log::error('Failed to send contact form email: ' . $e->getMessage());
+                Log::error('Failed to send contact form email to admin: ' . $e->getMessage());
+            }
+
+            // Send confirmation email to customer
+            try {
+                Mail::send('emails.contact-confirmation', [
+                    'contact' => $contact,
+                    'headerTitle' => 'Thank You for Contacting Us',
+                    'headerSubtitle' => 'XpartFone Support',
+                ], function($message) use ($contact) {
+                    $message->to($contact->email)
+                            ->subject('Thank You for Contacting XpartFone - Reference #' . $contact->id);
+                });
+            } catch (\Exception $e) {
+                // Log email error but don't fail the contact submission
+                Log::error('Failed to send contact confirmation email: ' . $e->getMessage());
             }
 
             return response()->json([
