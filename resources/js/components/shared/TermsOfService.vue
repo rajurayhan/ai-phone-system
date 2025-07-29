@@ -100,7 +100,7 @@
           </p>
           <div class="bg-gray-50 p-4 rounded-lg">
             <p class="mb-2"><strong>Email:</strong> support@SulusAI.com</p>
-            <p><strong>Phone:</strong> (231) 444-5797
+            <p><strong>Phone:</strong> (682) 582 8396
             </p>
           </div>
         </div>
