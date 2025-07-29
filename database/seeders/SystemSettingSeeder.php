@@ -16,7 +16,7 @@ class SystemSettingSeeder extends Seeder
         $settings = [
             [
                 'key' => 'site_title',
-                'value' => 'XpartFone',
+                'value' => 'Hive AI Phone',
                 'type' => 'text',
                 'group' => 'general',
                 'label' => 'Site Title',
@@ -24,7 +24,7 @@ class SystemSettingSeeder extends Seeder
             ],
             [
                 'key' => 'site_tagline',
-                'value' => 'Never Miss a call Again XpartFone answers 24x7!',
+                'value' => 'Never Miss a call Again Hive AI Phone answers 24x7!',
                 'type' => 'text',
                 'group' => 'general',
                 'label' => 'Site Tagline',

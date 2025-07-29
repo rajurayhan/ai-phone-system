@@ -49,7 +49,7 @@ export default {
   name: 'NotFound',
   mounted() {
     // Update document title
-    document.title = '404 - Page Not Found | XpartFone'
+    document.title = '404 - Page Not Found | Hive AI Phone'
   }
 }
 </script> 

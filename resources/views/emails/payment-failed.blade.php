@@ -3,7 +3,7 @@
 @section('content')
     <h2>Payment Failed ❌</h2>
     
-    <p>Hello <strong>{{ $user->name }}</strong>, we were unable to process your payment for your XpartFone subscription.</p>
+    <p>Hello <strong>{{ $user->name }}</strong>, we were unable to process your payment for your Hive AI Phone subscription.</p>
     
     <div class="card warning-card">
         <h3 style="color: #2d3748; margin-bottom: 15px;">⚠️ Action Required</h3>

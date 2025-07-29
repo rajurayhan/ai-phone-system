@@ -3,7 +3,7 @@
 @section('content')
     <h2>Reset Your Password 🔐</h2>
     
-    <p>Hello <strong>{{ $user->name }}</strong>, we received a request to reset your password for your XpartFone account.</p>
+    <p>Hello <strong>{{ $user->name }}</strong>, we received a request to reset your password for your Hive AI Phone account.</p>
     
     <div class="card warning-card">
         <h3 style="color: #2d3748; margin-bottom: 15px;">⚠️ Security Notice</h3>
@@ -35,7 +35,7 @@
     
     <div class="card success-card">
         <h3 style="color: #2d3748; margin-bottom: 15px;">💡 After Resetting</h3>
-        <p>Once you've reset your password, you'll be able to access all your XpartFone features including:</p>
+        <p>Once you've reset your password, you'll be able to access all your Hive AI Phone features including:</p>
         <ul class="feature-list">
             <li>Your voice assistants and projects</li>
             <li>Account settings and preferences</li>
