@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\CallLog;
 use App\Models\Assistant;
+use App\Services\VapiCallReportProcessor;
 
 class VapiWebhookController extends Controller
 {
@@ -60,12 +61,15 @@ class VapiWebhookController extends Controller
                 case 'call-update':
                     $this->handleCallUpdate($payload, $assistant);
                     break;
+                case 'end-of-call-report':
+                    $this->handleEndOfCallReport($payload, $assistant);
+                    break;
                 default:
                     Log::warning('Unknown event type', [
                         'type' => $eventType,
                         'callId' => $callId,
                         'assistantId' => $assistantId,
-                        'supported_types' => ['call-start', 'call-end', 'call-update']
+                        'supported_types' => ['call-start', 'call-end', 'call-update', 'end-of-call-report']
                     ]);
                     return response()->json(['success' => false, 'message' => 'Unknown event type'], 400);
             }
@@ -178,6 +182,29 @@ class VapiWebhookController extends Controller
             Log::info('Call log updated for call update', [
                 'call_id' => $callLog->call_id,
                 'status' => $callLog->status
+            ]);
+        }
+    }
+
+    /**
+     * Handle end-of-call-report event
+     */
+    private function handleEndOfCallReport(array $payload, Assistant $assistant)
+    {
+        $processor = new VapiCallReportProcessor();
+        $callLog = $processor->processEndCallReport($payload);
+
+        if ($callLog) {
+            Log::info('End-of-call-report processed successfully', [
+                'call_id' => $callLog->call_id,
+                'assistant_id' => $assistant->id,
+                'status' => $callLog->status,
+                'duration' => $callLog->duration
+            ]);
+        } else {
+            Log::warning('Failed to process end-of-call-report', [
+                'assistant_id' => $assistant->id,
+                'payload_keys' => array_keys($payload)
             ]);
         }
     }
