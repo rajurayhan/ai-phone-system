@@ -17,6 +17,7 @@ class VapiWebhookController extends Controller
     {
         try {
             $payload = $request->all();
+            $payload = $payload['message'] ?? [];
             Log::info('Vapi webhook received', [
                 'type' => $payload['type'] ?? 'unknown',
                 'callId' => $payload['callId'] ?? 'unknown',
