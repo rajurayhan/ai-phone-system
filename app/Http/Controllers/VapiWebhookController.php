@@ -19,15 +19,15 @@ class VapiWebhookController extends Controller
             $payload = $request->all();
             $payload = $payload['message'] ?? [];
             Log::info('Vapi webhook received', [
-                'type' => $payload['type'] ?? 'unknown',
-                'callId' => $payload['callId'] ?? 'unknown',
-                'assistantId' => $payload['assistantId'] ?? 'unknown',
+                'type' => $payload['message']['type'] ?? 'unknown',
+                'callId' => $payload['message']['call']['id'] ?? 'unknown',
+                'assistantId' => $payload['message']['assistant']['id'] ?? 'unknown',
                 'timestamp' => now()->toISOString()
             ]);
 
-            $eventType = $payload['type'] ?? null;
-            $callId = $payload['callId'] ?? null;
-            $assistantId = $payload['assistantId'] ?? null;
+            $eventType = $payload['message']['type'] ?? null;
+            $callId = $payload['message']['call']['id']?? null;
+            $assistantId = $payload['message']['assistant']['id'] ?? null;
 
             if (!$eventType || !$callId || !$assistantId) {
                 Log::warning('Missing required fields in webhook payload', [
