@@ -279,6 +279,40 @@ router.beforeEach((to, from, next) => {
     }
 });
 
+// Global afterEach hook to update document titles
+router.afterEach((to) => {
+    // Map route names to page titles
+    const pageTitles = {
+        'landing': '',
+        'login': 'Login',
+        'register': 'Register',
+        'forgot-password': 'Forgot Password',
+        'reset-password': 'Reset Password',
+        'dashboard': 'Dashboard',
+        'admin': 'Admin Dashboard',
+        'admin-users': 'User Management',
+        'admin-assistants': 'Assistant Management',
+        'admin-transactions': 'Transaction Management',
+        'admin-features': 'Feature Management',
+        'admin-call-logs': 'Call Logs',
+        'admin-contacts': 'Contact Management',
+        'profile': 'Profile',
+        'pricing': 'Pricing',
+        'subscription': 'Subscription',
+        'transaction-history': 'Transaction History',
+        'payment': 'Payment',
+        'demo-request': 'Request Demo',
+        'call-logs': 'Call Logs',
+        'call-log-details': 'Call Details',
+        'terms': 'Terms of Service',
+        'privacy': 'Privacy Policy',
+        'not-found': 'Page Not Found'
+    };
+
+    const pageTitle = pageTitles[to.name] || to.name;
+    updateDocumentTitle(pageTitle);
+});
+
 // Create Vue app
 const app = createApp(App);
 app.use(router);

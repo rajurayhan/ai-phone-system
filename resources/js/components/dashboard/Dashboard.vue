@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Navigation -->
     <Navigation />
 
-    <div class="py-6">
+    <div class="flex-1 py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
@@ -136,16 +136,22 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer -->
+    <Footer />
   </div>
 </template>
 
 <script>
 import Navigation from '../shared/Navigation.vue'
+import Footer from '../shared/Footer.vue'
+import { updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
   name: 'Dashboard',
   components: {
-    Navigation
+    Navigation,
+    Footer
   },
   data() {
     return {
@@ -157,6 +163,7 @@ export default {
   },
   async mounted() {
     await this.loadStats();
+    await updateDocumentTitle('Dashboard');
   },
   methods: {
     async loadStats() {

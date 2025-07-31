@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Navigation -->
     <Navigation />
 
-    <div class="py-6">
+    <div class="flex-1 py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
@@ -98,72 +98,6 @@
           </div>
         </div>
 
-        <!-- Additional Stats -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-          <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <div class="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center">
-                    <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                    </svg>
-                  </div>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">Total Assistants</dt>
-                    <dd class="text-2xl font-bold text-gray-900">{{ stats.overview?.total_assistants || 0 }}</dd>
-                    <dd class="text-sm text-gray-500">Today: {{ stats.overview?.new_assistants_today || 0 }}</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <div class="w-8 h-8 bg-pink-500 rounded-md flex items-center justify-center">
-                    <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">Active Subscriptions</dt>
-                    <dd class="text-2xl font-bold text-gray-900">{{ stats.overview?.active_subscriptions || 0 }}</dd>
-                    <dd class="text-sm text-gray-500">Trial: {{ stats.overview?.trial_subscriptions || 0 }}</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
-                    <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">Avg Duration</dt>
-                    <dd class="text-2xl font-bold text-gray-900">{{ stats.overview?.avg_duration || 0 }}s</dd>
-                    <dd class="text-sm text-gray-500">Per call average</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Top Performing Assistants -->
         <div class="bg-white shadow rounded-lg mb-8">
           <div class="px-6 py-4 border-b border-gray-200">
@@ -193,16 +127,22 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer -->
+    <Footer />
   </div>
 </template>
 
 <script>
 import Navigation from '../shared/Navigation.vue'
+import Footer from '../shared/Footer.vue'
+import { updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
   name: 'AdminDashboard',
   components: {
-    Navigation
+    Navigation,
+    Footer
   },
   data() {
     return {
@@ -214,6 +154,7 @@ export default {
   },
   async mounted() {
     await this.loadStats();
+    await updateDocumentTitle('Admin Dashboard');
   },
   methods: {
     async loadStats() {
