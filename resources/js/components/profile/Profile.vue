@@ -101,6 +101,17 @@
                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                     />
                   </div>
+
+                  <div>
+                    <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                    <textarea
+                      id="bio"
+                      v-model="form.bio"
+                      rows="3"
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      placeholder="Tell us about yourself..."
+                    ></textarea>
+                  </div>
                 </div>
 
                 <!-- Save Button -->
@@ -115,6 +126,63 @@
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     {{ loading ? 'Saving...' : 'Save Changes' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Change Password Section -->
+          <div class="mt-8 bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
+              <form @submit.prevent="changePassword">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
+                    <input
+                      id="current_password"
+                      v-model="passwordForm.current_password"
+                      type="password"
+                      required
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
+                    <input
+                      id="new_password"
+                      v-model="passwordForm.new_password"
+                      type="password"
+                      required
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                    <input
+                      id="new_password_confirmation"
+                      v-model="passwordForm.new_password_confirmation"
+                      type="password"
+                      required
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                  <button
+                    type="submit"
+                    :disabled="passwordLoading"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                  >
+                    <svg v-if="passwordLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ passwordLoading ? 'Changing...' : 'Change Password' }}
                   </button>
                 </div>
               </form>
@@ -147,9 +215,17 @@ export default {
         name: '',
         email: '',
         phone: '',
-        company: ''
+        company: '',
+        bio: ''
       },
-      loading: false
+      passwordForm: {
+        current_password: '',
+        new_password: '',
+        new_password_confirmation: ''
+      },
+      loading: false,
+      passwordLoading: false,
+      selectedProfilePicture: null
     }
   },
   computed: {
@@ -171,7 +247,8 @@ export default {
           name: user.name || '',
           email: user.email || '',
           phone: user.phone || '',
-          company: user.company || ''
+          company: user.company || '',
+          bio: user.bio || ''
         };
       } catch (error) {
         console.error('Error loading user:', error);
@@ -223,6 +300,37 @@ export default {
       const file = event.target.files[0];
       if (file) {
         this.selectedProfilePicture = file;
+      }
+    },
+    
+    async changePassword() {
+      this.passwordLoading = true;
+      try {
+        const response = await fetch('/api/profile/change-password', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(this.passwordForm)
+        });
+
+        if (response.ok) {
+          this.$toast.success('Password changed successfully');
+          this.passwordForm = {
+            current_password: '',
+            new_password: '',
+            new_password_confirmation: ''
+          };
+        } else {
+          const error = await response.json();
+          this.$toast.error(error.message || 'Failed to change password');
+        }
+      } catch (error) {
+        console.error('Error changing password:', error);
+        this.$toast.error('An error occurred while changing password');
+      } finally {
+        this.passwordLoading = false;
       }
     }
   }

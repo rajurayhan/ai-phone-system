@@ -165,8 +165,189 @@
         </div>
       </div>
 
-      <!-- Contact Section -->
-      <div id="contact" class="py-16 bg-primary-600">
+      <!-- Contact Us Section -->
+      <div id="contact" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center">
+            <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              Get in Touch
+            </h2>
+            <p class="mt-4 text-xl text-gray-600">
+              Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            </p>
+          </div>
+
+          <div class="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <!-- Contact Information -->
+            <div class="bg-gray-50 rounded-lg p-8">
+              <h3 class="text-lg font-medium text-gray-900 mb-6">Contact Information</h3>
+              <div class="space-y-6">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Phone</p>
+                    <a :href="`tel:${contactPhone}`" class="text-lg text-primary-600 hover:text-primary-700 font-medium">{{ contactPhone }}</a>
+                  </div>
+                </div>
+                
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Email</p>
+                    <a :href="`mailto:${contactEmail}`" class="text-lg text-primary-600 hover:text-primary-700 font-medium">{{ contactEmail }}</a>
+                  </div>
+                </div>
+                
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Business Hours</p>
+                    <p class="text-lg text-gray-700">Monday - Friday: 9:00 AM - 6:00 PM EST</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="bg-white border border-gray-200 rounded-lg p-8">
+              <h3 class="text-lg font-medium text-gray-900 mb-6">Send us a Message</h3>
+              
+              <!-- Success Message -->
+              <div v-if="contactFormSuccess" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">{{ contactFormSuccess }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Error Message -->
+              <div v-if="contactFormError" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-red-800">{{ contactFormError }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <form @submit.prevent="submitContactForm" class="space-y-6">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
+                    <input
+                      type="text"
+                      id="first_name"
+                      v-model="contactForm.first_name"
+                      required
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
+                    <input
+                      type="text"
+                      id="last_name"
+                      v-model="contactForm.last_name"
+                      required
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    v-model="contactForm.email"
+                    required
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  />
+                </div>
+                
+                <div>
+                  <label for="phone" class="block text-sm font-medium text-gray-700">Phone (Optional)</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    v-model="contactForm.phone"
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  />
+                </div>
+                
+                <div>
+                  <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
+                  <select
+                    id="subject"
+                    v-model="contactForm.subject"
+                    required
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  >
+                    <option value="">Select a subject</option>
+                    <option value="general">General Inquiry</option>
+                    <option value="sales">Sales Question</option>
+                    <option value="support">Technical Support</option>
+                    <option value="demo">Demo Request</option>
+                    <option value="partnership">Partnership</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+                  <textarea
+                    id="message"
+                    v-model="contactForm.message"
+                    rows="4"
+                    required
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    placeholder="Tell us how we can help you..."
+                  ></textarea>
+                </div>
+                
+                <div>
+                  <button
+                    type="submit"
+                    :disabled="contactFormSubmitting"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg v-if="contactFormSubmitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ contactFormSubmitting ? 'Sending...' : 'Send Message' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Section -->
+      <div class="bg-primary-700">
         <div class="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
           <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
             <span class="block">Ready to get started?</span>

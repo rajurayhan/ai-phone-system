@@ -19,219 +19,177 @@
             </router-link>
           </div>
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-            <router-link 
-              to="/dashboard" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path === '/dashboard' 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Dashboard
-            </router-link>
-            <router-link 
-              v-if="!isAdmin"
-              to="/assistants" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path === '/assistants' 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              My Assistants
-            </router-link>
-            <router-link 
-              v-if="!isAdmin"
-              to="/demo-request" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path === '/demo-request' 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Request Demo
-            </router-link>
-            <router-link 
-              v-if="!isAdmin"
-              to="/call-logs" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path === '/call-logs' 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Call Logs
-            </router-link>
-            <router-link 
-              v-if="!isAdmin"
-              to="/subscription" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path === '/subscription' 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Subscription
-            </router-link>
-            <router-link 
-              v-if="!isAdmin"
-              to="/transactions" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path === '/transactions' 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Transactions
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/users" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/users') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Users
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/assistants" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/assistants') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              All Assistants
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/features" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/features') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Features
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/packages" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/packages') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Packages
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/subscriptions" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/subscriptions') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Subscriptions
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/templates" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/templates') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Templates
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/demo-requests" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/demo-requests') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Demo Requests
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/call-logs" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/call-logs') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Call Logs
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/contacts" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/contacts') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Contact Management
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/transactions" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/transactions') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              Transactions
-            </router-link>
-            <router-link 
-              v-if="isAdmin"
-              to="/admin/system-settings" 
-              :class="[
-                'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                $route.path.startsWith('/admin/system-settings') 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              ]"
-            >
-              System Settings
-            </router-link>
+            <!-- User Navigation -->
+            <template v-if="!isAdmin">
+              <router-link 
+                to="/dashboard" 
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path === '/dashboard' 
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Dashboard
+              </router-link>
+              <router-link 
+                to="/assistants" 
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path === '/assistants' 
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Assistants
+              </router-link>
+              <router-link 
+                to="/call-logs" 
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path === '/call-logs' 
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Call Logs
+              </router-link>
+              
+              <!-- User Subscription Dropdown -->
+              <div class="relative inline-flex items-center">
+                <button 
+                  @click="subscriptionMenuOpen = !subscriptionMenuOpen"
+                  :class="[
+                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                    $route.path === '/subscription' || $route.path === '/transactions'
+                      ? 'border-green-500 text-green-600' 
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  ]"
+                >
+                  Subscription
+                  <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="subscriptionMenuOpen" class="absolute right-0 top-full mt-1 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 z-50">
+                  <router-link to="/subscription" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Subscriptions</router-link>
+                  <router-link to="/transactions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Transactions</router-link>
+                </div>
+              </div>
+              
+              <router-link 
+                to="/demo-request" 
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path === '/demo-request' 
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Demo Requests
+              </router-link>
+            </template>
+            
+            <!-- Admin Navigation -->
+            <template v-if="isAdmin">
+              <router-link 
+                to="/admin" 
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path === '/admin' 
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Dashboard
+              </router-link>
+              <router-link 
+                to="/admin/assistants" 
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path.startsWith('/admin/assistants') 
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Assistants
+              </router-link>
+              <router-link 
+                to="/admin/call-logs" 
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path.startsWith('/admin/call-logs') 
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Call Logs
+              </router-link>
+              
+              <!-- Admin Subscription Dropdown -->
+              <div class="relative inline-flex items-center">
+                <button 
+                  @click="subscriptionMenuOpen = !subscriptionMenuOpen"
+                  :class="[
+                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                    $route.path.startsWith('/admin/subscriptions') || $route.path.startsWith('/admin/transactions')
+                      ? 'border-green-500 text-green-600' 
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  ]"
+                >
+                  Subscription
+                  <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="subscriptionMenuOpen" class="absolute right-0 top-full mt-1 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 z-50">
+                  <router-link to="/admin/subscriptions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Subscriptions</router-link>
+                  <router-link to="/admin/transactions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Transactions</router-link>
+                </div>
+              </div>
+              
+              <!-- Admin Config Dropdown -->
+              <div class="relative inline-flex items-center">
+                <button 
+                  @click="configMenuOpen = !configMenuOpen"
+                  :class="[
+                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                    $route.path.startsWith('/admin/features') || $route.path.startsWith('/admin/templates') || $route.path.startsWith('/admin/packages') || $route.path.startsWith('/admin/users') || $route.path.startsWith('/admin/system-settings') || $route.path.startsWith('/admin/contacts')
+                      ? 'border-green-500 text-green-600' 
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  ]"
+                >
+                  Config
+                  <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="configMenuOpen" class="absolute right-0 top-full mt-1 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 z-50">
+                  <router-link to="/admin/features" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Features</router-link>
+                  <router-link to="/admin/templates" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Templates</router-link>
+                  <router-link to="/admin/packages" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Packages</router-link>
+                  <router-link to="/admin/users" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Users</router-link>
+                  <router-link to="/admin/system-settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</router-link>
+                  <router-link to="/admin/contacts" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Contacts</router-link>
+                </div>
+              </div>
+              
+              <router-link 
+                to="/admin/demo-requests" 
+                :class="[
+                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                  $route.path === '/admin/demo-requests' 
+                    ? 'border-green-500 text-green-600' 
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ]"
+              >
+                Demo Requests
+              </router-link>
+            </template>
           </div>
         </div>
         <div class="flex items-center">
-          <div class="flex items-center space-x-4">
-            <router-link to="/profile" class="text-gray-500 hover:text-gray-700">
-              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </router-link>
-            <div class="relative">
+          <div class="relative">
               <button @click="showUserMenu = !showUserMenu" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                 <div class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center">
                   <span class="text-white text-sm font-medium">{{ userInitials }}</span>
@@ -252,8 +210,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 </template>
 
 <script>
@@ -268,6 +225,8 @@ export default {
   data() {
     return {
       showUserMenu: false,
+      subscriptionMenuOpen: false,
+      configMenuOpen: false,
       user: JSON.parse(localStorage.getItem('user') || '{}'),
       settings: {
         site_title: 'XpartFone',
@@ -328,6 +287,8 @@ export default {
     document.addEventListener('click', (e) => {
       if (!this.$el.contains(e.target)) {
         this.showUserMenu = false;
+        this.subscriptionMenuOpen = false;
+        this.configMenuOpen = false;
       }
     });
   }
