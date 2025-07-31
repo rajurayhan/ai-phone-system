@@ -24,7 +24,7 @@ export default {
   data() {
     return {
       settings: {
-        site_title: 'SulusAI',
+        site_title: 'XpartFone',
         logo_url: '/logo.png'
       }
     }

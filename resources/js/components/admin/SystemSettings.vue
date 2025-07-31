@@ -75,6 +75,17 @@
                   />
                   <p class="mt-1 text-sm text-gray-500">Primary contact email address for the company</p>
                 </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                  <input
+                    v-model="settings.company_name"
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    placeholder="Enter company name"
+                  />
+                  <p class="mt-1 text-sm text-gray-500">Official company name for legal documents and branding</p>
+                </div>
               </div>
 
               <!-- SEO Settings -->
@@ -193,7 +204,8 @@ export default {
       logo_url: '',
       homepage_banner: '',
       company_phone: '',
-      company_email: ''
+      company_email: '',
+      company_name: ''
     })
     const selectedLogoFile = ref(null)
     const selectedBannerFile = ref(null)

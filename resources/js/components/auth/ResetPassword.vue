@@ -164,7 +164,7 @@ export default {
       error: '',
       passwordReset: false,
       settings: {
-        site_title: 'SulusAI',
+        site_title: 'XpartFone',
         logo_url: '/logo.png'
       }
     }
@@ -177,7 +177,7 @@ export default {
     } catch (error) {
       // Set default values if API fails
       this.settings = {
-        site_title: 'SulusAI',
+        site_title: 'XpartFone',
         logo_url: '/logo.png'
       }
     }

@@ -47,6 +47,14 @@ class SystemSettingSeeder extends Seeder
                 'description' => 'Primary contact email address for the company'
             ],
             [
+                'key' => 'company_name',
+                'value' => 'XpartFone',
+                'type' => 'text',
+                'group' => 'contact',
+                'label' => 'Company Name',
+                'description' => 'Official company name for legal documents and branding'
+            ],
+            [
                 'key' => 'meta_description',
                 'value' => 'Transform your business with cutting-edge voice AI technology. Create intelligent voice agents that understand, respond, and engage with your customers 24/7.',
                 'type' => 'textarea',

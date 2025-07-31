@@ -18,12 +18,12 @@
         <div class="prose prose-lg max-w-none">
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
           <p class="mb-6">
-            By accessing and using SulusAI ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+            By accessing and using {{ companyName }} ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
           <p class="mb-6">
-            SulusAI provides voice AI assistant services, including but not limited to:
+            {{ companyName }} provides voice AI assistant services, including but not limited to:
           </p>
           <ul class="list-disc pl-6 mb-6 space-y-2">
             <li>Voice assistant creation and customization</li>
@@ -76,12 +76,12 @@
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Intellectual Property</h2>
           <p class="mb-6">
-            The Service and its original content, features, and functionality are owned by SulusAI and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+            The Service and its original content, features, and functionality are owned by {{ companyName }} and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">8. Limitation of Liability</h2>
           <p class="mb-6">
-            In no event shall SulusAI, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the Service.
+            In no event shall {{ companyName }}, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the Service.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">9. Termination</h2>
@@ -117,12 +117,14 @@ export default {
   setup() {
     const contactEmail = ref('support@xpartfone.com')
     const contactPhone = ref('(682) 582 8396')
+    const companyName = ref('XpartFone')
 
     const loadContactInfo = async () => {
       try {
         const settings = await getSystemSettings()
         contactEmail.value = settings.company_email || 'support@xpartfone.com'
         contactPhone.value = settings.company_phone || '(682) 582 8396'
+        companyName.value = settings.company_name || 'XpartFone'
       } catch (error) {
         console.error('Error loading contact info:', error)
       }
@@ -135,7 +137,8 @@ export default {
 
     return {
       contactEmail,
-      contactPhone
+      contactPhone,
+      companyName
     }
   }
 }

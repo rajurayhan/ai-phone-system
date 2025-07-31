@@ -141,7 +141,7 @@ export default {
   data() {
     return {
       settings: {
-        site_title: 'SulusAI',
+        site_title: 'XpartFone',
         logo_url: '/logo.png'
       },
       contactEmail: 'support@xpartfone.com'
@@ -167,11 +167,11 @@ export default {
     } catch (error) {
       // Set default values if API fails
       this.settings = {
-        site_title: 'SulusAI',
+        site_title: 'XpartFone',
         logo_url: '/logo.png'
       }
       this.contactEmail = 'support@xpartfone.com'
-      document.title = `${this.errorCode} - ${this.errorTitle} | SulusAI`
+      document.title = `${this.errorCode} - ${this.errorTitle} | XpartFone`
     }
   }
 }

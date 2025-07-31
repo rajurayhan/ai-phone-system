@@ -42,7 +42,8 @@ const getDefaultSettings = () => {
     logo_url: '/logo.png',
     homepage_banner: null,
     company_phone: '(682) 582 8396',
-    company_email: 'support@xpartfone.com'
+    company_email: 'support@xpartfone.com',
+    company_name: 'XpartFone'
   }
 }
 

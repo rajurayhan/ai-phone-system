@@ -227,7 +227,7 @@ export default {
       configMenuOpen: false,
       user: JSON.parse(localStorage.getItem('user') || '{}'),
       settings: {
-        site_title: 'SulusAI',
+        site_title: 'XpartFone',
         logo_url: '/logo.png'
       }
     }

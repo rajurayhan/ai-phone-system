@@ -35,6 +35,18 @@ return new class extends Migration
                 'description' => 'Primary contact email address for the company'
             ]);
         }
+
+        // Add company name setting if it doesn't exist
+        if (!SystemSetting::where('key', 'company_name')->exists()) {
+            SystemSetting::create([
+                'key' => 'company_name',
+                'value' => 'XpartFone',
+                'type' => 'text',
+                'group' => 'contact',
+                'label' => 'Company Name',
+                'description' => 'Official company name for legal documents and branding'
+            ]);
+        }
     }
 
     /**
@@ -45,5 +57,6 @@ return new class extends Migration
         // Remove the company contact settings
         SystemSetting::where('key', 'company_phone')->delete();
         SystemSetting::where('key', 'company_email')->delete();
+        SystemSetting::where('key', 'company_name')->delete();
     }
 };

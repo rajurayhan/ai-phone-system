@@ -16,7 +16,12 @@
       <!-- Content -->
       <div class="bg-white shadow-lg rounded-lg p-8">
         <div class="prose prose-lg max-w-none">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Information We Collect</h2>
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
+          <p class="mb-6">
+            Welcome to {{ companyName }}. We respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our voice AI platform and services.
+          </p>
+
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. Information We Collect</h2>
           <p class="mb-6">
             We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.
           </p>
@@ -147,12 +152,14 @@ export default {
   setup() {
     const contactEmail = ref('privacy@xpartfone.com')
     const contactPhone = ref('(682) 582 8396')
+    const companyName = ref('XpartFone')
 
     const loadContactInfo = async () => {
       try {
         const settings = await getSystemSettings()
         contactEmail.value = settings.company_email || 'privacy@xpartfone.com'
         contactPhone.value = settings.company_phone || '(682) 582 8396'
+        companyName.value = settings.company_name || 'XpartFone'
       } catch (error) {
         console.error('Error loading contact info:', error)
       }
@@ -165,7 +172,8 @@ export default {
 
     return {
       contactEmail,
-      contactPhone
+      contactPhone,
+      companyName
     }
   }
 }
