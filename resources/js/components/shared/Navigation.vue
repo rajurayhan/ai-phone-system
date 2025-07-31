@@ -5,7 +5,7 @@
         <div class="flex justify-between h-16">
           <div class="flex">
             <div class="flex-shrink-0 flex items-center">
-              <router-link to="/dashboard" class="flex items-center hover:opacity-80 transition-opacity">
+              <router-link to="/" class="flex items-center hover:opacity-80 transition-opacity">
                 <div v-if="settings.logo_url" class="h-8 w-auto">
                   <img :src="settings.logo_url" :alt="settings.site_title" class="h-full w-auto">
                 </div>

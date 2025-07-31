@@ -4,9 +4,9 @@
     <header class="bg-white shadow-sm sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-6">
-          <div class="flex items-center">
+          <div class="flex items-center"> 
             <div v-if="settings.logo_url" class="h-8 w-auto">
-              <img :src="settings.logo_url" :alt="settings.site_title" class="h-full w-auto">
+              <img :src="settings.logo_url" :alt="settings.site_title" class="h-8 w-auto object-contain" @error="handleLogoError" @load="handleLogoLoad">
             </div>
             <div v-else class="h-8 w-8 bg-gradient-to-r from-primary-600 to-blue-600 rounded-lg flex items-center justify-center">
               <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,7 +81,7 @@
         </div>
         <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
           <div v-if="settings.homepage_banner" class="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full rounded-lg shadow-xl overflow-hidden">
-            <img :src="settings.homepage_banner" :alt="settings.site_title" class="w-full h-full object-cover">
+            <img :src="settings.homepage_banner" :alt="settings.site_title" class="w-full h-full object-cover" @error="handleBannerError" @load="handleBannerLoad">
           </div>
           <div v-else class="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full bg-gradient-to-r from-primary-400 to-blue-500 rounded-lg shadow-xl"></div>
         </div>
@@ -441,8 +441,20 @@ export default {
     const loadSettings = async () => {
       try {
         const response = await axios.get('/api/public-settings')
-        settings.value = response.data.data
+        console.log('Settings loaded:', response.data.data)
+        
+        // The API returns flat data structure, not grouped
+        if (response.data.data && typeof response.data.data === 'object') {
+          settings.value = response.data.data
+        } else {
+          settings.value = response.data.data
+        }
+        
+        console.log('Processed settings:', settings.value)
+        console.log('Logo URL:', settings.value.logo_url)
+        console.log('Banner URL:', settings.value.homepage_banner)
       } catch (error) {
+        console.error('Error loading settings:', error)
         // Set default values if API fails
         settings.value = {
           site_title: 'XpartFone',
@@ -491,6 +503,24 @@ export default {
       }
     }
 
+    const handleLogoError = (event) => {
+      console.error('Logo failed to load:', settings.value.logo_url)
+      console.error('Error event:', event)
+    }
+
+    const handleLogoLoad = () => {
+      console.log('Logo loaded successfully:', settings.value.logo_url)
+    }
+
+    const handleBannerError = (event) => {
+      console.error('Banner failed to load:', settings.value.homepage_banner)
+      console.error('Error event:', event)
+    }
+
+    const handleBannerLoad = () => {
+      console.log('Banner loaded successfully:', settings.value.homepage_banner)
+    }
+
     onMounted(() => {
       loadPackages()
       loadFeatures()
@@ -520,8 +550,12 @@ export default {
       contactFormSuccess,
       contactFormError,
       submitContactForm,
-      contactPhone: computed(() => settings.value.company_phone),
-      contactEmail: computed(() => settings.value.company_email)
+      contactPhone: computed(() => settings.value.company_phone || '(682) 582 8396'),
+      contactEmail: computed(() => settings.value.company_email || 'support@xpartfone.com'),
+      handleLogoError,
+      handleLogoLoad,
+      handleBannerError,
+      handleBannerLoad
     }
   }
 }
