@@ -183,7 +183,7 @@ class AustralianPhoneNumberTest extends TestCase
         // Mock TwilioService to verify correct country code is passed
         $this->mock(TwilioService::class, function ($mock) {
             $mock->shouldReceive('purchaseNumber')
-                ->with('+447123456789', 'GB')
+                ->with('+447123456789', 'CA')
                 ->andReturn([
                     'success' => false,
                     'message' => 'Test message'
@@ -213,7 +213,7 @@ class AustralianPhoneNumberTest extends TestCase
                 'company_name' => 'Test Company',
                 'industry' => 'Technology',
                 'services_products' => 'Software Development',
-                'country' => 'United Kingdom'
+                'country' => 'Canada'
             ],
             'selected_phone_number' => '+447123456789'
         ]);

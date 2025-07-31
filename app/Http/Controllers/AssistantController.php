@@ -115,7 +115,7 @@ class AssistantController extends Controller
             'metadata' => 'array',
             'metadata.company_name' => 'string|max:255',
             'metadata.industry' => 'string|max:255',
-            'metadata.country' => 'required|string|in:United States',
+            'metadata.country' => 'required|string|in:United States,Canada,Australia',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
             'metadata.assistant_phone_number' => 'nullable|string|max:20|regex:/^\+[1-9]\d{1,14}$/',
@@ -168,8 +168,19 @@ class AssistantController extends Controller
         if ($request->has('selected_phone_number') && $request->selected_phone_number) {
             $twilioService = app(\App\Services\TwilioService::class);
             
+            // Determine country code from metadata
+            $countryCode = null;
+            if ($request->has('metadata.country')) {
+                $countryCodeMap = [
+                    'United States' => 'US',
+                    'Canada' => 'CA',
+                    'Australia' => 'AU'
+                ];
+                $countryCode = $countryCodeMap[$request->input('metadata.country')] ?? null;
+            }
+            
             // Purchase the selected phone number
-            $purchaseResult = $twilioService->purchaseNumber($request->selected_phone_number);
+            $purchaseResult = $twilioService->purchaseNumber($request->selected_phone_number, $countryCode);
             
             if ($purchaseResult['success']) {
                 $phoneNumber = $request->selected_phone_number;
@@ -301,7 +312,7 @@ class AssistantController extends Controller
             'metadata' => 'array',
             'metadata.company_name' => 'string|max:255',
             'metadata.industry' => 'string|max:255',
-            'metadata.country' => 'required|string|in:United States',
+            'metadata.country' => 'required|string|in:United States,Canada,Australia',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
             'metadata.assistant_phone_number' => 'nullable|string|max:20|regex:/^\+[1-9]\d{1,14}$/',

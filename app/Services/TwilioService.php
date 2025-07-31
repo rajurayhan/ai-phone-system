@@ -32,8 +32,8 @@ class TwilioService
                 'smsEnabled' => true
             ];
             
-            // Add area code filter only for US (where area codes are applicable)
-            if ($areaCode && $countryCode === 'US') {
+            // Add area code filter for supported countries (US, CA, AU)
+            if ($areaCode && in_array($countryCode, ['US', 'CA', 'AU'])) {
                 $params['areaCode'] = $areaCode;
             }
             
@@ -46,7 +46,7 @@ class TwilioService
                 Log::info('No local numbers with voice+SMS found, trying without restrictions');
                 
                 $params = ['limit' => $limit];
-                if ($areaCode && in_array($countryCode, ['US', 'CA'])) {
+                if ($areaCode && in_array($countryCode, ['US', 'CA', 'AU'])) {
                     $params['areaCode'] = $areaCode;
                 }
                 
@@ -102,13 +102,18 @@ class TwilioService
     /**
      * Purchase a phone number
      */
-    public function purchaseNumber($phoneNumber)
+    public function purchaseNumber($phoneNumber, $countryCode = null)
     {
         try {
             // Ensure phone number is in E.164 format
             $phoneNumber = $this->formatPhoneNumber($phoneNumber);
             
-            Log::info('Twilio Purchase Number Attempt: ' . $phoneNumber);
+            // Determine country code if not provided
+            if (!$countryCode) {
+                $countryCode = $this->determineCountryFromPhoneNumber($phoneNumber);
+            }
+            
+            Log::info('Twilio Purchase Number Attempt: ' . $phoneNumber . ' for country: ' . $countryCode);
             
             // Check if the number is already owned by this account
             $existingNumbers = $this->client->incomingPhoneNumbers
@@ -129,7 +134,7 @@ class TwilioService
             }
             
             // Check if the number is available for purchase
-            $availableNumbers = $this->client->availablePhoneNumbers('US')
+            $availableNumbers = $this->client->availablePhoneNumbers($countryCode)
                 ->local
                 ->read(['phoneNumber' => $phoneNumber], 1);
             
@@ -141,15 +146,25 @@ class TwilioService
                 ];
             }
             
+            // Prepare purchase parameters
+            $purchaseParams = [
+                'phoneNumber' => $phoneNumber,
+                // 'voiceUrl' => config('app.url') . '/api/twilio/voice',
+                // 'smsUrl' => config('app.url') . '/api/twilio/sms',
+                'voiceMethod' => 'POST',
+                'smsMethod' => 'POST'
+            ];
+            
+            // Add address SID for countries that require it
+            $addressSid = $this->getAddressSidForCountry($countryCode);
+            if ($addressSid) {
+                $purchaseParams['addressSid'] = $addressSid;
+                Log::info('Twilio Purchase Number: Using address SID ' . $addressSid . ' for country ' . $countryCode);
+            }
+            
             // Purchase the phone number
             $incomingPhoneNumber = $this->client->incomingPhoneNumbers
-                ->create([
-                    'phoneNumber' => $phoneNumber,
-                    // 'voiceUrl' => config('app.url') . '/api/twilio/voice',
-                    // 'smsUrl' => config('app.url') . '/api/twilio/sms',
-                    'voiceMethod' => 'POST',
-                    'smsMethod' => 'POST'
-                ]);
+                ->create($purchaseParams);
 
             Log::info('Twilio Purchase Number Success: ' . $phoneNumber . ' - SID: ' . $incomingPhoneNumber->sid);
             
@@ -431,5 +446,46 @@ class TwilioService
         }
         
         return $results;
+    }
+
+    /**
+     * Determine country code from phone number
+     */
+    private function determineCountryFromPhoneNumber($phoneNumber)
+    {
+        // Remove any non-digit characters except +
+        $cleanNumber = preg_replace('/[^\d+]/', '', $phoneNumber);
+        
+        // Country code mapping based on phone number prefixes
+        if (preg_match('/^\+1/', $cleanNumber)) {
+            return 'US'; // Default to US for +1, could be Canada but US is more common
+        } elseif (preg_match('/^\+61/', $cleanNumber)) {
+            return 'AU';
+        } elseif (preg_match('/^\+44/', $cleanNumber)) {
+            return 'GB';
+        } elseif (preg_match('/^\+64/', $cleanNumber)) {
+            return 'NZ';
+        } elseif (preg_match('/^\+353/', $cleanNumber)) {
+            return 'IE';
+        } else {
+            return 'US'; // Default fallback
+        }
+    }
+
+    /**
+     * Get address SID for country if required
+     */
+    private function getAddressSidForCountry($countryCode)
+    {
+        $addressSids = config('services.twilio.address_sids', []);
+        
+        // Countries that require address verification
+        $countriesRequiringAddress = ['AU', 'CA', 'GB', 'NZ', 'IE'];
+        
+        if (in_array($countryCode, $countriesRequiringAddress) && isset($addressSids[$countryCode])) {
+            return $addressSids[$countryCode];
+        }
+        
+        return null;
     }
 } 

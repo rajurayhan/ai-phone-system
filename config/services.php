@@ -44,6 +44,10 @@ return [
     'twilio' => [
         'account_sid' => env('TWILIO_ACCOUNT_SID'),
         'auth_token' => env('TWILIO_AUTH_TOKEN'),
+        'address_sids' => [
+            'AU' => env('TWILIO_AUSTRALIA_ADDRESS_SID', 'AD41a1be18b65714198009c9004ed9d2cd'),
+            'CA' => env('TWILIO_CANADA_ADDRESS_SID', 'ADefbe5e284152650c6ee9c622378569e6'),
+        ],
     ],
 
 ];

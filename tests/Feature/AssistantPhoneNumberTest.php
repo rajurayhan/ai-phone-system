@@ -78,6 +78,7 @@ class AssistantPhoneNumberTest extends TestCase
             'metadata' => [
                 'company_name' => 'Test Company',
                 'industry' => 'Technology',
+                'country' => 'United States',
                 'services_products' => 'Software Development'
             ],
             'selected_phone_number' => '+1234567890'
@@ -134,6 +135,7 @@ class AssistantPhoneNumberTest extends TestCase
             'metadata' => [
                 'company_name' => 'Test Company',
                 'industry' => 'Technology',
+                'country' => 'United States',
                 'services_products' => 'Software Development'
             ]
             // No selected_phone_number
@@ -182,6 +184,7 @@ class AssistantPhoneNumberTest extends TestCase
             'metadata' => [
                 'company_name' => 'Test Company',
                 'industry' => 'Technology',
+                'country' => 'United States',
                 'services_products' => 'Software Development'
             ],
             'selected_phone_number' => '+1234567890'

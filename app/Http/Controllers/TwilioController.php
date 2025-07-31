@@ -23,7 +23,7 @@ class TwilioController extends Controller
     {
         $request->validate([
             'country_code' => 'string|max:2',
-            'country' => 'string|in:United States',
+            'country' => 'string|in:United States,Canada,Australia',
             'limit' => 'integer|min:1|max:50',
             'area_code' => 'nullable|string|max:3'
         ]);
@@ -35,7 +35,9 @@ class TwilioController extends Controller
 
         // Map country names to Twilio country codes
         $countryCodeMap = [
-            'United States' => 'US'
+            'United States' => 'US',
+            'Canada' => 'CA',
+            'Australia' => 'AU'
         ];
 
         // Use country parameter if provided, otherwise use country_code
@@ -47,7 +49,7 @@ class TwilioController extends Controller
         if ($areaCode && !$this->validateAreaCode($areaCode, $countryCode)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Area code is not supported for the selected country. Only US supports area codes.'
+                'message' => 'Area code is not supported for the selected country. Only US, CA, and AU support area codes.'
             ], 422);
         }
 
@@ -72,12 +74,14 @@ class TwilioController extends Controller
     public function purchaseNumber(Request $request): JsonResponse
     {
         $request->validate([
-            'phone_number' => 'required|string'
+            'phone_number' => 'required|string',
+            'country_code' => 'nullable|string|max:2'
         ]);
 
         $phoneNumber = $request->input('phone_number');
+        $countryCode = $request->input('country_code');
 
-        $result = $this->twilioService->purchaseNumber($phoneNumber);
+        $result = $this->twilioService->purchaseNumber($phoneNumber, $countryCode);
 
         if ($result['success']) {
             return response()->json([
@@ -152,12 +156,12 @@ class TwilioController extends Controller
     {
         if (!$areaCode) return true;
         
-        // Only US supports area codes
-        if ($countryCode !== 'US') {
+        // Only US, CA, and AU support area codes
+        if (!in_array($countryCode, ['US', 'CA', 'AU'])) {
             return false;
         }
         
-        // Validate area code format (3 digits for US)
+        // Validate area code format (3 digits for US, CA, AU)
         return preg_match('/^\d{3}$/', $areaCode);
     }
 } 

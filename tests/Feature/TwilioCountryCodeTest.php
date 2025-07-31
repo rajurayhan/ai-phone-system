@@ -34,22 +34,7 @@ class TwilioCountryCodeTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_united_kingdom_country_code_mapping()
-    {
-        $user = User::factory()->create(['role' => 'admin']);
 
-        $this->mock(TwilioService::class, function ($mock) {
-            $mock->shouldReceive('getAvailableNumbers')
-                ->with('GB', 10, null)
-                ->andReturn([
-                    'success' => true,
-                    'data' => [['phone_number' => '+44123456789']]
-                ]);
-        });
-
-        $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country=United%20Kingdom');
-        $response->assertStatus(200);
-    }
 
     public function test_canada_country_code_mapping()
     {
@@ -85,46 +70,16 @@ class TwilioCountryCodeTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_new_zealand_country_code_mapping()
+
+
+
+
+    public function test_area_code_validation_for_supported_countries()
     {
         $user = User::factory()->create(['role' => 'admin']);
 
-        $this->mock(TwilioService::class, function ($mock) {
-            $mock->shouldReceive('getAvailableNumbers')
-                ->with('NZ', 10, null)
-                ->andReturn([
-                    'success' => true,
-                    'data' => [['phone_number' => '+6423456789']]
-                ]);
-        });
-
-        $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country=New%20Zealand');
-        $response->assertStatus(200);
-    }
-
-    public function test_ireland_country_code_mapping()
-    {
-        $user = User::factory()->create(['role' => 'admin']);
-
-        $this->mock(TwilioService::class, function ($mock) {
-            $mock->shouldReceive('getAvailableNumbers')
-                ->with('IE', 10, null)
-                ->andReturn([
-                    'success' => true,
-                    'data' => [['phone_number' => '+3531234567']]
-                ]);
-        });
-
-        $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country=Ireland');
-        $response->assertStatus(200);
-    }
-
-    public function test_area_code_validation_for_us_and_canada()
-    {
-        $user = User::factory()->create(['role' => 'admin']);
-
-        // Test that area codes work for US and Canada
-        $supportedCountries = ['United States', 'Canada'];
+        // Test that area codes work for US, Canada, and Australia
+        $supportedCountries = ['United States', 'Canada', 'Australia'];
 
         foreach ($supportedCountries as $country) {
             $this->mock(TwilioService::class, function ($mock) {
@@ -146,16 +101,13 @@ class TwilioCountryCodeTest extends TestCase
         $user = User::factory()->create(['role' => 'admin']);
 
         // Test that area codes are rejected for unsupported countries
-        $unsupportedCountries = ['United Kingdom', 'Australia', 'New Zealand', 'Ireland'];
+        $unsupportedCountries = ['United Kingdom', 'New Zealand', 'Ireland'];
 
         foreach ($unsupportedCountries as $country) {
             $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country=' . urlencode($country) . '&area_code=212');
 
             $response->assertStatus(422);
-            $response->assertJson([
-                'success' => false,
-                'message' => 'Area code is not supported for the selected country. Only US and Canada support area codes.'
-            ]);
+            $response->assertJsonValidationErrors(['country']);
         }
     }
 
@@ -177,17 +129,17 @@ class TwilioCountryCodeTest extends TestCase
     {
         $user = User::factory()->create(['role' => 'admin']);
 
-        // Mock TwilioService to expect GB (United Kingdom) instead of US
+        // Mock TwilioService to expect CA (Canada) instead of US
         $this->mock(TwilioService::class, function ($mock) {
             $mock->shouldReceive('getAvailableNumbers')
-                ->with('GB', 10, null) // Should use GB from country parameter, not US from country_code
+                ->with('CA', 10, null) // Should use CA from country parameter, not US from country_code
                 ->andReturn([
                     'success' => true,
                     'data' => []
                 ]);
         });
 
-        $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country_code=US&country=United%20Kingdom');
+        $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country_code=US&country=Canada');
 
         $response->assertStatus(200);
     }
