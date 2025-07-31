@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Create subscription packages
-        $this->call([
-            SubscriptionPackageSeeder::class,
-        ]);
+        // $this->call([
+        //     SubscriptionPackageSeeder::class,
+        // ]);
 
         // Create settings and templates
         $this->call([

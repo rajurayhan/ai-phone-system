@@ -49,6 +49,9 @@ return [
             'CA' => env('TWILIO_CANADA_ADDRESS_SID', 'ADefbe5e284152650c6ee9c622378569e6'),
             'GB' => env('TWILIO_UK_ADDRESS_SID', 'AD4c3f06239dbde51132ce10dc187822e6'),
         ],
+        'bundle_sids' => [
+            'GB' => env('TWILIO_UK_BUNDLE_SID', 'AD4c3f06239dbde51132ce10dc187822e6'),
+        ],
     ],
 
 ];

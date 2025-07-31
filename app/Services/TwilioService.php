@@ -155,11 +155,18 @@ class TwilioService
                 'smsMethod' => 'POST'
             ];
             
-            // Add address SID for countries that require it
-            $addressSid = $this->getAddressSidForCountry($countryCode);
-            if ($addressSid) {
-                $purchaseParams['addressSid'] = $addressSid;
-                Log::info('Twilio Purchase Number: Using address SID ' . $addressSid . ' for country ' . $countryCode);
+            // Add bundle SID for countries that require it (like UK)
+            $bundleSid = $this->getBundleSidForCountry($countryCode);
+            if ($bundleSid) {
+                $purchaseParams['bundleSid'] = $bundleSid;
+                Log::info('Twilio Purchase Number: Using bundle SID ' . $bundleSid . ' for country ' . $countryCode);
+            } else {
+                // Add address SID for countries that require it (but not bundle)
+                $addressSid = $this->getAddressSidForCountry($countryCode);
+                if ($addressSid) {
+                    $purchaseParams['addressSid'] = $addressSid;
+                    Log::info('Twilio Purchase Number: Using address SID ' . $addressSid . ' for country ' . $countryCode);
+                }
             }
             
             // Purchase the phone number
@@ -199,6 +206,10 @@ class TwilioService
                     $errorMessage = 'Phone number is no longer available. Please select a different number.';
                 } elseif (str_contains($errorMessage, 'already owned')) {
                     $errorMessage = 'Phone number is already owned by another account. Please select a different number.';
+                } elseif (str_contains($errorMessage, 'Bundle required')) {
+                    $errorMessage = 'Bundle verification required for UK phone numbers. Please create a Bundle in Twilio Console and add the Bundle SID to your environment variables. Bundle SIDs start with "BU" and are different from Address SIDs.';
+                } elseif (str_contains($errorMessage, 'AddressSid')) {
+                    $errorMessage = 'Address verification required for this country. Please contact support to set up address verification in your Twilio account.';
                 }
             }
             
@@ -487,5 +498,49 @@ class TwilioService
         }
         
         return null;
+    }
+
+    /**
+     * Get bundle SID for country if required
+     */
+    private function getBundleSidForCountry($countryCode)
+    {
+        $bundleSids = config('services.twilio.bundle_sids', []);
+        
+        // Countries that require bundle verification
+        $countriesRequiringBundle = ['GB'];
+        
+        if (in_array($countryCode, $countriesRequiringBundle) && isset($bundleSids[$countryCode])) {
+            $bundleSid = $bundleSids[$countryCode];
+            Log::info('Twilio Bundle SID Lookup: Found bundle SID ' . $bundleSid . ' for country ' . $countryCode);
+            
+            // Validate the bundle SID with Twilio
+            if ($this->validateBundleSid($bundleSid)) {
+                return $bundleSid;
+            } else {
+                Log::error('Twilio Bundle SID Validation: Invalid bundle SID ' . $bundleSid . ' for country ' . $countryCode);
+                return null;
+            }
+        }
+        
+        Log::info('Twilio Bundle SID Lookup: No bundle SID found for country ' . $countryCode);
+        return null;
+    }
+
+
+
+    /**
+     * Validate bundle SID with Twilio
+     */
+    private function validateBundleSid($bundleSid)
+    {
+        try {
+            $bundle = $this->client->numbers->v2->regulatoryCompliance->bundles($bundleSid)->fetch();
+            Log::info('Twilio Bundle Validation: Bundle ' . $bundleSid . ' is valid - Status: ' . $bundle->status);
+            return $bundle->status === 'APPROVED';
+        } catch (TwilioException $e) {
+            Log::error('Twilio Bundle Validation Error: ' . $e->getMessage() . ' for bundle SID ' . $bundleSid);
+            return false;
+        }
     }
 } 
