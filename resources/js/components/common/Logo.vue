@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="ml-2">
-                      <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'SulusAI' }}</h1>
+                      <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'sulus.ai' }}</h1>
     </div>
   </div>
 </template>
@@ -24,7 +24,7 @@ export default {
   data() {
     return {
       settings: {
-        site_title: 'XpartFone',
+        site_title: 'sulus.ai',
         logo_url: '/logo.png'
       }
     }

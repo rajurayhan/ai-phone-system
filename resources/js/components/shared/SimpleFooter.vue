@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <p class="text-sm text-gray-500">
-          &copy; {{ new Date().getFullYear() }} {{ settings.company_name || 'XpartFone' }}. All rights reserved.
+          &copy; {{ new Date().getFullYear() }} {{ settings.company_name || 'sulus.ai' }}. All rights reserved.
         </p>
         <div class="mt-4 md:mt-0 flex space-x-6">
           <router-link to="/terms" class="text-sm text-gray-500 hover:text-gray-700">Terms of Service</router-link>
@@ -22,7 +22,7 @@ export default {
   name: 'SimpleFooter',
   setup() {
     const settings = ref({
-      company_name: 'XpartFone'
+      company_name: 'sulus.ai'
     })
 
     const loadSettings = async () => {

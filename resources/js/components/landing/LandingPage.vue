@@ -14,7 +14,7 @@
               </svg>
             </div>
             <div class="ml-2">
-              <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
+              <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'sulusIA' }}</h1>
             </div>
           </div>
           <nav class="hidden md:flex space-x-8">
@@ -55,7 +55,7 @@
               <div class="sm:text-center lg:text-left">
                 <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl"> 
                   <span class="block xl:inline">Never Miss a call Again </span>
-                  <span class="block text-primary-600 xl:inline"> {{ settings.company_name || 'XpartFone' }} answers 24x7!</span> 
+                  <span class="block text-primary-600 xl:inline"> {{ settings.company_name || 'sulusIA' }} answers 24x7!</span> 
                 </h1>
                 <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
                   {{ 'Transform your business with cutting-edge voice AI technology. Create intelligent voice agents that understand, respond, and engage with your customers 24/7.' }}
@@ -93,7 +93,7 @@
           <div class="lg:text-center">
             <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">Features</h2>
             <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Everything you need for {{ settings.company_name || 'XpartFone' }}
+              Everything you need for {{ settings.company_name || 'sulusIA' }}
             </p>
             <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
               Our platform provides all the tools you need to create, deploy, and manage intelligent voice agents.
@@ -365,7 +365,7 @@
             <span class="block">Transform your business today.</span>
           </h2>
           <p class="mt-4 text-lg leading-6 text-primary-200">
-            Join thousands of businesses already using our {{ settings.company_name || 'XpartFone' }} platform.
+            Join thousands of businesses already using our {{ settings.company_name || 'sulusIA' }} platform.
           </p>
           <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <router-link v-if="!isAuthenticated" to="/register" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50">
@@ -452,12 +452,12 @@ export default {
         console.error('Error loading settings:', error)
         // Set default values if API fails
         settings.value = {
-          site_title: 'XpartFone',
-          site_tagline: 'Never Miss a call Again XpartFone answers 24x7!',
+          site_title: 'sulusIA',
+          site_tagline: 'Never Miss a call Again sulusIA answers 24x7!',
           logo_url: '/logo.png',
           homepage_banner: null,
           company_phone: '(682) 582 8396',
-          company_email: 'support@xpartfone.com'
+          company_email: 'support@sulusIA.com'
         }
       }
     }
@@ -521,8 +521,8 @@ export default {
       loadFeatures()
       loadSettings()
       // Set document title as "title - tagline"
-      const title = settings.value.site_title || 'XpartFone'
-      const tagline = settings.value.site_tagline || 'Never Miss a call Again XpartFone answers 24x7!'
+      const title = settings.value.site_title || 'sulusIA'
+      const tagline = settings.value.site_tagline || 'Never Miss a call Again sulusIA answers 24x7!'
       updateDocumentTitle(`${title} - ${tagline}`)
       
       // Close mobile menu when clicking outside
@@ -546,7 +546,7 @@ export default {
       contactFormError,
       submitContactForm,
       contactPhone: computed(() => settings.value.company_phone || '(682) 582 8396'),
-      contactEmail: computed(() => settings.value.company_email || 'xpartfone@gmail.com'),
+      contactEmail: computed(() => settings.value.company_email || 'sulusIA@gmail.com'),
       handleLogoError,
       handleLogoLoad,
       handleBannerError,

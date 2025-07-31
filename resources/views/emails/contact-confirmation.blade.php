@@ -3,7 +3,7 @@
 @section('content')
     <h2>Thank You for Contacting Us! 📧</h2>
     
-    <p>Hello <strong>{{ $contact->first_name }}</strong>, thank you for reaching out to SulusAI. We've received your message and will get back to you as soon as possible.</p>
+    <p>Hello <strong>{{ $contact->first_name }}</strong>, thank you for reaching out to sulus.ai. We've received your message and will get back to you as soon as possible.</p>
     
     <div class="card success-card">
         <h3 style="color: #2d3748; margin-bottom: 15px;">✅ Message Received</h3>
@@ -82,7 +82,7 @@
     </div>
     
     <p style="margin-top: 30px; color: #4a5568;">
-        Thank you for choosing SulusAI! We're excited to help you with your voice AI needs.
+        Thank you for choosing sulus.ai! We're excited to help you with your voice AI needs.
     </p>
     
     <p style="margin-top: 20px; font-size: 14px; color: #6c757d;">

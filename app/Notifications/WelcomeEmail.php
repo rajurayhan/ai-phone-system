@@ -40,11 +40,11 @@ class WelcomeEmail extends Notification
         $verificationUrl = config('app.url') . '/api/verify-email/' . $hash . '?t=' . $timestamp;
 
         return (new MailMessage)
-            ->subject('Welcome to SulusAI! 🎉')
+            ->subject('Welcome to sulus.ai! 🎉')
             ->view('emails.welcome', [
                 'user' => $notifiable,
                 'verificationUrl' => $verificationUrl,
-                'headerTitle' => 'Welcome to SulusAI!',
+                'headerTitle' => 'Welcome to sulus.ai!',
                 'headerSubtitle' => 'Your Voice AI Platform',
             ]);
     }

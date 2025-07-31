@@ -141,10 +141,10 @@ export default {
   data() {
     return {
       settings: {
-        site_title: 'XpartFone',
+        site_title: 'sulus.ai',
         logo_url: '/logo.png'
       },
-      contactEmail: 'support@xpartfone.com'
+      contactEmail: 'support@sulus.ai'
     }
   },
   computed: {
@@ -161,17 +161,17 @@ export default {
     try {
       const settings = await getSystemSettings()
       this.settings = settings
-      this.contactEmail = settings.company_email || 'support@xpartfone.com'
+      this.contactEmail = settings.company_email || 'support@sulus.ai.com'
       // Update document title
-      document.title = `${this.errorCode} - ${this.errorTitle} | ${this.settings.site_title || 'SulusAI'}`
+      document.title = `${this.errorCode} - ${this.errorTitle} | ${this.settings.site_title || 'sulus.ai'}`
     } catch (error) {
       // Set default values if API fails
       this.settings = {
-        site_title: 'XpartFone',
+        site_title: 'sulus.ai',
         logo_url: '/logo.png'
       }
-      this.contactEmail = 'support@xpartfone.com'
-      document.title = `${this.errorCode} - ${this.errorTitle} | XpartFone`
+      this.contactEmail = 'support@sulus.ai.com'
+      document.title = `${this.errorCode} - ${this.errorTitle} | sulus.ai`
     }
   }
 }

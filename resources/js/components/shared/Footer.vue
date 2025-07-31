@@ -13,7 +13,7 @@
               </svg>
             </div>
             <div class="ml-2">
-              <h3 class="text-xl font-bold text-white">{{ settings.site_title || 'XpartFone' }}</h3>
+              <h3 class="text-xl font-bold text-white">{{ settings.site_title || 'sulus.ai' }}</h3>
             </div>
           </div>
           <p class="text-gray-300 text-sm">
@@ -44,7 +44,7 @@
       <div class="mt-8 border-t border-gray-700 pt-6">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <p class="text-sm text-gray-400">
-            &copy; {{ new Date().getFullYear() }} {{ settings.company_name || 'XpartFone' }}. All rights reserved.
+            &copy; {{ new Date().getFullYear() }} {{ settings.company_name || 'sulus.ai' }}. All rights reserved.
           </p>
           <div class="mt-4 md:mt-0 flex space-x-6">
             <a href="/terms" class="text-sm text-gray-400 hover:text-white">Terms of Service</a>
@@ -64,8 +64,8 @@ export default {
   name: 'Footer',
   setup() {
     const settings = ref({
-      site_title: 'XpartFone',
-      company_name: 'XpartFone',
+      site_title: 'sulus.ai',
+      company_name: 'sulus.ai',
       logo_url: null
     })
 
@@ -76,8 +76,8 @@ export default {
       } catch (error) {
         // Set default values if API fails
         settings.value = {
-          site_title: 'XpartFone',
-          company_name: 'XpartFone',
+          site_title: 'sulus.ai',
+          company_name: 'sulus.ai',
           logo_url: null
         }
       }

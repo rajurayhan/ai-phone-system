@@ -88,7 +88,7 @@
     </p>
     
     <p style="margin-top: 20px; font-size: 14px; color: #6c757d;">
-        <strong>Thank you for choosing SulusAI!</strong> We're excited to see what amazing voice assistants you'll create.
+        <strong>Thank you for choosing sulus.ai!</strong> We're excited to see what amazing voice assistants you'll create.
     </p>
     
     <p style="margin-top: 20px; font-size: 12px; color: #6c757d;">

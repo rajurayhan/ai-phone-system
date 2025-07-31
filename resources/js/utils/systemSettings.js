@@ -36,14 +36,14 @@ export const getSystemSettings = async () => {
  */
 const getDefaultSettings = () => {
   return {
-    site_title: 'XpartFone',
-    site_tagline: 'Never Miss a call Again XpartFone answers 24x7!',
+    site_title: 'sulus.ai',
+    site_tagline: 'Never Miss a call Again sulus.ai answers 24x7!',
     meta_description: 'Transform your business with cutting-edge voice AI technology',
     logo_url: '/logo.png',
     homepage_banner: null,
     company_phone: '(682) 582 8396',
-    company_email: 'support@xpartfone.com',
-    company_name: 'XpartFone'
+    company_email: 'support@sulus.ai',
+    company_name: 'sulus.ai'
   }
 }
 
@@ -69,10 +69,10 @@ export const getSetting = async (key, defaultValue = '') => {
 export const updateDocumentTitle = async (pageTitle = '') => {
   try {
     const settings = await getSystemSettings()
-    const siteTitle = settings.site_title || 'XpartFone'
+    const siteTitle = settings.site_title || 'sulus.ai'
     
     if (pageTitle) {
-      // If pageTitle already contains the site title (like "XpartFone - Tagline"), use it as is
+      // If pageTitle already contains the site title (like "sulus.ai - Tagline"), use it as is
       if (pageTitle.includes(siteTitle)) {
         document.title = pageTitle
       } else {
@@ -88,7 +88,7 @@ export const updateDocumentTitle = async (pageTitle = '') => {
     if (pageTitle) {
       document.title = pageTitle
     } else {
-      document.title = 'XpartFone'
+      document.title = 'sulus.ai'
     }
   }
 } 

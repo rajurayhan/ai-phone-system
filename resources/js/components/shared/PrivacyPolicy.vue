@@ -150,16 +150,16 @@ import { updateDocumentTitle, getSystemSettings } from '../../utils/systemSettin
 export default {
   name: 'PrivacyPolicy',
   setup() {
-    const contactEmail = ref('privacy@xpartfone.com')
+    const contactEmail = ref('privacy@sulus.ai')
     const contactPhone = ref('(682) 582 8396')
-    const companyName = ref('XpartFone')
+    const companyName = ref('sulus.ai')
 
     const loadContactInfo = async () => {
       try {
         const settings = await getSystemSettings()
-        contactEmail.value = settings.company_email || 'privacy@xpartfone.com'
+        contactEmail.value = settings.company_email || 'privacy@sulus.ai'
         contactPhone.value = settings.company_phone || '(682) 582 8396'
-        companyName.value = settings.company_name || 'XpartFone'
+        companyName.value = settings.company_name || 'sulus.ai'
       } catch (error) {
         console.error('Error loading contact info:', error)
       }

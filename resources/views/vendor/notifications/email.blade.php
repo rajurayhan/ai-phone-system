@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'SulusAI') }}</title>
+    <title>{{ config('app.name', 'sulus.ai') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -324,7 +324,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                     </svg>
                 </div>
-                <h1>SulusAI</h1>
+                <h1>sulus.ai</h1>
                 <p>Your AI-Powered Voice Assistant Platform</p>
             </div>
         </div>
@@ -362,8 +362,8 @@
         
         <div class="footer">
             <div class="footer-content">
-                <p>© {{ date('Y') }} {{ \App\Models\SystemSetting::getValue('company_name', 'XpartFone') }}. All rights reserved.</p>
-                <p>This email was sent to you because you registered for a {{ \App\Models\SystemSetting::getValue('company_name', 'XpartFone') }} account.</p>
+                <p>© {{ date('Y') }} {{ \App\Models\SystemSetting::getValue('company_name', 'sulus.ai') }}. All rights reserved.</p>
+                <p>This email was sent to you because you registered for a {{ \App\Models\SystemSetting::getValue('company_name', 'sulus.ai') }} account.</p>
                 
                 <div class="footer-links">
                     <a href="{{ config('app.url') }}">Visit Website</a>

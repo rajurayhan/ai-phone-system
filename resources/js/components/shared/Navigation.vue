@@ -15,7 +15,7 @@
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'XpartFone' }}</h1>
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'sulus.ai' }}</h1>
                 </div>
               </router-link>
             </div>
@@ -466,7 +466,7 @@ export default {
       mobileMenuOpen: false,
       user: JSON.parse(localStorage.getItem('user') || '{}'),
       settings: {
-        site_title: 'XpartFone',
+        site_title: 'sulus.ai',
         logo_url: '/logo.png'
       }
     }

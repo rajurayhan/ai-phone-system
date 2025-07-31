@@ -15,7 +15,7 @@
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'SulusAI' }}</h1>
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'sulus.ai' }}</h1>
                 </div>
               </div>
             </div>
@@ -134,7 +134,7 @@ export default {
       error: '',
       emailSent: false,
       settings: {
-        site_title: 'XpartFone',
+        site_title: 'sulus.ai',
         logo_url: '/logo.png'
       }
     }
@@ -147,7 +147,7 @@ export default {
     } catch (error) {
       // Set default values if API fails
       this.settings = {
-        site_title: 'XpartFone',
+        site_title: 'sulus.ai',
         logo_url: '/logo.png'
       }
     }

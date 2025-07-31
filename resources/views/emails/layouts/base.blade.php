@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $subject ?? 'SulusAI' }}</title>
+    <title>{{ $subject ?? 'sulus.ai' }}</title>
     <style>
         /* Reset and base styles */
         * {
@@ -299,7 +299,7 @@
         <div class="header">
             <div class="logo">
                 <span class="logo-icon"></span>
-                SulusAI
+                sulus.ai
             </div>
             <h1>{{ $headerTitle ?? 'Welcome' }}</h1>
             <p>{{ $headerSubtitle ?? 'Your Voice AI Platform' }}</p>
@@ -325,10 +325,10 @@
                 <a href="#" title="Email">📧</a>
             </div>
             
-            <p><strong>SulusAI Team</strong></p>
+            <p><strong>sulus.ai Team</strong></p>
             <p>This is an automated email. Please do not reply to this message.</p>
-            <p>For support, contact us at <a href="mailto:{{ \App\Models\SystemSetting::getValue('company_email', 'support@xpartfone.com') }}">{{ \App\Models\SystemSetting::getValue('company_email', 'support@xpartfone.com') }}</a></p>
-            <p>&copy; {{ date('Y') }} {{ \App\Models\SystemSetting::getValue('company_name', 'XpartFone') }}. All rights reserved.</p>
+            <p>For support, contact us at <a href="mailto:{{ \App\Models\SystemSetting::getValue('company_email', 'support@sulus.ai.com') }}">{{ \App\Models\SystemSetting::getValue('company_email', 'support@sulus.ai.com') }}</a></p>
+            <p>&copy; {{ date('Y') }} {{ \App\Models\SystemSetting::getValue('company_name', 'sulus.ai') }}. All rights reserved.</p>
         </div>
     </div>
 </body>

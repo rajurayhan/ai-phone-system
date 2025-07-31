@@ -16,7 +16,7 @@
                   </svg>
                 </div>
                 <div class="ml-2">
-                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'SulusAI' }}</h1>
+                  <h1 class="text-xl font-bold text-gray-900">{{ settings.site_title || 'sulus.ai' }}</h1>
                 </div>
               </router-link>
             </div>
@@ -46,7 +46,7 @@
         <div class="text-center mb-8">
           <h1 class="text-3xl font-bold text-gray-900 mb-4">Request a Demo</h1>
           <p class="text-lg text-gray-600">
-            Experience the power of our {{ settings.company_name || 'XpartFone' }} platform firsthand.
+            Experience the power of our {{ settings.company_name || 'sulus.ai' }} platform firsthand.
             Our team will schedule a personalized demo tailored to your business needs.
           </p>
         </div>
@@ -299,7 +299,7 @@
                       placeholder="Describe your services or products"
                     ></textarea>
                     <p class="text-xs text-gray-500 mt-1">
-                      Tell us about your business and how you think {{ settings.company_name || 'XpartFone' }} could help
+                      Tell us about your business and how you think {{ settings.company_name || 'sulus.ai' }} could help
                     </p>
                   </div>
                 </div>
@@ -366,7 +366,7 @@
               </div>
               <div class="ml-4">
                 <h4 class="text-sm font-medium text-gray-900">Live Demo</h4>
-                <p class="text-sm text-gray-600 mt-1">See our {{ settings.company_name || 'XpartFone' }} platform in action with real examples</p>
+                <p class="text-sm text-gray-600 mt-1">See our {{ settings.company_name || 'sulus.ai' }} platform in action with real examples</p>
               </div>
             </div>
             <div class="flex items-start">
@@ -412,7 +412,7 @@ export default {
     const hasRequestedDemo = ref(false)
     const existingRequest = ref(null)
     const settings = ref({
-                site_title: 'XpartFone',
+                site_title: 'sulus.ai',
       logo_url: null
     })
     
@@ -428,7 +428,7 @@ export default {
       } catch (error) {
         // Set default values if API fails
         settings.value = {
-          site_title: 'XpartFone',
+          site_title: 'sulus.ai',
           logo_url: '/logo.png'
         }
       }
