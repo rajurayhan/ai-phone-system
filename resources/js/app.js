@@ -283,9 +283,9 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to) => {
     // Map route names to page titles
     const pageTitles = {
-        'landing': '',
-        'login': 'Login',
-        'register': 'Register',
+        'landing': 'Home',
+        'login': 'Sign In',
+        'register': 'Sign Up',
         'forgot-password': 'Forgot Password',
         'reset-password': 'Reset Password',
         'dashboard': 'Dashboard',

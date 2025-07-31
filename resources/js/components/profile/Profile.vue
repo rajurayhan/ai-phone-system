@@ -17,6 +17,45 @@
           </div>
         </div>
 
+        <!-- Profile Update Messages -->
+        <div v-if="profileMessage.show" class="mt-6">
+          <div :class="[
+            'rounded-md p-4',
+            profileMessage.type === 'success' 
+              ? 'bg-green-50 border border-green-200' 
+              : 'bg-red-50 border border-red-200'
+          ]">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg v-if="profileMessage.type === 'success'" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <svg v-else class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p :class="[
+                  'text-sm font-medium',
+                  profileMessage.type === 'success' ? 'text-green-800' : 'text-red-800'
+                ]">
+                  {{ profileMessage.text }}
+                </p>
+              </div>
+              <div class="ml-auto pl-3">
+                <div class="-mx-1.5 -my-1.5">
+                  <button @click="profileMessage.show = false" class="inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2" :class="profileMessage.type === 'success' ? 'bg-green-50 text-green-500 hover:bg-green-100 focus:ring-green-600' : 'bg-red-50 text-red-500 hover:bg-red-100 focus:ring-red-600'">
+                    <span class="sr-only">Dismiss</span>
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="mt-8">
           <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
@@ -65,8 +104,15 @@
                       v-model="form.name"
                       type="text"
                       required
-                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      @input="clearProfileErrors"
+                      :class="[
+                        'mt-1 block w-full rounded-md shadow-sm sm:text-sm',
+                        profileErrors.name 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                      ]"
                     />
+                    <p v-if="profileErrors.name" class="mt-1 text-sm text-red-600">{{ profileErrors.name }}</p>
                   </div>
 
                   <div>
@@ -88,8 +134,15 @@
                       id="phone"
                       v-model="form.phone"
                       type="tel"
-                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      @input="clearProfileErrors"
+                      :class="[
+                        'mt-1 block w-full rounded-md shadow-sm sm:text-sm',
+                        profileErrors.phone 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                      ]"
                     />
+                    <p v-if="profileErrors.phone" class="mt-1 text-sm text-red-600">{{ profileErrors.phone }}</p>
                   </div>
 
                   <div>
@@ -98,8 +151,15 @@
                       id="company"
                       v-model="form.company"
                       type="text"
-                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      @input="clearProfileErrors"
+                      :class="[
+                        'mt-1 block w-full rounded-md shadow-sm sm:text-sm',
+                        profileErrors.company 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                      ]"
                     />
+                    <p v-if="profileErrors.company" class="mt-1 text-sm text-red-600">{{ profileErrors.company }}</p>
                   </div>
 
                   <div>
@@ -108,9 +168,16 @@
                       id="bio"
                       v-model="form.bio"
                       rows="3"
-                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      @input="clearProfileErrors"
+                      :class="[
+                        'mt-1 block w-full rounded-md shadow-sm sm:text-sm',
+                        profileErrors.bio 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                      ]"
                       placeholder="Tell us about yourself..."
                     ></textarea>
+                    <p v-if="profileErrors.bio" class="mt-1 text-sm text-red-600">{{ profileErrors.bio }}</p>
                   </div>
                 </div>
 
@@ -132,6 +199,45 @@
             </div>
           </div>
 
+          <!-- Password Change Messages -->
+          <div v-if="passwordMessage.show" class="mt-6">
+            <div :class="[
+              'rounded-md p-4',
+              passwordMessage.type === 'success' 
+                ? 'bg-green-50 border border-green-200' 
+                : 'bg-red-50 border border-red-200'
+            ]">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg v-if="passwordMessage.type === 'success'" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg v-else class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p :class="[
+                    'text-sm font-medium',
+                    passwordMessage.type === 'success' ? 'text-green-800' : 'text-red-800'
+                  ]">
+                    {{ passwordMessage.text }}
+                  </p>
+                </div>
+                <div class="ml-auto pl-3">
+                  <div class="-mx-1.5 -my-1.5">
+                    <button @click="passwordMessage.show = false" class="inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2" :class="passwordMessage.type === 'success' ? 'bg-green-50 text-green-500 hover:bg-green-100 focus:ring-green-600' : 'bg-red-50 text-red-500 hover:bg-red-100 focus:ring-red-600'">
+                      <span class="sr-only">Dismiss</span>
+                      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Change Password Section -->
           <div class="mt-8 bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
@@ -145,8 +251,15 @@
                       v-model="passwordForm.current_password"
                       type="password"
                       required
-                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      @input="clearPasswordErrors"
+                      :class="[
+                        'mt-1 block w-full rounded-md shadow-sm sm:text-sm',
+                        passwordErrors.current_password 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                      ]"
                     />
+                    <p v-if="passwordErrors.current_password" class="mt-1 text-sm text-red-600">{{ passwordErrors.current_password }}</p>
                   </div>
 
                   <div>
@@ -156,8 +269,15 @@
                       v-model="passwordForm.new_password"
                       type="password"
                       required
-                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      @input="clearPasswordErrors"
+                      :class="[
+                        'mt-1 block w-full rounded-md shadow-sm sm:text-sm',
+                        passwordErrors.new_password 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                      ]"
                     />
+                    <p v-if="passwordErrors.new_password" class="mt-1 text-sm text-red-600">{{ passwordErrors.new_password }}</p>
                   </div>
 
                   <div>
@@ -167,8 +287,15 @@
                       v-model="passwordForm.new_password_confirmation"
                       type="password"
                       required
-                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      @input="clearPasswordErrors"
+                      :class="[
+                        'mt-1 block w-full rounded-md shadow-sm sm:text-sm',
+                        passwordErrors.new_password_confirmation 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                      ]"
                     />
+                    <p v-if="passwordErrors.new_password_confirmation" class="mt-1 text-sm text-red-600">{{ passwordErrors.new_password_confirmation }}</p>
                   </div>
                 </div>
 
@@ -201,6 +328,7 @@
 import Navigation from '../shared/Navigation.vue'
 import SimpleFooter from '../shared/SimpleFooter.vue'
 import { updateDocumentTitle } from '../../utils/systemSettings.js'
+import axios from 'axios'
 
 export default {
   name: 'Profile',
@@ -225,7 +353,24 @@ export default {
       },
       loading: false,
       passwordLoading: false,
-      selectedProfilePicture: null
+      selectedProfilePicture: null,
+      // Success and error messages
+      profileMessage: {
+        type: '', // 'success' or 'error'
+        text: '',
+        show: false
+      },
+      passwordMessage: {
+        type: '', // 'success' or 'error'
+        text: '',
+        show: false
+      },
+      // Field validation errors
+      profileErrors: {},
+      passwordErrors: {},
+      // Form validation
+      profileValid: true,
+      passwordValid: true
     }
   },
   computed: {
@@ -239,6 +384,107 @@ export default {
     await updateDocumentTitle('Profile');
   },
   methods: {
+    // Message handling methods
+    showProfileMessage(type, text) {
+      this.profileMessage = {
+        type,
+        text,
+        show: true
+      };
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        this.profileMessage.show = false;
+      }, 5000);
+    },
+
+    showPasswordMessage(type, text) {
+      this.passwordMessage = {
+        type,
+        text,
+        show: true
+      };
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        this.passwordMessage.show = false;
+      }, 5000);
+    },
+
+    clearMessages() {
+      this.profileMessage.show = false;
+      this.passwordMessage.show = false;
+      this.profileErrors = {};
+      this.passwordErrors = {};
+    },
+
+    clearProfileErrors() {
+      this.profileErrors = {};
+    },
+
+    clearPasswordErrors() {
+      this.passwordErrors = {};
+    },
+
+    // Validation methods
+    validateProfileForm() {
+      this.profileErrors = {};
+      this.profileValid = true;
+
+      if (!this.form.name.trim()) {
+        this.profileErrors.name = 'Name is required';
+        this.profileValid = false;
+      }
+
+      if (this.form.name.length > 255) {
+        this.profileErrors.name = 'Name must be less than 255 characters';
+        this.profileValid = false;
+      }
+
+      if (this.form.phone && this.form.phone.length > 20) {
+        this.profileErrors.phone = 'Phone number must be less than 20 characters';
+        this.profileValid = false;
+      }
+
+      if (this.form.company && this.form.company.length > 255) {
+        this.profileErrors.company = 'Company name must be less than 255 characters';
+        this.profileValid = false;
+      }
+
+      if (this.form.bio && this.form.bio.length > 1000) {
+        this.profileErrors.bio = 'Bio must be less than 1000 characters';
+        this.profileValid = false;
+      }
+
+      return this.profileValid;
+    },
+
+    validatePasswordForm() {
+      this.passwordErrors = {};
+      this.passwordValid = true;
+
+      if (!this.passwordForm.current_password) {
+        this.passwordErrors.current_password = 'Current password is required';
+        this.passwordValid = false;
+      }
+
+      if (!this.passwordForm.new_password) {
+        this.passwordErrors.new_password = 'New password is required';
+        this.passwordValid = false;
+      } else if (this.passwordForm.new_password.length < 8) {
+        this.passwordErrors.new_password = 'New password must be at least 8 characters';
+        this.passwordValid = false;
+      }
+
+      if (!this.passwordForm.new_password_confirmation) {
+        this.passwordErrors.new_password_confirmation = 'Password confirmation is required';
+        this.passwordValid = false;
+      } else if (this.passwordForm.new_password !== this.passwordForm.new_password_confirmation) {
+        this.passwordErrors.new_password_confirmation = 'Passwords do not match';
+        this.passwordValid = false;
+      }
+
+      return this.passwordValid;
+    },
+
     async loadUser() {
       try {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -252,45 +498,74 @@ export default {
         };
       } catch (error) {
         console.error('Error loading user:', error);
+        this.showProfileMessage('error', 'Failed to load user profile');
       }
     },
     
     async updateProfile() {
+      // Clear previous messages
+      this.clearMessages();
+      
+      // Validate form
+      if (!this.validateProfileForm()) {
+        this.showProfileMessage('error', 'Please fix the errors in the form');
+        return;
+      }
+
       this.loading = true;
       try {
         const formData = new FormData();
         formData.append('name', this.form.name);
         formData.append('phone', this.form.phone || '');
         formData.append('company', this.form.company || '');
+        formData.append('bio', this.form.bio || '');
         
         if (this.selectedProfilePicture) {
           formData.append('profile_picture', this.selectedProfilePicture);
         }
 
-        const response = await fetch('/api/profile/update', {
-          method: 'POST',
+        const response = await axios.post('/api/user', formData, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: formData
+            'Content-Type': 'multipart/form-data',
+          }
         });
 
-        if (response.ok) {
-          const data = await response.json();
+        if (response.data.success) {
           // Update user in localStorage
           const user = JSON.parse(localStorage.getItem('user') || '{}');
-          const updatedUser = { ...user, ...data.data };
+          const updatedUser = { ...user, ...response.data.data };
           localStorage.setItem('user', JSON.stringify(updatedUser));
           
           this.user = updatedUser;
+          this.selectedProfilePicture = null; // Reset file input
+          
+          // Show success message
+          this.showProfileMessage('success', 'Profile updated successfully!');
           this.$toast.success('Profile updated successfully');
         } else {
-          const error = await response.json();
-          this.$toast.error(error.message || 'Failed to update profile');
+          const errorMessage = response.data.message || 'Failed to update profile';
+          this.showProfileMessage('error', errorMessage);
+          this.$toast.error(errorMessage);
         }
       } catch (error) {
         console.error('Error updating profile:', error);
-        this.$toast.error('An error occurred while updating profile');
+        let errorMessage = 'An error occurred while updating profile';
+        
+        if (error.response && error.response.data) {
+          if (error.response.data.errors) {
+            // Handle validation errors from backend
+            const errors = error.response.data.errors;
+            Object.keys(errors).forEach(field => {
+              this.profileErrors[field] = errors[field][0];
+            });
+            errorMessage = 'Please fix the errors in the form';
+          } else {
+            errorMessage = error.response.data.message || errorMessage;
+          }
+        }
+        
+        this.showProfileMessage('error', errorMessage);
+        this.$toast.error(errorMessage);
       } finally {
         this.loading = false;
       }
@@ -304,31 +579,54 @@ export default {
     },
     
     async changePassword() {
+      // Clear previous messages
+      this.clearMessages();
+      
+      // Validate form
+      if (!this.validatePasswordForm()) {
+        this.showPasswordMessage('error', 'Please fix the errors in the form');
+        return;
+      }
+
       this.passwordLoading = true;
       try {
-        const response = await fetch('/api/profile/change-password', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(this.passwordForm)
-        });
+        const response = await axios.put('/api/user/password', this.passwordForm);
 
-        if (response.ok) {
+        if (response.data.success) {
+          // Show success message
+          this.showPasswordMessage('success', 'Password changed successfully!');
           this.$toast.success('Password changed successfully');
+          
+          // Reset form
           this.passwordForm = {
             current_password: '',
             new_password: '',
             new_password_confirmation: ''
           };
         } else {
-          const error = await response.json();
-          this.$toast.error(error.message || 'Failed to change password');
+          const errorMessage = response.data.message || 'Failed to change password';
+          this.showPasswordMessage('error', errorMessage);
+          this.$toast.error(errorMessage);
         }
       } catch (error) {
         console.error('Error changing password:', error);
-        this.$toast.error('An error occurred while changing password');
+        let errorMessage = 'An error occurred while changing password';
+        
+        if (error.response && error.response.data) {
+          if (error.response.data.errors) {
+            // Handle validation errors from backend
+            const errors = error.response.data.errors;
+            Object.keys(errors).forEach(field => {
+              this.passwordErrors[field] = errors[field][0];
+            });
+            errorMessage = 'Please fix the errors in the form';
+          } else {
+            errorMessage = error.response.data.message || errorMessage;
+          }
+        }
+        
+        this.showPasswordMessage('error', errorMessage);
+        this.$toast.error(errorMessage);
       } finally {
         this.passwordLoading = false;
       }
