@@ -129,9 +129,8 @@
             If you have any questions about this Privacy Policy or our data practices, please contact us:
           </p>
           <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="mb-2"><strong>Email:</strong> privacy@xpartfone.com</p>
-            <p><strong>Phone:</strong> (682) 582 8396
-            </p>
+            <p class="mb-2"><strong>Email:</strong> {{ contactEmail }}</p>
+            <p><strong>Phone:</strong> {{ contactPhone }}</p>
           </div>
         </div>
       </div>
@@ -140,12 +139,34 @@
 </template>
 
 <script>
-import { updateDocumentTitle } from '../../utils/systemSettings.js'
+import { ref, onMounted } from 'vue'
+import { updateDocumentTitle, getSystemSettings } from '../../utils/systemSettings.js'
 
 export default {
   name: 'PrivacyPolicy',
-  async created() {
-    await updateDocumentTitle('Privacy Policy')
+  setup() {
+    const contactEmail = ref('privacy@xpartfone.com')
+    const contactPhone = ref('(682) 582 8396')
+
+    const loadContactInfo = async () => {
+      try {
+        const settings = await getSystemSettings()
+        contactEmail.value = settings.company_email || 'privacy@xpartfone.com'
+        contactPhone.value = settings.company_phone || '(682) 582 8396'
+      } catch (error) {
+        console.error('Error loading contact info:', error)
+      }
+    }
+
+    onMounted(async () => {
+      await updateDocumentTitle('Privacy Policy')
+      await loadContactInfo()
+    })
+
+    return {
+      contactEmail,
+      contactPhone
+    }
   }
 }
 </script>

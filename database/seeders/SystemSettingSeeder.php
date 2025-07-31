@@ -31,6 +31,22 @@ class SystemSettingSeeder extends Seeder
                 'description' => 'A short description or tagline for your site'
             ],
             [
+                'key' => 'company_phone',
+                'value' => '(682) 582 8396',
+                'type' => 'text',
+                'group' => 'contact',
+                'label' => 'Company Phone',
+                'description' => 'Primary contact phone number for the company'
+            ],
+            [
+                'key' => 'company_email',
+                'value' => 'support@xpartfone.com',
+                'type' => 'text',
+                'group' => 'contact',
+                'label' => 'Company Email',
+                'description' => 'Primary contact email address for the company'
+            ],
+            [
                 'key' => 'meta_description',
                 'value' => 'Transform your business with cutting-edge voice AI technology. Create intelligent voice agents that understand, respond, and engage with your customers 24/7.',
                 'type' => 'textarea',

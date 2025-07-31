@@ -49,6 +49,34 @@
                 </div>
               </div>
 
+              <!-- Contact Settings -->
+              <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Contact Information</h3>
+              </div>
+              <div class="px-6 py-4 space-y-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Company Phone</label>
+                  <input
+                    v-model="settings.company_phone"
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    placeholder="Enter company phone number"
+                  />
+                  <p class="mt-1 text-sm text-gray-500">Primary contact phone number for the company</p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Company Email</label>
+                  <input
+                    v-model="settings.company_email"
+                    type="email"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    placeholder="Enter company email address"
+                  />
+                  <p class="mt-1 text-sm text-gray-500">Primary contact email address for the company</p>
+                </div>
+              </div>
+
               <!-- SEO Settings -->
               <div class="px-6 py-4 border-b border-gray-200">
                 <h3 class="text-lg font-medium text-gray-900">SEO Settings</h3>
@@ -163,7 +191,9 @@ export default {
       site_tagline: '',
       meta_description: '',
       logo_url: '',
-      homepage_banner: ''
+      homepage_banner: '',
+      company_phone: '',
+      company_email: ''
     })
     const selectedLogoFile = ref(null)
     const selectedBannerFile = ref(null)

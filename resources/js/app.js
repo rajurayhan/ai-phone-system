@@ -39,7 +39,7 @@ import PrivacyPolicy from './components/shared/PrivacyPolicy.vue'
 import NotFound from './components/shared/NotFound.vue'
 
 // Set initial document title
-updateDocumentTitle('SulusAI - Never Miss a call Again SulusAI answers 24x7!')
+updateDocumentTitle('XpartFone - Never Miss a call Again XpartFone answers 24x7!')
 
 // Create a conditional dashboard component
 const ConditionalDashboard = {

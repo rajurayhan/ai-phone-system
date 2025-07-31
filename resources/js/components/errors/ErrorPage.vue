@@ -99,7 +99,7 @@
             </p>
             <div class="flex space-x-3">
               <a 
-                href="mailto:support@SulusAI.com" 
+                :href="`mailto:${contactEmail}`" 
                 class="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,7 +143,8 @@ export default {
       settings: {
         site_title: 'SulusAI',
         logo_url: '/logo.png'
-      }
+      },
+      contactEmail: 'support@xpartfone.com'
     }
   },
   computed: {
@@ -160,6 +161,7 @@ export default {
     try {
       const settings = await getSystemSettings()
       this.settings = settings
+      this.contactEmail = settings.company_email || 'support@xpartfone.com'
       // Update document title
       document.title = `${this.errorCode} - ${this.errorTitle} | ${this.settings.site_title || 'SulusAI'}`
     } catch (error) {
@@ -168,6 +170,7 @@ export default {
         site_title: 'SulusAI',
         logo_url: '/logo.png'
       }
+      this.contactEmail = 'support@xpartfone.com'
       document.title = `${this.errorCode} - ${this.errorTitle} | SulusAI`
     }
   }

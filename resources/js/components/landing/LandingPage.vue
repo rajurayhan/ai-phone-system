@@ -289,7 +289,7 @@
                 </div>
                 <div class="ml-4">
                   <p class="text-sm font-medium text-gray-900">Phone</p>
-                  <a href="tel:+16825828396" class="text-lg text-primary-600 hover:text-primary-700 font-medium">(682) 582 8396</a>
+                  <a :href="`tel:${contactPhone}`" class="text-lg text-primary-600 hover:text-primary-700 font-medium">{{ contactPhone }}</a>
                 </div>
               </div>
               
@@ -301,7 +301,7 @@
                 </div>
                 <div class="ml-4">
                   <p class="text-sm font-medium text-gray-900">Email</p>
-                  <a href="mailto:SulusAI@gmail.com" class="text-lg text-primary-600 hover:text-primary-700 font-medium">SulusAI@gmail.com</a>
+                  <a :href="`mailto:${contactEmail}`" class="text-lg text-primary-600 hover:text-primary-700 font-medium">{{ contactEmail }}</a>
                 </div>
               </div>
               
@@ -579,7 +579,9 @@ export default {
           site_title: 'SulusAI',
           site_tagline: 'Never Miss a call Again SulusAI answers 24x7!',
           logo_url: '/logo.png',
-          homepage_banner: null
+          homepage_banner: null,
+          company_phone: '(682) 582 8396',
+          company_email: 'support@xpartfone.com'
         }
       }
     }
@@ -648,7 +650,9 @@ export default {
       contactFormSubmitting,
       contactFormSuccess,
       contactFormError,
-      submitContactForm
+      submitContactForm,
+      contactPhone: computed(() => settings.value.company_phone),
+      contactEmail: computed(() => settings.value.company_email)
     }
   }
 }

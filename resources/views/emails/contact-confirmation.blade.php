@@ -60,11 +60,11 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
             <div style="background: #f0fff4; padding: 15px; border-radius: 8px; border: 2px solid #48bb78;">
                 <h4 style="color: #2d3748; margin-bottom: 10px;">📧 Email</h4>
-                <p style="color: #4a5568;">SulusAI@gmail.com</p>
+                <p style="color: #4a5568;">{{ \App\Models\SystemSetting::getValue('company_email', 'support@xpartfone.com') }}</p>
             </div>
             <div style="background: #fffaf0; padding: 15px; border-radius: 8px; border: 2px solid #ed8936;">
                 <h4 style="color: #2d3748; margin-bottom: 10px;">📞 Phone</h4>
-                <p style="color: #4a5568;">(682) 582 8396</p>
+                <p style="color: #4a5568;">{{ \App\Models\SystemSetting::getValue('company_phone', '(682) 582 8396') }}</p>
             </div>
         </div>
         <p style="color: #6c757d; font-size: 14px; margin-top: 15px;">
