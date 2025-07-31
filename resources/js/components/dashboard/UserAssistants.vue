@@ -80,23 +80,46 @@
 
         <!-- Search and Sort Controls -->
         <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <!-- Search -->
-          <div class="flex-1 max-w-sm">
-            <label for="search" class="sr-only">Search assistants</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+          <!-- Search Controls -->
+          <div class="flex-1 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <!-- Assistant Name Search -->
+            <div class="flex-1 max-w-sm">
+              <label for="search" class="sr-only">Search assistants</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input
+                  id="search"
+                  v-model="searchQuery"
+                  @input="debounceSearch"
+                  type="text"
+                  placeholder="Search assistants by name..."
+                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                />
               </div>
-              <input
-                id="search"
-                v-model="searchQuery"
-                @input="debounceSearch"
-                type="text"
-                placeholder="Search assistants by name..."
-                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
-              />
+            </div>
+
+            <!-- Phone Number Search -->
+            <div class="flex-1 max-w-sm">
+              <label for="phoneSearch" class="sr-only">Search by phone number</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </div>
+                <input
+                  id="phoneSearch"
+                  v-model="phoneSearchQuery"
+                  @input="debouncePhoneSearch"
+                  type="text"
+                  placeholder="Search by phone number..."
+                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                />
+              </div>
             </div>
           </div>
 
@@ -257,11 +280,11 @@
               <div>
                 <p class="text-sm text-gray-700">
                   Showing 
-                  <span class="font-medium">{{ startIndex + 1 }}</span>
+                  <span class="font-medium">{{ pagination.from }}</span>
                   to 
-                  <span class="font-medium">{{ endIndex }}</span>
+                  <span class="font-medium">{{ pagination.to }}</span>
                   of 
-                  <span class="font-medium">{{ assistants.length }}</span>
+                  <span class="font-medium">{{ pagination.total }}</span>
                   results
                 </p>
               </div>
@@ -392,25 +415,35 @@ export default {
       selectedAssistant: null,
       stats: null,
       searchQuery: '',
+      phoneSearchQuery: '',
       sortBy: 'name',
       sortOrder: 'asc',
       searchTimeout: null,
+      phoneSearchTimeout: null,
       deletingAssistant: null, // New state for tracking deletion
-      subscriptionInfo: null // New state for subscription info
+      subscriptionInfo: null, // New state for subscription info
+      pagination: {
+        current_page: 1,
+        last_page: 1,
+        per_page: 9,
+        total: 0,
+        from: 0,
+        to: 0
+      }
     }
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.assistants.length / this.itemsPerPage);
+      return this.pagination.last_page;
     },
     startIndex() {
-      return (this.currentPage - 1) * this.itemsPerPage;
+      return this.pagination.from - 1;
     },
     endIndex() {
-      return Math.min(this.startIndex + this.itemsPerPage, this.assistants.length);
+      return this.pagination.to;
     },
     paginatedAssistants() {
-      return this.assistants.slice(this.startIndex, this.endIndex);
+      return this.assistants;
     },
     visiblePages() {
       const pages = [];
@@ -463,11 +496,22 @@ export default {
         const params = {
           sort_by: this.sortBy,
           sort_order: this.sortOrder,
-          search: this.searchQuery
+          search: this.searchQuery,
+          phone_search: this.phoneSearchQuery,
+          page: this.currentPage,
+          per_page: this.itemsPerPage
         };
 
         const response = await axios.get('/api/assistants', { params });
         this.assistants = response.data.data || [];
+        this.pagination = response.data.pagination || {
+          current_page: 1,
+          last_page: 1,
+          per_page: 9,
+          total: 0,
+          from: 0,
+          to: 0
+        };
       } catch (error) {
         if (error.response && error.response.status === 401) {
           this.$router.push('/login');
@@ -555,6 +599,14 @@ export default {
       clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(() => {
         this.currentPage = 1; // Reset to first page when search changes
+        this.loadAssistants();
+      }, 500);
+    },
+
+    debouncePhoneSearch() {
+      clearTimeout(this.phoneSearchTimeout);
+      this.phoneSearchTimeout = setTimeout(() => {
+        this.currentPage = 1; // Reset to first page when phone search changes
         this.loadAssistants();
       }, 500);
     },

@@ -129,7 +129,11 @@ export default {
   methods: {
     async loadAssistants() {
       try {
-        const response = await axios.get('/api/assistants')
+        const response = await axios.get('/api/assistants', {
+          params: {
+            per_page: 100 // Load more for dropdown selection
+          }
+        })
         this.assistants = response.data.data || []
       } catch (error) {
         // Handle error silently

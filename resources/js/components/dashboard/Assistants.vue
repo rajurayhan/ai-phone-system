@@ -160,7 +160,11 @@ export default {
       try {
         loading.value = true
         error.value = null
-        const response = await axios.get('/api/assistants')
+        const response = await axios.get('/api/assistants', {
+          params: {
+            per_page: 100 // Load more for this component since it's a simple list
+          }
+        })
         assistants.value = response.data.data || []
       } catch (err) {
         error.value = 'Failed to load assistants. Please try again.'

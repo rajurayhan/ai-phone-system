@@ -42,6 +42,12 @@ class AssistantController extends Controller
             $query->where('name', 'like', "%{$search}%");
         }
         
+        // Search by phone number
+        if ($request->has('phone_search') && !empty($request->phone_search)) {
+            $phoneSearch = $request->phone_search;
+            $query->where('phone_number', 'like', "%{$phoneSearch}%");
+        }
+        
         // Sort by name (default) or other fields
         $sortBy = $request->get('sort_by', 'name');
         $sortOrder = $request->get('sort_order', 'asc');
@@ -52,12 +58,24 @@ class AssistantController extends Controller
             $query->orderBy('name', 'asc'); // Default fallback
         }
         
-        $assistants = $query->get();
+        // Pagination
+        $perPage = $request->get('per_page', 9);
+        $page = $request->get('page', 1);
+        
+        $assistants = $query->paginate($perPage, ['*'], 'page', $page);
 
-        // Return basic database data without Vapi details for list view
+        // Return paginated data
         return response()->json([
             'success' => true,
-            'data' => $assistants
+            'data' => $assistants->items(),
+            'pagination' => [
+                'current_page' => $assistants->currentPage(),
+                'last_page' => $assistants->lastPage(),
+                'per_page' => $assistants->perPage(),
+                'total' => $assistants->total(),
+                'from' => $assistants->firstItem(),
+                'to' => $assistants->lastItem(),
+            ]
         ]);
     }
 
@@ -83,6 +101,12 @@ class AssistantController extends Controller
             });
         }
         
+        // Search by phone number
+        if ($request->filled('phone_search')) {
+            $phoneSearch = $request->phone_search;
+            $query->where('phone_number', 'like', "%{$phoneSearch}%");
+        }
+        
         // Sort by name (default) or other fields
         $sortBy = $request->get('sort_by', 'name');
         $sortOrder = $request->get('sort_order', 'asc');
@@ -93,11 +117,23 @@ class AssistantController extends Controller
             $query->orderBy('name', 'asc'); // Default fallback
         }
         
-        $assistants = $query->get();
+        // Pagination
+        $perPage = $request->get('per_page', 9);
+        $page = $request->get('page', 1);
+        
+        $assistants = $query->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             'success' => true,
-            'data' => $assistants
+            'data' => $assistants->items(),
+            'pagination' => [
+                'current_page' => $assistants->currentPage(),
+                'last_page' => $assistants->lastPage(),
+                'per_page' => $assistants->perPage(),
+                'total' => $assistants->total(),
+                'from' => $assistants->firstItem(),
+                'to' => $assistants->lastItem(),
+            ]
         ]);
     }
 
