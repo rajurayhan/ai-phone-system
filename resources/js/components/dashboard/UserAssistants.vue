@@ -582,17 +582,20 @@ export default {
     previousPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
+        this.loadAssistants();
       }
     },
     
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
+        this.loadAssistants();
       }
     },
     
     goToPage(page) {
       this.currentPage = page;
+      this.loadAssistants();
     },
 
     debounceSearch() {
