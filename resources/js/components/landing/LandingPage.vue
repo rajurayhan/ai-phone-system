@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-white flex flex-col">
     <!-- Header -->
-    <header class="bg-white shadow-sm">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-6">
           <div class="flex items-center">
@@ -34,6 +34,17 @@
         </div>
       </div>
     </header>
+
+    <!-- Mobile menu -->
+    <div v-if="mobileMenuOpen" class="md:hidden">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-b border-gray-200">
+        <a href="#features" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Features</a>
+        <a href="#pricing" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Pricing</a>
+        <a href="#contact" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Contact</a>
+        <router-link v-if="!isAuthenticated" to="/login" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Login</router-link>
+        <router-link v-else to="/dashboard" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Dashboard</router-link>
+      </div>
+    </div>
 
     <div class="flex-1">
       <!-- Hero Section -->
