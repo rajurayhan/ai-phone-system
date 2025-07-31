@@ -151,7 +151,7 @@ class AssistantController extends Controller
             'metadata' => 'array',
             'metadata.company_name' => 'string|max:255',
             'metadata.industry' => 'string|max:255',
-            'metadata.country' => 'required|string|in:United States,Canada,Australia',
+            'metadata.country' => 'required|string|in:United States,Canada,Australia,United Kingdom',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
             'metadata.assistant_phone_number' => 'nullable|string|max:20|regex:/^\+[1-9]\d{1,14}$/',
@@ -210,7 +210,8 @@ class AssistantController extends Controller
                 $countryCodeMap = [
                     'United States' => 'US',
                     'Canada' => 'CA',
-                    'Australia' => 'AU'
+                    'Australia' => 'AU',
+                    'United Kingdom' => 'GB'
                 ];
                 $countryCode = $countryCodeMap[$request->input('metadata.country')] ?? null;
             }
@@ -348,7 +349,7 @@ class AssistantController extends Controller
             'metadata' => 'array',
             'metadata.company_name' => 'string|max:255',
             'metadata.industry' => 'string|max:255',
-            'metadata.country' => 'required|string|in:United States,Canada,Australia',
+            'metadata.country' => 'required|string|in:United States,Canada,Australia,United Kingdom',
             'metadata.services_products' => 'string|max:1000',
             'metadata.sms_phone_number' => 'string|max:20',
             'metadata.assistant_phone_number' => 'nullable|string|max:20|regex:/^\+[1-9]\d{1,14}$/',

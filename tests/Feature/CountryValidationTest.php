@@ -15,7 +15,7 @@ class CountryValidationTest extends TestCase
         $user = User::factory()->create();
 
         // Test with supported countries (should pass)
-        $supportedCountries = ['United States', 'Canada', 'Australia'];
+        $supportedCountries = ['United States', 'Canada', 'Australia', 'United Kingdom'];
         
         foreach ($supportedCountries as $country) {
             $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country=' . urlencode($country));
@@ -23,7 +23,7 @@ class CountryValidationTest extends TestCase
         }
 
         // Test with unsupported country (should fail)
-        $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country=United Kingdom');
+        $response = $this->actingAs($user)->getJson('/api/twilio/available-numbers?country=Germany');
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['country']);
     }
@@ -32,7 +32,7 @@ class CountryValidationTest extends TestCase
     {
         // Test that the validation rules allow supported countries
         $rules = [
-            'metadata.country' => 'required|string|in:United States,Canada,Australia'
+            'metadata.country' => 'required|string|in:United States,Canada,Australia,United Kingdom'
         ];
         
         // This test verifies that our validation rules are correctly set
