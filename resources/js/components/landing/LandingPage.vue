@@ -441,7 +441,6 @@ export default {
     const loadSettings = async () => {
       try {
         const response = await axios.get('/api/public-settings')
-        console.log('Settings loaded:', response.data.data)
         
         // The API returns flat data structure, not grouped
         if (response.data.data && typeof response.data.data === 'object') {
@@ -449,10 +448,6 @@ export default {
         } else {
           settings.value = response.data.data
         }
-        
-        console.log('Processed settings:', settings.value)
-        console.log('Logo URL:', settings.value.logo_url)
-        console.log('Banner URL:', settings.value.homepage_banner)
       } catch (error) {
         console.error('Error loading settings:', error)
         // Set default values if API fails
@@ -551,7 +546,7 @@ export default {
       contactFormError,
       submitContactForm,
       contactPhone: computed(() => settings.value.company_phone || '(682) 582 8396'),
-      contactEmail: computed(() => settings.value.company_email || 'support@xpartfone.com'),
+      contactEmail: computed(() => settings.value.company_email || 'xpartfone@gmail.com'),
       handleLogoError,
       handleLogoLoad,
       handleBannerError,

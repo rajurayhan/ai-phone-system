@@ -98,6 +98,8 @@ class SystemSettingController extends Controller
             'meta_description' => SystemSetting::getValue('meta_description', 'Transform your business with cutting-edge voice AI technology'),
             'logo_url' => SystemSetting::getValue('logo_url'),
             'homepage_banner' => SystemSetting::getValue('homepage_banner'),
+            'company_phone' => SystemSetting::getValue('company_phone', '(682) 582 8396'),
+            'company_email' => SystemSetting::getValue('company_email', 'support@xpartfone.com'),
         ];
 
         return response()->json([
