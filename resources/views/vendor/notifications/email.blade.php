@@ -362,8 +362,8 @@
         
         <div class="footer">
             <div class="footer-content">
-                <p>© {{ date('Y') }} SulusAI. All rights reserved.</p>
-                <p>This email was sent to you because you registered for a SulusAI account.</p>
+                <p>© {{ date('Y') }} {{ \App\Models\SystemSetting::getValue('company_name', 'XpartFone') }}. All rights reserved.</p>
+                <p>This email was sent to you because you registered for a {{ \App\Models\SystemSetting::getValue('company_name', 'XpartFone') }} account.</p>
                 
                 <div class="footer-links">
                     <a href="{{ config('app.url') }}">Visit Website</a>

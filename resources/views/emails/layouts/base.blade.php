@@ -328,7 +328,7 @@
             <p><strong>SulusAI Team</strong></p>
             <p>This is an automated email. Please do not reply to this message.</p>
             <p>For support, contact us at <a href="mailto:{{ \App\Models\SystemSetting::getValue('company_email', 'support@xpartfone.com') }}">{{ \App\Models\SystemSetting::getValue('company_email', 'support@xpartfone.com') }}</a></p>
-            <p>&copy; {{ date('Y') }} SulusAI. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} {{ \App\Models\SystemSetting::getValue('company_name', 'XpartFone') }}. All rights reserved.</p>
         </div>
     </div>
 </body>
