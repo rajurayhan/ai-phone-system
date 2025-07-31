@@ -129,20 +129,20 @@
     </div>
 
     <!-- Footer -->
-    <Footer />
+    <SimpleFooter />
   </div>
 </template>
 
 <script>
 import Navigation from '../shared/Navigation.vue'
-import Footer from '../shared/Footer.vue'
+import SimpleFooter from '../shared/SimpleFooter.vue'
 import { updateDocumentTitle } from '../../utils/systemSettings.js'
 
 export default {
   name: 'AdminDashboard',
   components: {
     Navigation,
-    Footer
+    SimpleFooter
   },
   data() {
     return {

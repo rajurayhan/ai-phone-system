@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Simple Navigation for Demo Request Page -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex">
@@ -40,7 +40,7 @@
       </div>
     </nav>
 
-    <div class="py-12">
+    <div class="flex-1 py-12">
       <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="text-center mb-8">
@@ -386,6 +386,9 @@
         </div>
       </div>
     </div>
+    
+    <!-- Footer -->
+    <SimpleFooter />
   </div>
 </template>
 
@@ -395,9 +398,13 @@ import { useRouter } from 'vue-router'
 import { showSuccess, showError } from '../../utils/sweetalert.js'
 import axios from 'axios'
 import { updateDocumentTitle } from '../../utils/systemSettings.js'
+import SimpleFooter from '../shared/SimpleFooter.vue'
 
 export default {
   name: 'DemoRequestForm',
+  components: {
+    SimpleFooter
+  },
   setup() {
     const router = useRouter()
     const loading = ref(false)

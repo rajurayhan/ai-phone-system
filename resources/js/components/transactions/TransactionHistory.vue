@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Navigation -->
     <Navigation />
 
-    <div class="py-6">
+    <div class="flex-1 py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="md:flex md:items-center md:justify-between">
@@ -257,17 +257,22 @@
         </div>
       </div>
     </div>
+    
+    <!-- Footer -->
+    <SimpleFooter />
   </div>
 </template>
 
 <script>
 import Navigation from '../shared/Navigation.vue'
+import SimpleFooter from '../shared/SimpleFooter.vue'
 import axios from 'axios'
 
 export default {
   name: 'TransactionHistory',
   components: {
-    Navigation
+    Navigation,
+    SimpleFooter
   },
   data() {
     return {

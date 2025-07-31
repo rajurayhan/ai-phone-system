@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Header -->
     <div class="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -85,7 +85,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
@@ -623,6 +623,9 @@
         </div>
       </div>
     </div>
+    
+    <!-- Footer -->
+    <SimpleFooter />
   </div>
 </template>
 
@@ -631,9 +634,13 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { showError, showSuccess } from '../../utils/sweetalert.js'
+import SimpleFooter from '../shared/SimpleFooter.vue'
 
 export default {
   name: 'AssistantForm',
+  components: {
+    SimpleFooter
+  },
   setup() {
     const route = useRoute()
     const router = useRouter()

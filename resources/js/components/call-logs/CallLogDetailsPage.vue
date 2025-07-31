@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Navigation -->
     <Navigation />
 
-    <div class="py-6">
+    <div class="flex-1 py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-8">
@@ -219,19 +219,24 @@
         </div>
       </div>
     </div>
+    
+    <!-- Footer -->
+    <SimpleFooter />
   </div>
 </template>
 
 <script>
 import Navigation from '../shared/Navigation.vue'
 import AudioPlayer from '../shared/AudioPlayer.vue'
+import SimpleFooter from '../shared/SimpleFooter.vue'
 import axios from 'axios'
 
 export default {
   name: 'CallLogDetailsPage',
   components: {
     Navigation,
-    AudioPlayer
+    AudioPlayer,
+    SimpleFooter
   },
   data() {
     return {

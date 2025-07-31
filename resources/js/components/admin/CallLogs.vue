@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Navigation -->
     <Navigation />
 
-    <div class="py-6">
+    <div class="flex-1 py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-8">
@@ -65,11 +65,15 @@
         </div>
       </div>
     </div>
+    
+    <!-- Footer -->
+    <SimpleFooter />
   </div>
 </template>
 
 <script>
 import Navigation from '../shared/Navigation.vue'
+import SimpleFooter from '../shared/SimpleFooter.vue'
 import AdminCallLogsList from './AdminCallLogsList.vue'
 import AdminCallLogsStats from './AdminCallLogsStats.vue'
 import axios from 'axios'
@@ -79,7 +83,8 @@ export default {
   components: {
     Navigation,
     AdminCallLogsList,
-    AdminCallLogsStats
+    AdminCallLogsStats,
+    SimpleFooter
   },
   data() {
     return {
